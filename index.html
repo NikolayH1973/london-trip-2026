@@ -218,6 +218,7 @@ nav.tabs a span { max-width: 100%; }
 .st-more summary { cursor: pointer; font-size: .85rem; font-weight: 600; color: var(--tube); min-height: 32px; display: flex; align-items: center; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
+.photo-tip { font-size: .95rem; padding: 10px 12px; border-radius: 10px; background: var(--bg); border-left: 4px solid var(--tube); }
 .place-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .88rem; color: var(--muted); }
 .pill.cat-xmas { background: #e8f3ec; color: #17693a; }
 .pill.cat-view { background: #e6eefc; color: #1d4fa8; }
@@ -546,32 +547,32 @@ const TOUR = {
      direct — сколько остановок по Piccadilly без пересадок (null = с пересадкой). */
   places: [
     /* program — дата дня программы, когда группа там будет. free — вход бесплатный. */
-    { cat: "sight", name: "Биг-Бен и здание Парламента", route: [["Piccadilly",5,"Green Park"],["Jubilee",1,"Westminster","на восток"]], q: "Big Ben London", program: "2026-12-03", free: true,
+    { cat: "sight", name: "Биг-Бен и здание Парламента", photo: "Классический кадр — с южного берега Темзы у Вестминстерского моста: Парламент и Биг-Бен целиком над рекой. Лучшее время — синий час, примерно 16:00–16:30: небо ещё синее, а подсветка уже горит.", route: [["Piccadilly",5,"Green Park"],["Jubilee",1,"Westminster","на восток"]], q: "Big Ben London", program: "2026-12-03", free: true,
       station: "Westminster", direct: null, hours: "снаружи — всегда",
       text: "Главный символ Лондона. Лучшие фото — с Вестминстерского моста или с противоположного берега Темзы, особенно вечером, когда включается подсветка." },
-    { cat: "sight", name: "Вестминстерское аббатство", route: [["Piccadilly",5,"Green Park"],["Jubilee",1,"Westminster","на восток"],["walk",5]], q: "Westminster Abbey", program: "2026-12-04",
+    { cat: "sight", name: "Вестминстерское аббатство", photo: "Западный фасад с двумя башнями снимайте с площади Broad Sanctuary, отойдя подальше, чтобы башни вошли целиком. Красный двухэтажный автобус в кадре — бонус.", route: [["Piccadilly",5,"Green Park"],["Jubilee",1,"Westminster","на восток"],["walk",5]], q: "Westminster Abbey", program: "2026-12-04",
       station: "Westminster", direct: null, hours: "вход платный, по программе — за доплату",
       text: "Здесь коронуют британских монархов, здесь похоронены Ньютон и Дарвин. Снаружи смотреть бесплатно, внутрь — по билету." },
-    { cat: "sight", name: "Букингемский дворец", q: "Buckingham Palace", program: "2026-12-04", free: true,
+    { cat: "sight", name: "Букингемский дворец", photo: "Самый живописный вид — с синего мостика над озером в Сент-Джеймсском парке: в одну сторону дворец, в другую — крыши Уайтхолла. Зимним утром над водой бывает лёгкий туман.", q: "Buckingham Palace", program: "2026-12-04", free: true,
       station: "Green Park", direct: 5, hours: "снаружи — всегда",
       text: "Резиденция короля. Зимой смена караула проходит не каждый день, точное расписание лучше уточнить у гида накануне." },
-    { cat: "sight", name: "Трафальгарская площадь", route: [["Piccadilly",3,"Leicester Square"],["walk",5]], q: "Trafalgar Square London", program: "2026-12-03", free: true,
+    { cat: "sight", name: "Трафальгарская площадь", photo: "Поднимитесь на террасу перед Национальной галереей: площадь, ёлка, колонна Нельсона и уходящий к Биг-Бену Уайтхолл — в одном кадре.", route: [["Piccadilly",3,"Leicester Square"],["walk",5]], q: "Trafalgar Square London", program: "2026-12-03", free: true,
       station: "Charing Cross", direct: null, hours: "всегда",
       text: "Колонна Нельсона, львы и Национальная галерея. В декабре здесь стоит главная ёлка города. От Leicester Square 5 минут пешком." },
-    { cat: "sight", name: "Тауэрский мост", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",6,"Tower Hill","в сторону Aldgate"],["walk",10]], q: "Tower Bridge London", program: "2026-12-06", free: true,
+    { cat: "sight", name: "Тауэрский мост", photo: "Мост целиком — из парка Potters Fields на южном берегу, лучше всего с подсветкой в синий час. Другой ракурс — с набережной у Тауэра на северном берегу.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",6,"Tower Hill","в сторону Aldgate"],["walk",10]], q: "Tower Bridge London", program: "2026-12-06", free: true,
       station: "Tower Hill", direct: null, hours: "по мосту — всегда бесплатно",
       text: "Тот самый разводной мост. Перейти по нему можно бесплатно, а верхняя галерея со стеклянным полом платная." },
-    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"]], q: "St Paul's Cathedral London", free: true,
+    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", photo: "Встаньте на южной половине моста Миллениум лицом к собору: линии моста ведут взгляд прямо к куполу. Для купола крупным планом — бесплатная крыша One New Change рядом.", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"]], q: "St Paul's Cathedral London", free: true,
       station: "St. Paul's", direct: null, hours: "собор — по билету, мост — всегда",
       text: "Огромный купол Рена. Внутрь собора вход платный, но красивее всего пройти от него по пешеходному мосту Миллениум через Темзу прямо к галерее Тейт Модерн." },
-    { cat: "sight", name: "Пикадилли-серкус", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
+    { cat: "sight", name: "Пикадилли-серкус", photo: "Светящиеся экраны и рядом Риджент-стрит с рождественскими гирляндами над улицей. Поднимите телефон чуть выше голов прохожих — гирлянды уйдут в перспективу.", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
       station: "Piccadilly Circus", direct: 4, hours: "всегда",
       text: "Лондонский «Таймс-сквер» со светящимися экранами. Отсюда начинается Риджент-стрит с рождественской иллюминацией над улицей." },
-    { cat: "sight", name: "Вокзал King's Cross", q: "King's Cross Station London", free: true,
+    { cat: "sight", name: "Вокзал King's Cross", photo: "Загляните в соседний вокзал Сент-Панкрас: огромный арочный свод, статуя «Место встречи», а под Рождество — большая ёлка.", q: "King's Cross Station London", free: true,
       station: "King's Cross St. Pancras", direct: 1, hours: "всегда",
       text: "Одна остановка от отеля. Внутри — знаменитая тележка «Платформа 9¾» из «Гарри Поттера», а рядом — роскошный викторианский вокзал Сент-Панкрас." },
 
-    { cat: "museum", name: "Британский музей", q: "British Museum London", program: "2026-12-07", free: true,
+    { cat: "museum", name: "Британский музей", photo: "Большой двор под сетчатой стеклянной крышей: снимайте снизу вверх, чтобы узор крыши заполнил кадр.", q: "British Museum London", program: "2026-12-07", free: true,
       station: "Russell Square", direct: 0, hours: "ежедневно 10–17, в пятницу до 20:30",
       text: "Три минуты пешком от отеля. Розеттский камень, мумии Египта, мраморы Парфенона. Вход бесплатный, но бесплатный билет на время лучше взять на сайте заранее. С сентября 2026 здесь показывают гобелен из Байё — на него нужен отдельный билет на время." },
     { cat: "museum", name: "Национальная галерея", q: "National Gallery London", program: "2026-12-07", free: true, route: [["Piccadilly",3,"Leicester Square"],["walk",5]],
@@ -580,7 +581,7 @@ const TOUR = {
     { cat: "museum", name: "Национальная портретная галерея", q: "National Portrait Gallery London", free: true,
       station: "Leicester Square", direct: 3, hours: "ежедневно",
       text: "Сразу за Национальной галереей. Портреты всех знаменитых британцев — от Генриха VIII до современных звёзд." },
-    { cat: "museum", name: "Музей естествознания", q: "Natural History Museum London", program: "2026-12-07", free: true,
+    { cat: "museum", name: "Музей естествознания", photo: "Главный зал со скелетом синего кита — снимайте сверху, с площадки большой лестницы.", q: "Natural History Museum London", program: "2026-12-07", free: true,
       station: "South Kensington", direct: 8, hours: "ежедневно 10–17:50",
       text: "Скелет синего кита под потолком, зал динозавров, само здание — как собор. Бесплатно, но лучше взять бесплатный билет на время: в будни зимой обычно свободнее." },
     { cat: "museum", name: "Музей Виктории и Альберта (V&A)", q: "Victoria and Albert Museum London", free: true,
@@ -589,14 +590,14 @@ const TOUR = {
     { cat: "museum", name: "Музей науки", q: "Science Museum London", free: true,
       station: "South Kensington", direct: 8, hours: "ежедневно",
       text: "Паровозы, космические капсулы, первые компьютеры. Стоит рядом с двумя предыдущими музеями." },
-    { cat: "museum", name: "Тейт Модерн", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"],["walk",10,"через мост Миллениум"]], q: "Tate Modern London", free: true,
+    { cat: "museum", name: "Тейт Модерн", photo: "Бесплатная терраса Level 10 (здание Blavatnik): Темза, собор Святого Павла, Сити. В пятницу и субботу открыта до 21:00 — можно снять вечерние огни.", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"],["walk",10,"через мост Миллениум"]], q: "Tate Modern London", free: true,
       station: "Blackfriars / Southwark", direct: null, hours: "ежедневно",
       text: "Современное искусство в бывшей электростанции на берегу Темзы. С верхнего этажа бесплатно видно собор Святого Павла." },
     { cat: "museum", name: "Музей сэра Джона Соуна", q: "Sir John Soane's Museum", free: true,
       station: "Holborn", direct: 1, hours: "не каждый день — проверьте на сайте",
       text: "Необычный дом-музей архитектора XIX века: каждая стена увешана картинами и древностями. Маленький, но незабываемый. Одна остановка от отеля." },
 
-    { cat: "xmas", name: "Рождество в Ковент-Гардене", q: "Covent Garden Piazza London",
+    { cat: "xmas", name: "Рождество в Ковент-Гардене", photo: "Ёлка и гирлянды лучше всего смотрятся после 16:00, когда стемнеет. Снимайте под стеклянной крышей рынка — свет мягкий, без резких теней.", q: "Covent Garden Piazza London",
       station: "Covent Garden", direct: 2, hours: "пн–сб 10–21, вс 12–17",
       text: "Огромная ёлка, гирлянды и рождественские лавки в старом крытом рынке. Вечером 5 декабря вы будете здесь с группой." },
     { cat: "xmas", name: "Ярмарка на Лестер-сквер", q: "Leicester Square London",
@@ -605,20 +606,30 @@ const TOUR = {
     { cat: "xmas", name: "Winter Wonderland в Гайд-парке", q: "Hyde Park Winter Wonderland",
       station: "Hyde Park Corner", direct: 6, hours: "10–22", book: true,
       text: "Самая большая рождественская ярмарка Британии: колесо обозрения, каток, аттракционы, баварская пивная. Билет на вход нужно купить заранее на конкретный час. Закладывайте 3–4 часа." },
-    { cat: "xmas", name: "Зимний рынок на Саут-Банк", route: [["Piccadilly",5,"Green Park"],["Jubilee",2,"Waterloo","на восток"],["walk",5]], q: "Southbank Centre Winter Market",
+    { cat: "xmas", name: "Зимний рынок на Саут-Банк", photo: "Поднимитесь на пешеходные мосты Golden Jubilee рядом: оттуда Лондонский глаз и Парламент над рекой — особенно в синий час.", route: [["Piccadilly",5,"Green Park"],["Jubilee",2,"Waterloo","на восток"],["walk",5]], q: "Southbank Centre Winter Market",
       station: "Waterloo / Embankment", direct: null, hours: "каждый день",
       text: "Рынок на набережной Темзы с видом на Лондонский глаз. Красиво вечером, когда горят огни на воде." },
     { cat: "xmas", name: "Рынок на Трафальгарской площади", route: [["Piccadilly",3,"Leicester Square"],["walk",5]], q: "Trafalgar Square London",
       station: "Charing Cross", direct: null, hours: "каждый день",
       text: "Небольшой рынок у главной ёлки Лондона, которую каждый год дарит Норвегия. Пешком 5 минут от Лестер-сквер." },
 
-    { cat: "view", name: "Sky Garden", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",7,"Monument","в сторону Aldgate"],["walk",5]], q: "Sky Garden 1 Sky Garden Walk London",
+    { cat: "view", name: "Sky Garden", photo: "Панорама на Темзу, Тауэрский мост и The Shard сверху. Чтобы не было бликов от стекла, прижмите телефон вплотную к стеклу. В выходные открыто до 21:00.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",7,"Monument","в сторону Aldgate"],["walk",5]], q: "Sky Garden 1 Sky Garden Walk London",
       station: "Monument", direct: null, hours: "пн–пт 10–18, сб–вс 11–21", book: true,
       text: "Бесплатная смотровая площадка с садом на 35-м этаже. Вход только по бесплатным билетам на сайте, при бронировании нужно указать имена. Если билетов нет, можно спросить у входа: иногда пускают без брони." },
-    { cat: "view", name: "Холм Примроуз-Хилл", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",3,"Chalk Farm","поезд на Edgware"],["walk",10]], q: "Primrose Hill London",
+    { cat: "view", name: "Холм Примроуз-Хилл", photo: "Лучшая панорама Лондона с земли, бесплатно. Приходите к закату (около 15:50). Приблизьте зумом — небоскрёбы Сити «сожмутся» в плотную красивую стену.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",3,"Chalk Farm","поезд на Edgware"],["walk",10]], q: "Primrose Hill London",
       station: "Chalk Farm", direct: null, hours: "всегда, бесплатно",
       text: "Тихий холм в парке с панорамой всего центра. Хорошо совместить с Кэмден-маркетом, это рядом." },
-    { cat: "view", name: "The Shard", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"]], q: "The View from The Shard",
+    { cat: "view", name: "Крыша One New Change", q: "One New Change roof terrace London", free: true,
+      route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"],["walk",3]],
+      photo: "Купол собора Святого Павла почти на расстоянии вытянутой руки — такого ракурса больше нигде нет. Красиво и днём, и с вечерней подсветкой.",
+      station: "St. Paul's", direct: null, hours: "ежедневно, бесплатно",
+      text: "Бесплатная терраса на 6-м этаже торгового центра прямо напротив собора Святого Павла. Лифт — внутри центра. Удобно совместить с собором и мостом Миллениум." },
+    { cat: "view", name: "Мосты Golden Jubilee", q: "Golden Jubilee Bridges London", free: true,
+      route: [["Piccadilly",3,"Leicester Square"],["walk",10]],
+      photo: "С моста видны Лондонский глаз, Парламент и Биг-Бен над рекой. Лучше всего — в синий час, примерно 16:00–16:30.",
+      station: "Embankment / Charing Cross", direct: null, hours: "всегда",
+      text: "Пешеходные мосты по обе стороны железнодорожного моста Hungerford. Один из лучших бесплатных видов на Темзу, особенно вечером." },
+    { cat: "view", name: "The Shard", photo: "Сверху видно, как Темза змеёй уходит к горизонту. Билет лучше брать на время незадолго до заката — застанете и день, и огни.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"]], q: "The View from The Shard",
       station: "London Bridge", direct: null, hours: "платно, по билетам",
       text: "Самый высокий небоскрёб Лондона, площадка выше Sky Garden. Платно. Рядом Боро-маркет: сначала поесть, потом наверх." },
 
@@ -638,7 +649,7 @@ const TOUR = {
       station: "Golders Green", direct: null, hours: "пятница — до вечера, в субботу почти всё закрыто", days: [0,1,2,3,4,5],
       text: "Еврейский район с кошерными ресторанами, пекарнями и магазинами. Северная линия метро." },
 
-    { cat: "flea", name: "Портобелло-роуд", route: [["Piccadilly",1,"Holborn"],["Central",7,"Notting Hill Gate","на запад"],["walk",10]], q: "Portobello Road Market London",
+    { cat: "flea", name: "Портобелло-роуд", photo: "Пастельные дома вдоль улицы — классический кадр. Приходите пораньше, пока нет толпы.", route: [["Piccadilly",1,"Holborn"],["Central",7,"Notting Hill Gate","на запад"],["walk",10]], q: "Portobello Road Market London",
       station: "Notting Hill Gate / Ladbroke Grove", direct: null, hours: "сб — главный день; пт — антиквариат и винтаж", days: [5,6],
       text: "Самый знаменитый антикварный рынок мира: в субботу больше 1500 прилавков. Внимание: 5 декабря, суббота, совпадает с поездкой в Виндзор. Придётся выбирать или ехать в пятницу, 4-го, после программы." },
     { cat: "flea", name: "Антикварный рынок Бермондси", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"],["walk",15]], q: "Bermondsey Square Antiques Market",
@@ -647,10 +658,10 @@ const TOUR = {
     { cat: "flea", name: "Олд-Спиталфилдс", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",4,"Liverpool Street","Circle, H&C или Metropolitan"],["walk",5]], q: "Old Spitalfields Market",
       station: "Liverpool Street", direct: null, hours: "каждый день; антиквариат — по четвергам",
       text: "Красивый викторианский крытый рынок: дизайнеры, винтаж, еда. По четвергам большой антикварный рынок, но 3 декабря у вас день прилёта." },
-    { cat: "flea", name: "Цветочный рынок Коламбия-роуд", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Old Street","на юг"],["walk",20]], q: "Columbia Road Flower Market",
+    { cat: "flea", name: "Цветочный рынок Коламбия-роуд", photo: "Цветы в вёдрах на фоне старых витрин — кадр, который хочется повесить на стену. Лучше утром.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Old Street","на юг"],["walk",20]], q: "Columbia Road Flower Market",
       station: "Old Street", direct: null, hours: "только вс, примерно 8–15", days: [0],
       text: "Улица превращается в море цветов, вокруг маленькие винтажные лавки. Рядом Брик-лейн с воскресным рынком. В поездке это 6 декабря, лучше утром." },
-    { cat: "flea", name: "Кэмден-маркет", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Camden Town","на север"],["walk",5]], q: "Camden Market London",
+    { cat: "flea", name: "Кэмден-маркет", photo: "Шлюз Камден-Лок: мостик над каналом, узкие лодки и пёстрые фасады.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Camden Town","на север"],["walk",5]], q: "Camden Market London",
       station: "Camden Town", direct: null, hours: "каждый день",
       text: "Огромный рынок альтернативной моды, винтажа и уличной еды у канала. Можно совместить с Примроуз-Хилл." }
   ],
@@ -785,7 +796,7 @@ function renderProgram() {
   </div>`;
 }
 
-const CATS = { all: "Все", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", flea: "Блошиные рынки" };
+const CATS = { all: "Все", photo: "📷 Для фото", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", flea: "Блошиные рынки" };
 let placeCat = "all";
 
 // Все даты поездки, в которые место открыто (по дням недели)
@@ -863,7 +874,7 @@ function renderPlaces() {
   const inTrip = today >= TOUR.start && today <= TOUR.end;
   const wd = parse(today).getDay();
   const L = TOUR.line;
-  const list = TOUR.places.filter(p => placeCat === "all" || p.cat === placeCat);
+  const list = TOUR.places.filter(p => placeCat === "all" || (placeCat === "photo" ? p.photo : p.cat === placeCat));
 
   $("#v-places").innerHTML = `<div class="stack">
     <article class="card">
@@ -891,6 +902,16 @@ function renderPlaces() {
       ${Object.entries(CATS).map(([k, v]) => `<button type="button" class="chip" data-cat="${k}" aria-pressed="${k === placeCat}">${v}</button>`).join("")}
     </div>
 
+    ${placeCat === "photo" ? `<article class="card now">
+      <h3>📷 Свет в ваши даты (3–9 декабря)</h3>
+      <ul class="items small">
+        <li><span><b>Закат около 15:52</b> — в эти дни самые ранние закаты года.</span></li>
+        <li><span><b>Мягкий «золотой» свет</b> — примерно с 15:00. Солнце низко весь день, тени длинные и красивые.</span></li>
+        <li><span><b>Синий час — примерно 16:00–16:30</b>: небо ещё синее, а подсветка мостов и зданий уже горит. Лучшее время для городских пейзажей.</span></li>
+        <li><span><b>Рассвет около 7:50</b> — утренние кадры без толпы до завтрака.</span></li>
+      </ul>
+      <p class="small muted">Совет: в синий час держите телефон неподвижно (облокотитесь на парапет) — снимок будет чётче.</p>
+    </article>` : ""}
     ${list.map(p => {
       const dates = tripDatesFor(p);
       const openToday = !p.days || p.days.includes(wd);
@@ -903,6 +924,7 @@ function renderPlaces() {
         </div>
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.text)}</p>
+        ${p.photo ? `<p class="photo-tip"><b>📷 Для фото:</b> ${esc(p.photo)}</p>` : ""}
         <div class="place-meta">
           ${p.program ? `<span>📌 <b>По программе: ${wday(p.program)}, ${fmt(p.program)}</b></span>` : ""}
           <span>🚇 ${esc(p.station)}${p.direct === 0 ? ` · <b style="color:var(--tube)">пешком от отеля</b>` : p.direct ? ` · <b style="color:var(--tube)">${p.direct} ост. без пересадок</b>` : ""}</span>
