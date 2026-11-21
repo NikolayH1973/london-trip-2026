@@ -97,6 +97,13 @@ ul.items li.opt::before { background: var(--optional); }
 .preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: .9rem; margin-bottom: 14px; }
 .preview-bar button { background: transparent; border: 1px solid currentColor; border-radius: 999px; padding: 6px 12px; cursor: pointer; color: inherit; }
 
+.day-nav { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; }
+.nav-btn { min-height: 44px; min-width: 44px; padding: 6px 10px; font-size: 1.1rem !important; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: .9rem; cursor: pointer; white-space: nowrap; }
+.nav-btn:disabled { opacity: .35; cursor: default; }
+.day-dots { display: flex; justify-content: center; gap: 4px; min-width: 0; }
+.dot-btn { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: .8rem; font-weight: 600; cursor: pointer; padding: 0; font-variant-numeric: tabular-nums; }
+.dot-btn[aria-current="true"] { background: var(--gold); border-color: var(--gold); color: #fff; }
+.next-card { text-align: left; font: inherit; color: inherit; cursor: pointer; width: 100%; }
 .big-num { font-family: var(--font-display); font-size: 3.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
 
 /* Program */
@@ -538,13 +545,18 @@ function renderToday() {
   const idx = TOUR.days.findIndex(d => d.date === today);
   let html = "";
 
-  if (preview) {
-    html += `<div class="preview-bar"><span>Предпросмотр: ${fmt(preview)}</span><button type="button" id="pv-exit">Вернуться к сегодня</button></div>`;
+  if (preview && preview !== real) {
+    html += `<div class="preview-bar"><span>Просмотр дня: ${fmt(preview)}</span><button type="button" id="pv-exit">К сегодня</button></div>`;
   }
 
   if (idx >= 0) {
-    const d = TOUR.days[idx], next = TOUR.days[idx + 1];
+    const d = TOUR.days[idx], prev = TOUR.days[idx - 1], next = TOUR.days[idx + 1];
     html += `<div class="stack">
+      <nav class="day-nav" aria-label="Переход между днями">
+        <button type="button" class="nav-btn" ${prev ? `data-pv="${prev.date}"` : "disabled"} aria-label="Предыдущий день">←</button>
+        <div class="day-dots">${TOUR.days.map((x, i) => `<button type="button" class="dot-btn" data-pv="${x.date}" aria-label="День ${i + 1}" ${i === idx ? 'aria-current="true"' : ""}>${i + 1}</button>`).join("")}</div>
+        <button type="button" class="nav-btn" ${next ? `data-pv="${next.date}"` : "disabled"} aria-label="Следующий день">→</button>
+      </nav>
       <article class="card now">
         <span class="pill gold">День ${idx + 1} из ${TOUR.days.length} · ${wday(d.date)}, ${fmt(d.date)}</span>
         <h2>${esc(d.title)}</h2>
@@ -555,8 +567,8 @@ function renderToday() {
         ${dayItems(d)}
         ${d.tip ? `<p class="tip">${esc(d.tip)}</p>` : ""}
       </article>
-      ${next ? `<article class="card"><span class="eyebrow">Завтра · ${fmt(next.date)}</span><h3>${esc(next.title)}</h3>
-        <p class="muted small">Сбор: ${next.meeting.time ? esc(next.meeting.time) : "уточнить у гида"}</p></article>` : ""}
+      ${next ? `<button type="button" class="card next-card" data-pv="${next.date}"><span class="eyebrow">${today === real ? "Завтра" : "Следующий день"} · ${fmt(next.date)} →</span><h3>${esc(next.title)}</h3>
+        <p class="muted small">Сбор: ${next.meeting.time ? esc(next.meeting.time) : "уточнить у гида"}</p></button>` : ""}
       <div class="btn-row">
         ${TOUR.guide.phone ? `<a class="btn" href="${waHref(TOUR.guide.phone)}" target="_blank" rel="noopener">Написать гиду</a>` : ""}
         <a class="btn ghost" href="#help">Отель и телефоны</a>
@@ -601,6 +613,7 @@ function renderProgram() {
         <h3>${esc(d.title)}</h3>
         ${dayItems(d)}
         <p class="small muted">Сбор: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.place.startsWith("TODO") ? "уточнить у гида" : esc(d.meeting.place)}</p>
+        <button type="button" class="btn ghost" data-pv-go="${d.date}">Открыть день подробно</button>
       </article>`).join("")}
   </div>`;
 }
@@ -782,6 +795,8 @@ document.addEventListener("click", e => {
   const pv = e.target.closest("[data-pv]");
   if (pv) { preview = pv.dataset.pv; renderToday(); renderProgram(); renderPlaces(); window.scrollTo(0, 0); return; }
   if (e.target.closest("#pv-exit")) { preview = null; renderToday(); renderProgram(); renderPlaces(); return; }
+  const go = e.target.closest("[data-pv-go]");
+  if (go) { preview = go.dataset.pvGo; renderToday(); renderProgram(); renderPlaces(); location.hash = "today"; return; }
   const cat = e.target.closest("[data-cat]");
   if (cat) { placeCat = cat.dataset.cat; renderPlaces(); return; }
   if (e.target.closest("#taxi-open")) { $("#taxi").classList.add("open"); $("#taxi-close").focus(); return; }
@@ -797,6 +812,23 @@ document.addEventListener("change", e => {
   renderToday();
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#taxi").classList.remove("open"); });
+
+/* Свайп влево/вправо на экране «Сегодня» листает дни */
+(() => {
+  let x0 = null, y0 = null;
+  const v = $("#v-today");
+  v.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  v.addEventListener("touchend", e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > 40) return; // это не свайп, а прокрутка
+    const cur = TOUR.days.findIndex(d => d.date === (preview || londonToday()));
+    if (cur < 0) return;
+    const target = TOUR.days[cur + (dx < 0 ? 1 : -1)];
+    if (target) { preview = target.date; renderToday(); renderProgram(); renderPlaces(); }
+  });
+})();
 
 $("#taxi-name").textContent = TOUR.hotel.name;
 $("#taxi-addr").textContent = TOUR.hotel.address;
