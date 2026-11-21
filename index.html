@@ -120,6 +120,8 @@ ul.items li.opt::before { background: var(--optional); }
 .next-card { text-align: left; font: inherit; color: inherit; cursor: pointer; width: 100%; }
 .offline-bar { margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; background: var(--gold-soft); border: 1px solid var(--gold); font-size: .9rem; }
 .offline-bar[hidden] { display: none; }
+details.card summary { cursor: pointer; min-height: 32px; }
+details.card[open] summary { margin-bottom: 6px; }
 .install-steps { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
 .phrase .en { font-size: 1.2rem; font-weight: 700; line-height: 1.35; }
 .phrase .tr { color: var(--tube); font-size: 1rem; }
@@ -897,6 +899,46 @@ function showBig(a, b, c, d) {
   $("#taxi").classList.add("open"); $("#taxi-close").focus();
 }
 
+/* ===== Установка на экран: iPhone и Android ===== */
+const IS_ANDROID = /Android/i.test(navigator.userAgent);
+let installOS = IS_ANDROID ? "android" : "iphone"; // по умолчанию — платформа этого телефона
+let installPrompt = null; // событие Chrome «можно установить», сохраняем для кнопки
+
+// Chrome на Android сообщает, что сайт можно установить как приложение
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();          // не показываем стандартную плашку Chrome
+  installPrompt = e;           // покажем свою кнопку «Установить»
+  renderTools();
+});
+window.addEventListener("appinstalled", () => { installPrompt = null; renderTools(); });
+
+function installHtml() {
+  const tab = (id, label) => `<button type="button" class="chip" data-os="${id}" aria-pressed="${installOS === id}">${label}</button>`;
+  const iphone = `
+    <ol class="install-steps small">
+      <li>Откройте эту страницу в <b>Safari</b></li>
+      <li>Нажмите <b>«Поделиться»</b> — квадрат со стрелкой вверх. В новых iOS он может быть в меню <b>«⋯»</b> внизу справа</li>
+      <li>Пролистайте вниз и выберите <b>«На экран „Домой“»</b></li>
+      <li>Если есть переключатель «Открыть как веб-приложение» — оставьте его включённым и нажмите <b>«Добавить»</b></li>
+    </ol>`;
+  const android = `
+    ${installPrompt ? `<button type="button" class="btn" id="install-btn">📲 Установить приложение</button>
+      <p class="small muted">Или вручную:</p>` : ""}
+    <p class="small"><b>Chrome</b> (обычно — значок с красно-жёлто-зелёным кругом):</p>
+    <ol class="install-steps small">
+      <li>Откройте эту страницу в Chrome</li>
+      <li>Нажмите меню <b>⋮</b> справа вверху</li>
+      <li>Выберите <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b> → «Установить»</li>
+    </ol>
+    <p class="small"><b>Samsung Internet</b> (на телефонах Samsung):</p>
+    <ol class="install-steps small">
+      <li>Нажмите меню <b>≡</b> внизу справа</li>
+      <li>Выберите <b>«Добавить страницу на»</b> → <b>«Главный экран»</b></li>
+    </ol>`;
+  return `<div class="chips" role="group" aria-label="Тип телефона">${tab("iphone", "📱 iPhone")}${tab("android", "🤖 Android")}</div>
+    ${installOS === "iphone" ? iphone : android}`;
+}
+
 function telHref(p) { return "tel:" + p.replace(/[^\d+]/g, ""); }
 function waHref(p) { return "https://wa.me/" + p.replace(/\D/g, ""); }
 
@@ -953,13 +995,14 @@ function renderTools() {
   const list = TOUR.checklist, done = store.get("checks", []);
   const standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
   $("#v-tools").innerHTML = `<div class="stack">
-    ${standalone ? "" : `<article class="card now">
-      <h3>Поставьте приложение на экран телефона</h3>
-      <p class="small">Тогда оно откроется одним касанием и будет работать даже без интернета: в метро, в самолёте, без роуминга. Достаточно один раз открыть его с интернетом.</p>
-      ${IS_APPLE
-        ? `<ol class="install-steps small"><li>Откройте эту страницу в <b>Safari</b></li><li>Нажмите кнопку «Поделиться» (квадрат со стрелкой вверх)</li><li>Выберите <b>«На экран Домой»</b> → «Добавить»</li></ol>`
-        : `<ol class="install-steps small"><li>Откройте эту страницу в <b>Chrome</b></li><li>Нажмите меню <b>⋮</b> справа вверху</li><li>Выберите <b>«Добавить на главный экран»</b> или «Установить приложение»</li></ol>`}
-    </article>`}
+    ${standalone
+      // Приложение уже установлено: инструкция свёрнута — она нужна, чтобы помочь соседу
+      ? `<details class="card"><summary><b>Как поставить приложение другим</b> <span class="small muted">· iPhone и Android</span></summary>${installHtml()}</details>`
+      : `<article class="card now">
+          <h3>Поставьте приложение на экран телефона</h3>
+          <p class="small">Тогда оно откроется одним касанием и будет работать даже без интернета: в метро, в самолёте, без роуминга. Достаточно один раз открыть его с интернетом.</p>
+          ${installHtml()}
+        </article>`}
     <a class="card" href="#phrases" style="text-decoration:none;color:inherit">
       <h3>🗣️ Разговорник с озвучкой</h3>
       <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
@@ -1030,6 +1073,13 @@ document.addEventListener("click", e => {
   if (big) { showBig("", big.dataset.bigEn, "", big.dataset.bigRu); return; }
   const tl = e.target.closest("[data-theme-link]");
   if (tl) { phraseTheme = tl.dataset.themeLink; renderPhrases(); } // переход по href выполнится сам
+  const os = e.target.closest("[data-os]");
+  if (os) { installOS = os.dataset.os; renderTools(); if (os.closest("details")) $("#v-tools details").open = true; return; }
+  if (e.target.closest("#install-btn") && installPrompt) {
+    installPrompt.prompt();
+    installPrompt.userChoice.finally(() => { installPrompt = null; renderTools(); });
+    return;
+  }
   const th = e.target.closest("[data-theme]");
   if (th) { phraseTheme = th.dataset.theme; renderPhrases(); return; }
   if (e.target.closest("#taxi-close")) { $("#taxi").classList.remove("open"); return; }
