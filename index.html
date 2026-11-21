@@ -193,14 +193,27 @@ nav.tabs a { display: flex; flex-direction: column; align-items: center; gap: 2p
 /* Places: line diagram */
 .line { list-style: none; margin: 0; padding: 0; position: relative; }
 .line::before { content: ""; position: absolute; left: 11px; top: 14px; bottom: 14px; width: 8px; border-radius: 4px; background: var(--tube); }
-.line li { position: relative; display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: start; padding: 7px 0; }
-.line .dot { width: 30px; height: 30px; display: grid; place-items: center; z-index: 1; }
+.line > li { position: relative; display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: start; padding: 7px 0; }
+.line > li > .dot { width: 30px; height: 30px; display: grid; place-items: center; z-index: 1; }
 .line .dot i { width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 4px solid var(--tube); }
-.line li.home .dot i { width: 28px; height: 28px; border: 6px solid var(--accent); }
+.line > li.home .dot i { width: 28px; height: 28px; border: 6px solid var(--accent); }
 .line .st { font-weight: 600; line-height: 1.25; }
-.line li.home .st { color: var(--accent); }
+.line > li.home .st { color: var(--accent); }
 .line .near { font-size: .88rem; color: var(--muted); line-height: 1.35; }
 .line .stops { font-size: .8rem; font-weight: 600; color: var(--tube); white-space: nowrap; padding-top: 3px; font-variant-numeric: tabular-nums; }
+.route { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 12px; background: var(--bg); }
+.r-st { display: flex; align-items: center; gap: 10px; font-size: .92rem; }
+.r-st i { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 3px solid var(--ink); }
+.r-leg { display: flex; align-items: center; gap: 8px; margin-left: 5px; padding: 6px 0 6px 13px; border-left: 4px solid var(--lc); }
+:root[data-theme="dark"] .r-leg[style*="#000000"] { border-left-color: #8a96a8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .r-leg[style*="#000000"] { border-left-color: #8a96a8; } }
+.r-line { font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.r-chg { font-size: .72rem; font-weight: 600; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 1px 7px; }
+.r-walk { margin-left: 5px; padding: 4px 0 4px 13px; border-left: 4px dotted var(--muted); font-size: .88rem; color: var(--muted); }
+.st-more { margin-top: 4px; }
+.st-more summary { cursor: pointer; font-size: .85rem; font-weight: 600; color: var(--tube); min-height: 32px; display: flex; align-items: center; }
+.st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
+.st-list a { color: var(--ink); }
 .place-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .88rem; color: var(--muted); }
 .pill.cat-xmas { background: #e8f3ec; color: #17693a; }
 .pill.cat-view { background: #e6eefc; color: #1d4fa8; }
@@ -521,22 +534,22 @@ const TOUR = {
      direct — сколько остановок по Piccadilly без пересадок (null = с пересадкой). */
   places: [
     /* program — дата дня программы, когда группа там будет. free — вход бесплатный. */
-    { cat: "sight", name: "Биг-Бен и здание Парламента", q: "Big Ben London", program: "2026-12-03", free: true,
+    { cat: "sight", name: "Биг-Бен и здание Парламента", route: [["Piccadilly",5,"Green Park"],["Jubilee",1,"Westminster","на восток"]], q: "Big Ben London", program: "2026-12-03", free: true,
       station: "Westminster", direct: null, hours: "снаружи — всегда",
       text: "Главный символ Лондона. Лучшие фото — с Вестминстерского моста или с противоположного берега Темзы, особенно вечером, когда включается подсветка." },
-    { cat: "sight", name: "Вестминстерское аббатство", q: "Westminster Abbey", program: "2026-12-04",
+    { cat: "sight", name: "Вестминстерское аббатство", route: [["Piccadilly",5,"Green Park"],["Jubilee",1,"Westminster","на восток"],["walk",5]], q: "Westminster Abbey", program: "2026-12-04",
       station: "Westminster", direct: null, hours: "вход платный, по программе — за доплату",
       text: "Здесь коронуют британских монархов, здесь похоронены Ньютон и Дарвин. Снаружи смотреть бесплатно, внутрь — по билету." },
     { cat: "sight", name: "Букингемский дворец", q: "Buckingham Palace", program: "2026-12-04", free: true,
       station: "Green Park", direct: 5, hours: "снаружи — всегда",
       text: "Резиденция короля. Зимой смена караула проходит не каждый день, точное расписание лучше уточнить у гида накануне." },
-    { cat: "sight", name: "Трафальгарская площадь", q: "Trafalgar Square London", program: "2026-12-03", free: true,
+    { cat: "sight", name: "Трафальгарская площадь", route: [["Piccadilly",3,"Leicester Square"],["walk",5]], q: "Trafalgar Square London", program: "2026-12-03", free: true,
       station: "Charing Cross", direct: null, hours: "всегда",
       text: "Колонна Нельсона, львы и Национальная галерея. В декабре здесь стоит главная ёлка города. От Leicester Square 5 минут пешком." },
-    { cat: "sight", name: "Тауэрский мост", q: "Tower Bridge London", program: "2026-12-06", free: true,
+    { cat: "sight", name: "Тауэрский мост", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",6,"Tower Hill","в сторону Aldgate"],["walk",10]], q: "Tower Bridge London", program: "2026-12-06", free: true,
       station: "Tower Hill", direct: null, hours: "по мосту — всегда бесплатно",
       text: "Тот самый разводной мост. Перейти по нему можно бесплатно, а верхняя галерея со стеклянным полом платная." },
-    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", q: "St Paul's Cathedral London", free: true,
+    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"]], q: "St Paul's Cathedral London", free: true,
       station: "St. Paul's", direct: null, hours: "собор — по билету, мост — всегда",
       text: "Огромный купол Рена. Внутрь собора вход платный, но красивее всего пройти от него по пешеходному мосту Миллениум через Темзу прямо к галерее Тейт Модерн." },
     { cat: "sight", name: "Пикадилли-серкус", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
@@ -549,8 +562,8 @@ const TOUR = {
     { cat: "museum", name: "Британский музей", q: "British Museum London", program: "2026-12-07", free: true,
       station: "Russell Square", direct: 0, hours: "ежедневно 10–17, в пятницу до 20:30",
       text: "Три минуты пешком от отеля. Розеттский камень, мумии Египта, мраморы Парфенона. Вход бесплатный, но бесплатный билет на время лучше взять на сайте заранее. С сентября 2026 здесь показывают гобелен из Байё — на него нужен отдельный билет на время." },
-    { cat: "museum", name: "Национальная галерея", q: "National Gallery London", program: "2026-12-07", free: true,
-      station: "Charing Cross / Leicester Square", direct: 3, hours: "ежедневно",
+    { cat: "museum", name: "Национальная галерея", q: "National Gallery London", program: "2026-12-07", free: true, route: [["Piccadilly",3,"Leicester Square"],["walk",5]],
+      station: "Leicester Square", direct: 3, hours: "ежедневно",
       text: "Ван Гог, Тёрнер, Леонардо, Рембрандт — вся классика живописи в одном здании на Трафальгарской площади." },
     { cat: "museum", name: "Национальная портретная галерея", q: "National Portrait Gallery London", free: true,
       station: "Leicester Square", direct: 3, hours: "ежедневно",
@@ -564,7 +577,7 @@ const TOUR = {
     { cat: "museum", name: "Музей науки", q: "Science Museum London", free: true,
       station: "South Kensington", direct: 8, hours: "ежедневно",
       text: "Паровозы, космические капсулы, первые компьютеры. Стоит рядом с двумя предыдущими музеями." },
-    { cat: "museum", name: "Тейт Модерн", q: "Tate Modern London", free: true,
+    { cat: "museum", name: "Тейт Модерн", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"],["walk",10,"через мост Миллениум"]], q: "Tate Modern London", free: true,
       station: "Blackfriars / Southwark", direct: null, hours: "ежедневно",
       text: "Современное искусство в бывшей электростанции на берегу Темзы. С верхнего этажа бесплатно видно собор Святого Павла." },
     { cat: "museum", name: "Музей сэра Джона Соуна", q: "Sir John Soane's Museum", free: true,
@@ -580,24 +593,24 @@ const TOUR = {
     { cat: "xmas", name: "Winter Wonderland в Гайд-парке", q: "Hyde Park Winter Wonderland",
       station: "Hyde Park Corner", direct: 6, hours: "10–22", book: true,
       text: "Самая большая рождественская ярмарка Британии: колесо обозрения, каток, аттракционы, баварская пивная. Билет на вход нужно купить заранее на конкретный час. Закладывайте 3–4 часа." },
-    { cat: "xmas", name: "Зимний рынок на Саут-Банк", q: "Southbank Centre Winter Market",
+    { cat: "xmas", name: "Зимний рынок на Саут-Банк", route: [["Piccadilly",5,"Green Park"],["Jubilee",2,"Waterloo","на восток"],["walk",5]], q: "Southbank Centre Winter Market",
       station: "Waterloo / Embankment", direct: null, hours: "каждый день",
       text: "Рынок на набережной Темзы с видом на Лондонский глаз. Красиво вечером, когда горят огни на воде." },
-    { cat: "xmas", name: "Рынок на Трафальгарской площади", q: "Trafalgar Square London",
+    { cat: "xmas", name: "Рынок на Трафальгарской площади", route: [["Piccadilly",3,"Leicester Square"],["walk",5]], q: "Trafalgar Square London",
       station: "Charing Cross", direct: null, hours: "каждый день",
       text: "Небольшой рынок у главной ёлки Лондона, которую каждый год дарит Норвегия. Пешком 5 минут от Лестер-сквер." },
 
-    { cat: "view", name: "Sky Garden", q: "Sky Garden 1 Sky Garden Walk London",
+    { cat: "view", name: "Sky Garden", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",7,"Monument","в сторону Aldgate"],["walk",5]], q: "Sky Garden 1 Sky Garden Walk London",
       station: "Monument", direct: null, hours: "пн–пт 10–18, сб–вс 11–21", book: true,
       text: "Бесплатная смотровая площадка с садом на 35-м этаже. Вход только по бесплатным билетам на сайте, при бронировании нужно указать имена. Если билетов нет, можно спросить у входа: иногда пускают без брони." },
-    { cat: "view", name: "Холм Примроуз-Хилл", q: "Primrose Hill London",
+    { cat: "view", name: "Холм Примроуз-Хилл", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",3,"Chalk Farm","поезд на Edgware"],["walk",10]], q: "Primrose Hill London",
       station: "Chalk Farm", direct: null, hours: "всегда, бесплатно",
       text: "Тихий холм в парке с панорамой всего центра. Хорошо совместить с Кэмден-маркетом, это рядом." },
-    { cat: "view", name: "The Shard", q: "The View from The Shard",
+    { cat: "view", name: "The Shard", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"]], q: "The View from The Shard",
       station: "London Bridge", direct: null, hours: "платно, по билетам",
       text: "Самый высокий небоскрёб Лондона, площадка выше Sky Garden. Платно. Рядом Боро-маркет: сначала поесть, потом наверх." },
 
-    { cat: "food", name: "Боро-маркет", q: "Borough Market London",
+    { cat: "food", name: "Боро-маркет", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"],["walk",3]], q: "Borough Market London",
       station: "London Bridge", direct: null, hours: "в декабре каждый день; пн–пт 10–17, сб 9–17, вс 10–16",
       text: "Главный гастрономический рынок Лондона: сыры, выпечка, уличная еда со всего мира. В субботу после обеда не протолкнуться, лучше в будни утром." },
     { cat: "food", name: "Фуд-холл Harrods", q: "Harrods Food Halls Knightsbridge",
@@ -609,23 +622,23 @@ const TOUR = {
     { cat: "food", name: "Seven Dials Market", q: "Seven Dials Market London",
       station: "Covent Garden", direct: 2, hours: "каждый день",
       text: "Крытый фуд-холл у Ковент-Гардена: десятки прилавков, каждый выбирает своё. Удобно, если в компании разные вкусы." },
-    { cat: "food", name: "Кошерный Голдерс-Грин", q: "Golders Green Road London",
+    { cat: "food", name: "Кошерный Голдерс-Грин", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",6,"Golders Green","поезд на Edgware или Golders Green"]], q: "Golders Green Road London",
       station: "Golders Green", direct: null, hours: "пятница — до вечера, в субботу почти всё закрыто", days: [0,1,2,3,4,5],
       text: "Еврейский район с кошерными ресторанами, пекарнями и магазинами. Северная линия метро." },
 
-    { cat: "flea", name: "Портобелло-роуд", q: "Portobello Road Market London",
+    { cat: "flea", name: "Портобелло-роуд", route: [["Piccadilly",1,"Holborn"],["Central",7,"Notting Hill Gate","на запад"],["walk",10]], q: "Portobello Road Market London",
       station: "Notting Hill Gate / Ladbroke Grove", direct: null, hours: "сб — главный день; пт — антиквариат и винтаж", days: [5,6],
       text: "Самый знаменитый антикварный рынок мира: в субботу больше 1500 прилавков. Внимание: 5 декабря, суббота, совпадает с поездкой в Виндзор. Придётся выбирать или ехать в пятницу, 4-го, после программы." },
-    { cat: "flea", name: "Антикварный рынок Бермондси", q: "Bermondsey Square Antiques Market",
+    { cat: "flea", name: "Антикварный рынок Бермондси", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"],["walk",15]], q: "Bermondsey Square Antiques Market",
       station: "London Bridge / Borough", direct: null, hours: "только пт, 6–14", days: [5],
       text: "Больше 200 прилавков: фарфор, серебро, стекло. Рынок для знатоков, начинается очень рано. В вашей поездке это только 4 декабря." },
-    { cat: "flea", name: "Олд-Спиталфилдс", q: "Old Spitalfields Market",
+    { cat: "flea", name: "Олд-Спиталфилдс", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",4,"Liverpool Street","Circle, H&C или Metropolitan"],["walk",5]], q: "Old Spitalfields Market",
       station: "Liverpool Street", direct: null, hours: "каждый день; антиквариат — по четвергам",
       text: "Красивый викторианский крытый рынок: дизайнеры, винтаж, еда. По четвергам большой антикварный рынок, но 3 декабря у вас день прилёта." },
-    { cat: "flea", name: "Цветочный рынок Коламбия-роуд", q: "Columbia Road Flower Market",
-      station: "Hoxton", direct: null, hours: "только вс, примерно 8–15", days: [0],
+    { cat: "flea", name: "Цветочный рынок Коламбия-роуд", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Old Street","на юг"],["walk",20]], q: "Columbia Road Flower Market",
+      station: "Old Street", direct: null, hours: "только вс, примерно 8–15", days: [0],
       text: "Улица превращается в море цветов, вокруг маленькие винтажные лавки. Рядом Брик-лейн с воскресным рынком. В поездке это 6 декабря, лучше утром." },
-    { cat: "flea", name: "Кэмден-маркет", q: "Camden Market London",
+    { cat: "flea", name: "Кэмден-маркет", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Camden Town","на север"],["walk",5]], q: "Camden Market London",
       station: "Camden Town", direct: null, hours: "каждый день",
       text: "Огромный рынок альтернативной моды, винтажа и уличной еды у канала. Можно совместить с Примроуз-Хилл." }
   ],
@@ -780,6 +793,59 @@ function mapsTransit(q) {
   return "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(mapQuery(q)) + "&travelmode=transit";
 }
 
+/* ===== Маршруты на метро ===== */
+// Официальные цвета линий метро Лондона
+const TUBE = {
+  Piccadilly: { bg: "#003688", fg: "#ffffff" },
+  Northern:   { bg: "#000000", fg: "#ffffff" },
+  Central:    { bg: "#DC241F", fg: "#ffffff" },
+  Circle:     { bg: "#FFD300", fg: "#000000" },
+  Jubilee:    { bg: "#A0A5A9", fg: "#000000" }
+};
+const HOME_ST = "Russell Square";
+// Маршрут места: прописанный вручную (route) или собранный из direct для ветки Piccadilly
+function routeOf(p) {
+  if (p.route) return p.route;
+  if (p.direct === 0) return [["walk", 3]];
+  if (p.direct > 0) return [["Piccadilly", p.direct, p.station.split(" / ")[0]]];
+  return null;
+}
+// Станция Piccadilly, у которой место «рядом» (дальше только пешком)
+function nearPiccadilly(p) {
+  const r = routeOf(p); if (!r) return null;
+  const tube = r.filter(l => l[0] !== "walk");
+  if (!tube.length) return HOME_ST;
+  return tube.length === 1 && tube[0][0] === "Piccadilly" ? tube[0][2] : null;
+}
+// Станция Piccadilly, где делается пересадка к месту
+function changeAt(p) {
+  const tube = (routeOf(p) || []).filter(l => l[0] !== "walk");
+  return tube.length > 1 && tube[0][0] === "Piccadilly" ? tube[0][2] : null;
+}
+const sameSt = (a, b) => a && b && a.replace(/\./g, "") === b.replace(/\./g, "");
+const stopsWord = n => n + " " + plural(n, "остановка", "остановки", "остановок");
+
+function routeHtml(p) {
+  const r = routeOf(p); if (!r) return "";
+  const tubeLegs = r.filter(l => l[0] !== "walk").length;
+  let html = `<div class="route" aria-label="Маршрут на метро">
+    <div class="r-st"><i></i><span>${HOME_ST} <span class="muted">· отель</span></span></div>`;
+  r.forEach((leg, i) => {
+    if (leg[0] === "walk") {
+      html += `<div class="r-walk">🚶 пешком ~${leg[1]} мин${leg[2] ? " · " + esc(leg[2]) : ""}</div>`;
+      return;
+    }
+    const [line, n, to, note] = leg, c = TUBE[line] || { bg: "#666", fg: "#fff" };
+    const isChange = i < r.length - 1 && r.slice(i + 1).some(l => l[0] !== "walk");
+    html += `<div class="r-leg" style="--lc:${c.bg}"><span class="r-line" style="background:${c.bg};color:${c.fg}">${line}</span>
+        <span class="small">${stopsWord(n)}${note ? " · " + esc(note) : ""}</span></div>
+      <div class="r-st"><i></i><span><b>${esc(to)}</b>${isChange ? ` <span class="r-chg">пересадка</span>` : ""}</span></div>`;
+  });
+  html += `</div>`;
+  if (tubeLegs > 1) html += `<p class="small muted">Обычный маршрут. В выходные участки метро бывают закрыты — перед поездкой нажмите «Как добраться».</p>`;
+  return html;
+}
+
 function renderPlaces() {
   const today = preview || londonToday();
   const inTrip = today >= TOUR.start && today <= TOUR.end;
@@ -790,13 +856,22 @@ function renderPlaces() {
   $("#v-places").innerHTML = `<div class="stack">
     <article class="card">
       <h2>Одна ветка — почти весь Лондон</h2>
-      <p class="small muted">От отеля по синей линии ${esc(L.name)} без пересадок.</p>
+      <p class="small muted">От отеля по синей линии ${esc(L.name)} без пересадок. Нажмите на станцию, чтобы увидеть места рядом.</p>
       <ol class="line">
-        ${L.stations.map(s => `<li class="${s.home ? "home" : ""}">
+        ${L.stations.map(s => {
+          const near = TOUR.places.filter(p => sameSt(nearPiccadilly(p), s.n));
+          const chg = TOUR.places.filter(p => sameSt(changeAt(p), s.n));
+          const item = p => `<li><span class="pill cat-${p.cat}" style="font-size:.7rem">${CATS[p.cat]}</span> <a href="${mapsPlace(p.q)}" target="_blank" rel="noopener">${esc(p.name)}</a></li>`;
+          const body = (near.length || chg.length) ? `<details class="st-more">
+              <summary>${near.length ? `${near.length} ${plural(near.length, "место", "места", "мест")} рядом` : ""}${near.length && chg.length ? " · " : ""}${chg.length ? `пересадка к ${chg.length}` : ""}</summary>
+              ${near.length ? `<ul class="st-list">${near.map(item).join("")}</ul>` : ""}
+              ${chg.length ? `<p class="small muted" style="margin-top:6px">Здесь пересадка к:</p><ul class="st-list">${chg.map(item).join("")}</ul>` : ""}
+            </details>` : "";
+          return `<li class="${s.home ? "home" : ""}">
           <span class="dot"><i></i></span>
-          <div><div class="st">${esc(s.n)}</div><div class="near">${esc(s.near)}</div></div>
+          <div><div class="st">${esc(s.n)}</div><div class="near">${esc(s.near)}</div>${body}</div>
           <span class="stops">${s.home ? "вы здесь" : s.s ? s.s + " ост." : ""}</span>
-        </li>`).join("")}
+        </li>`;}).join("")}
       </ol>
     </article>
 
@@ -822,6 +897,7 @@ function renderPlaces() {
           <span>🕒 ${esc(p.hours)}</span>
           ${dates ? `<span>📅 В поездке: ${dates.length ? dates.map(d => ["вс","пн","вт","ср","чт","пт","сб"][parse(d).getDay()] + " " + fmt(d)).join(", ") : "не совпадает"}</span>` : ""}
         </div>
+        ${routeHtml(p)}
         <div class="btn-row">
           <a class="btn ghost" href="${mapsPlace(p.q)}" target="_blank" rel="noopener">📍 На карте</a>
           <a class="btn ghost" href="${mapsTransit(p.q)}" target="_blank" rel="noopener">🚇 Как добраться</a>
