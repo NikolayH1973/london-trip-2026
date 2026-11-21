@@ -301,6 +301,10 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
 </nav>
 
 <script>
+/* Журнал ошибок для диагностики (собираем с самого начала) */
+const DIAG_ERRORS = [];
+window.addEventListener("error", e => DIAG_ERRORS.push((e.message || "error") + " @" + (e.lineno || "?")));
+window.addEventListener("unhandledrejection", e => DIAG_ERRORS.push("promise: " + (e.reason && e.reason.message || e.reason)));
 /* =========================================================
    ДАННЫЕ ТУРА. Всё, что относится к Лондону, — только здесь.
    Код ниже ничего не знает про Лондон и просто рисует эти данные.
@@ -1272,11 +1276,61 @@ setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - 
       "",
       navigator.userAgent,
       "",
-      "(коснитесь, чтобы закрыть)"
+      "Ошибки JS: " + (DIAG_ERRORS.length ? "\n  " + DIAG_ERRORS.slice(-6).join("\n  ") : "нет"),
     ].join("\n");
+    const btns = document.createElement("div");
+    btns.style.cssText = "display:flex;gap:8px;margin-top:14px;flex-wrap:wrap";
+    btns.innerHTML = `<button type="button" id="diag-test" style="padding:10px 14px;font:inherit;border:2px solid #000;border-radius:8px;background:#ffd300">Тест касаний (30 сек)</button>
+      <button type="button" id="diag-close" style="padding:10px 14px;font:inherit;border:2px solid #000;border-radius:8px;background:#fff">Закрыть</button>`;
+    d.appendChild(btns);
     d.hidden = false;
   });
-  $("#diag").addEventListener("click", () => $("#diag").hidden = true);
+  $("#diag").addEventListener("click", e => {
+    if (e.target.id === "diag-close") $("#diag").hidden = true;
+    if (e.target.id === "diag-test") { $("#diag").hidden = true; startTapLog(); }
+  });
+
+  /* Тест касаний: 30 секунд записываем, что происходит при каждом нажатии */
+  function startTapLog() {
+    const box = document.createElement("div");
+    box.id = "taplog";
+    box.style.cssText = "position:fixed;left:8px;right:8px;top:8px;z-index:70;max-height:45vh;overflow:hidden;background:rgba(255,255,255,.96);color:#000;border:2px solid #c8102e;border-radius:10px;padding:8px;font:11px/1.35 ui-monospace,monospace;white-space:pre-wrap;pointer-events:none";
+    document.body.appendChild(box);
+    const lines = ["ТЕСТ: нажмите «Программа», потом «Места». Затем скриншот."];
+    const draw = () => box.textContent = lines.slice(-14).join("\n");
+    const short = el => {
+      if (!el || !el.tagName) return "?";
+      const a = el.closest && el.closest("a");
+      const cls = typeof el.className === "string" ? el.className : (el.className && el.className.baseVal) || "";
+      return el.tagName.toLowerCase() + (cls ? "." + cls.trim().split(/\s+/)[0] : "") + (a && a.dataset.v ? " [меню:" + a.dataset.v + "]" : "");
+    };
+    const t0 = Date.now(), ts = () => ((Date.now() - t0) / 1000).toFixed(1) + "с";
+    const log = e => {
+      const p = e.touches && e.touches[0] || e.changedTouches && e.changedTouches[0] || e;
+      lines.push(`${ts()} ${e.type} → ${short(e.target)} (${Math.round(p.clientX)},${Math.round(p.clientY)})${e.defaultPrevented ? " prevented" : ""}`);
+      if (e.type === "click") setTimeout(() => {
+        lines.push(`   экран: ${(document.querySelector(".view.active") || {}).id} ${location.hash}`);
+        draw();
+      }, 400);
+      draw();
+    };
+    const types = ["touchstart", "touchend", "pointerup", "click"];
+    types.forEach(t => window.addEventListener(t, log, { capture: true, passive: true }));
+    const onHash = () => { lines.push(`${ts()} hashchange → ${location.hash}`); draw(); };
+    window.addEventListener("hashchange", onHash);
+    const errCount = DIAG_ERRORS.length;
+    const tick = setInterval(() => {
+      if (DIAG_ERRORS.length > errCount) { lines.push("ОШИБКА: " + DIAG_ERRORS[DIAG_ERRORS.length - 1]); draw(); }
+    }, 300);
+    draw();
+    setTimeout(() => {
+      types.forEach(t => window.removeEventListener(t, log, { capture: true }));
+      window.removeEventListener("hashchange", onHash);
+      clearInterval(tick);
+      lines.push("— тест окончен (коснитесь заголовка 5 раз, чтобы повторить) —"); draw();
+      setTimeout(() => box.remove(), 20000);
+    }, 30000);
+  }
 })();
 
 /* Подстраховка навигации: переключаем экран сами, не полагаясь только на событие hashchange */
