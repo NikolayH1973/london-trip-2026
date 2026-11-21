@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Лондон на Рождество — карманный гид</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#142033">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Лондон">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -104,6 +112,9 @@ ul.items li.opt::before { background: var(--optional); }
 .dot-btn { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: .8rem; font-weight: 600; cursor: pointer; padding: 0; font-variant-numeric: tabular-nums; }
 .dot-btn[aria-current="true"] { background: var(--gold); border-color: var(--gold); color: #fff; }
 .next-card { text-align: left; font: inherit; color: inherit; cursor: pointer; width: 100%; }
+.offline-bar { margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; background: var(--gold-soft); border: 1px solid var(--gold); font-size: .9rem; }
+.offline-bar[hidden] { display: none; }
+.install-steps { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
 .big-num { font-family: var(--font-display); font-size: 3.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
 
 /* Program */
@@ -218,6 +229,8 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
     <span class="eyebrow" id="hdr-eyebrow">3–9 декабря · Метрополь-Каспи · гид Алекс Табак</span>
     <h1 id="hdr-title">Лондон на Рождество</h1>
   </header>
+
+  <div class="offline-bar" id="offline-bar" role="status" hidden>Нет интернета — показана сохранённая версия. Карты и WhatsApp заработают, когда появится связь.</div>
 
   <section class="view" id="v-today" aria-label="Сегодня"></section>
   <section class="view" id="v-program" aria-label="Программа"></section>
@@ -743,7 +756,15 @@ function renderTools() {
   const c = TOUR.currency;
   const rate = store.get("rate", c.rate);
   const list = TOUR.checklist, done = store.get("checks", []);
+  const standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
   $("#v-tools").innerHTML = `<div class="stack">
+    ${standalone ? "" : `<article class="card now">
+      <h3>Поставьте приложение на экран телефона</h3>
+      <p class="small">Тогда оно откроется одним касанием и будет работать даже без интернета: в метро, в самолёте, без роуминга. Достаточно один раз открыть его с интернетом.</p>
+      ${IS_APPLE
+        ? `<ol class="install-steps small"><li>Откройте эту страницу в <b>Safari</b></li><li>Нажмите кнопку «Поделиться» (квадрат со стрелкой вверх)</li><li>Выберите <b>«На экран Домой»</b> → «Добавить»</li></ol>`
+        : `<ol class="install-steps small"><li>Откройте эту страницу в <b>Chrome</b></li><li>Нажмите меню <b>⋮</b> справа вверху</li><li>Выберите <b>«Добавить на главный экран»</b> или «Установить приложение»</li></ol>`}
+    </article>`}
     <article class="card">
       <h3>Конвертер</h3>
       <div class="conv">
@@ -836,6 +857,20 @@ $("#taxi-near").textContent = `Near ${TOUR.hotel.tube} station`;
 
 renderAll();
 show();
+
+/* Офлайн-режим: регистрируем Service Worker (файл sw.js рядом с index.html).
+   Работает только на настоящем сайте (https или localhost); в «песочнице» тихо пропускаем. */
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
+
+/* Плашка «Нет интернета» */
+function updateOnline() { $("#offline-bar").hidden = navigator.onLine; }
+window.addEventListener("online", updateOnline);
+window.addEventListener("offline", updateOnline);
+updateOnline();
 window.addEventListener("hashchange", show);
 </script>
 </body>
