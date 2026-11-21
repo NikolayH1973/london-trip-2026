@@ -66,7 +66,7 @@ p { margin: 0; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
 
-.app { max-width: 560px; margin: 0 auto; min-height: 100%;
+.app { max-width: 560px; margin: 0 auto; min-height: 100%; overflow-x: clip; /* страховка: ничто не делает страницу шире экрана */
   padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 96px); }
 
 header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
@@ -162,12 +162,14 @@ details.card[open] summary { margin-bottom: 6px; }
 .taxi button { align-self: flex-start; min-height: 52px; padding: 10px 20px; border-radius: 12px; border: 2px solid #000; background: #fff; color: #000; font-weight: 600; cursor: pointer; }
 
 /* Tools */
-.conv { display: grid; grid-template-columns: 1fr; gap: 10px; }
+/* minmax(0,1fr) + min-width:0 — иначе поле ввода (у него «природная» ширина ~20 символов) распирает страницу шире экрана */
+.conv { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.field { min-width: 0; }
 .field { display: flex; flex-direction: column; gap: 4px; }
 .field label { font-size: .9rem; color: var(--muted); }
 .field .inp { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 0 14px; }
 .field .inp span { font-size: 1.3rem; font-weight: 600; color: var(--muted); width: 1.4em; }
-.field input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1.5rem; font-weight: 600; padding: 12px 0; font-variant-numeric: tabular-nums; }
+.field input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1.5rem; font-weight: 600; padding: 12px 0; font-variant-numeric: tabular-nums; }
 .field input:focus { outline: none; }
 .field .inp:focus-within { outline: 3px solid var(--gold); }
 .rate-row { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); flex-wrap: wrap; }
@@ -185,10 +187,12 @@ details.card[open] summary { margin-bottom: 6px; }
 .tips { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
 /* Tabs */
-nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line);
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom); }
-nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
-nav.tabs a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 2px 12px; text-decoration: none; color: var(--muted); font-size: .72rem; font-weight: 500; text-align: center; line-height: 1.2; }
+/* minmax(0,1fr): колонки всегда равные, даже при крупном шрифте (иначе длинное слово распирает колонку) */
+nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+nav.tabs a { position: relative; z-index: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 2px 10px; text-decoration: none; color: var(--muted); font-size: .72rem; font-weight: 500; text-align: center; line-height: 1.15; overflow-wrap: anywhere; hyphens: auto; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+nav.tabs a span { max-width: 100%; }
 
 /* Places: line diagram */
 .line { list-style: none; margin: 0; padding: 0; position: relative; }
@@ -245,7 +249,9 @@ nav.tabs a { display: flex; flex-direction: column; align-items: center; gap: 2p
 }
 nav.tabs a svg { width: 26px; height: 26px; }
 nav.tabs a[aria-current="page"] { color: var(--accent); font-weight: 700; }
-nav.tabs a.sos[aria-current="page"], nav.tabs a.sos { }
+nav.tabs a svg { flex: none; pointer-events: none; }
+.diag { position: fixed; inset: 12px; z-index: 60; background: #fff; color: #000; border: 2px solid #000; border-radius: 12px; padding: 14px; overflow: auto; font: 12px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; }
+.diag[hidden] { display: none; }
 
 .view { display: none; }
 .view.active { display: block; }
@@ -281,6 +287,8 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
   <div class="t1" id="big-4"></div>
   <button type="button" id="taxi-close">Закрыть</button>
 </div>
+
+<div class="diag" id="diag" hidden></div>
 
 <nav class="tabs" aria-label="Разделы">
   <div class="in">
@@ -1229,6 +1237,54 @@ function renderClocks() {
 renderClocks();
 // Обновляем ровно в начале каждой минуты, а дальше — каждые 60 секунд
 setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - Date.now() % 60000);
+
+/* Диагностика для удалённой отладки: 5 быстрых касаний по заголовку «Лондон на Рождество».
+   Показывает, какой элемент реально лежит под центром каждой кнопки меню. */
+(() => {
+  let taps = 0, timer = null;
+  $("#hdr-title").addEventListener("click", () => {
+    taps++; clearTimeout(timer); timer = setTimeout(() => taps = 0, 1500);
+    if (taps < 5) return;
+    taps = 0;
+    const d = $("#diag");
+    const desc = el => {
+      if (!el) return "ничего";
+      const a = el.closest && el.closest("nav.tabs a");
+      if (a) return "OK → кнопка " + a.dataset.v;
+      const cls = typeof el.className === "string" ? el.className : (el.className && el.className.baseVal) || "";
+      return "ПЕРЕКРЫТО: <" + el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + (cls ? "." + cls.trim().replace(/\s+/g, ".") : "") + ">";
+    };
+    const rows = [...document.querySelectorAll("nav.tabs a")].map(a => {
+      const r = a.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      return `${a.dataset.v.padEnd(8)} x=${Math.round(x)} y=${Math.round(y)} w=${Math.round(r.width)}  ${desc(document.elementFromPoint(x, y))}`;
+    });
+    const nav = document.querySelector("nav.tabs").getBoundingClientRect();
+    d.textContent = [
+      "ДИАГНОСТИКА — сделайте скриншот и пришлите",
+      "",
+      "Экран: " + innerWidth + "×" + innerHeight + "  dpr=" + devicePixelRatio,
+      "Шрифт: " + getComputedStyle(document.body).fontSize + " (норма 18px)",
+      "Режим: " + (matchMedia("(display-mode: standalone)").matches ? "установленное приложение" : "браузер"),
+      "Меню: top=" + Math.round(nav.top) + " bottom=" + Math.round(nav.bottom),
+      "SW: " + (navigator.serviceWorker && navigator.serviceWorker.controller ? "активен" : "нет"),
+      "",
+      ...rows,
+      "",
+      navigator.userAgent,
+      "",
+      "(коснитесь, чтобы закрыть)"
+    ].join("\n");
+    d.hidden = false;
+  });
+  $("#diag").addEventListener("click", () => $("#diag").hidden = true);
+})();
+
+/* Подстраховка навигации: переключаем экран сами, не полагаясь только на событие hashchange */
+document.querySelectorAll("nav.tabs a").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault();
+  if (location.hash !== "#" + a.dataset.v) location.hash = a.dataset.v; // запись в историю: «назад» вернёт на прошлую вкладку
+  show();
+}));
 
 /* Плашка «Нет интернета» */
 function updateOnline() { $("#offline-bar").hidden = navigator.onLine; }
