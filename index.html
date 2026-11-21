@@ -441,18 +441,46 @@ const TOUR = {
       { en: "Would you mind taking a photo of us, please?", tr: "Вуд ю майнд тэ́йкинг э фо́утоу ов ас, пли́из?", ru: "Не могли бы вы нас сфотографировать?",
         tip: "Would you mind… — самая вежливая форма просьбы. Ответ «No, not at all» означает «Да, конечно»." }
     ]},
-    { id: "cafe", title: "Кафе и паб", icon: "☕", items: [
+    { id: "cafe", title: "Кафе, паб и ресторан", icon: "🍽️", items: [
       { en: "Could we have a table for two, please?", tr: "Куд уи хэв э тэ́йбл фо ту, пли́из?", ru: "Можно столик на двоих?",
         tip: "В пабе обычно не ждут официанта: заказывают и платят у стойки." },
       { en: "Is it table service, or do we order at the bar?", tr: "Из ит тэйбл сё́вис, о ду уи о́одэ эт зэ ба́а?", ru: "Здесь обслуживают за столиком или заказывать у стойки?" },
+      { en: "Could we see the menu, please?", tr: "Куд уи си́и зэ мэ́нью, пли́из?", ru: "Можно посмотреть меню?" },
+      { en: "What would you recommend?", tr: "Уот вуд ю рэкомэ́нд?", ru: "Что вы посоветуете?",
+        tip: "Классика британской кухни: fish and chips, pie and mash (пирог с пюре), а по воскресеньям — Sunday roast. Воскресенье в поездке — 6 декабря." },
+      { en: "We're ready to order, please.", tr: "Уи́эр рэ́ди ту о́одэ, пли́из.", ru: "Мы готовы сделать заказ." },
+      { en: "I'll have the fish and chips, please.", tr: "Айл хэв зэ фиш энд чипс, пли́из.", ru: "Мне, пожалуйста, рыбу с картошкой.",
+        tip: "I'll have… — обычный способ заказать. Подставьте любое блюдо из меню, можно просто показать пальцем: I'll have this one, please." },
+      { en: "Could we have a jug of tap water, please?", tr: "Куд уи хэв э джаг ов тэп уо́тэ, пли́из?", ru: "Можно нам графин обычной воды?",
+        tip: "В заведениях, где продают алкоголь, по закону обязаны бесплатно дать водопроводную воду. Она в Лондоне питьевая." },
       { en: "Could I have a cup of tea with milk, please?", tr: "Куд ай хэв э кап ов ти́и уиз милк, пли́из?", ru: "Можно чашку чая с молоком?",
         tip: "Чай здесь по умолчанию пьют с молоком. Если хотите без — no milk, please." },
       { en: "Could I have a white coffee, please?", tr: "Куд ай хэв э уа́йт ко́фи, пли́из?", ru: "Можно кофе с молоком?",
         tip: "White coffee — кофе с молоком, black coffee — чёрный. Американо тоже понимают." },
+      { en: "Could I have half a pint of lager, please?", tr: "Куд ай хэв ха́аф э пайнт ов ла́агэ, пли́из?", ru: "Можно полпинты светлого пива?",
+        tip: "Пинта — 568 мл, полпинты — около 280 мл. Lager — светлое, ale/bitter — традиционный британский эль, cider — сидр." },
       { en: "Does this have any pork in it?", tr: "Даз зис хэв э́ни по́ок ин ит?", ru: "В этом блюде есть свинина?",
         tip: "Сосиски, бобы и даже некоторые пироги часто бывают со свининой." },
+      { en: "I'm allergic to nuts.", tr: "Айм эла́ёджик ту натс.", ru: "У меня аллергия на орехи.",
+        tip: "Вместо nuts: dairy (молочное), gluten (глютен), shellfish (морепродукты). Персонал обязан рассказать о составе блюда." },
+      { en: "That was lovely, thank you.", tr: "Зэт воз ла́вли, сэ́нк ю.", ru: "Было очень вкусно, спасибо." },
       { en: "Could we have the bill, please?", tr: "Куд уи хэв зэ бил, пли́из?", ru: "Принесите, пожалуйста, счёт.",
-        tip: "В Британии говорят bill, а не check. Проверьте, нет ли в счёте service charge — это уже чаевые." }
+        tip: "В Британии говорят bill, а не check. Проверьте, нет ли в счёте service charge — это уже чаевые." },
+      { en: "Could we pay separately, please?", tr: "Куд уи пэй сэ́пэрэтли, пли́из?", ru: "Можно заплатить отдельно?",
+        tip: "Удобно, когда ужинаете с другими парами из группы." }
+    ]},
+    { id: "health", title: "Аптека и здоровье", icon: "💊", items: [
+      { en: "Excuse me, where is the nearest pharmacy?", tr: "Экскью́з ми, уэ́а из зэ ни́эрэст фа́амэси?", ru: "Простите, где ближайшая аптека?",
+        tip: "Аптеку называют pharmacy или chemist's. Сеть Boots есть почти на каждой большой улице." },
+      { en: "I need something for a headache, please.", tr: "Ай ни́ид са́мсинг фор э хэ́дэйк, пли́из.", ru: "Мне нужно что-нибудь от головной боли.",
+        tip: "Вместо headache: a cold — простуда, a sore throat — боль в горле, an upset stomach — расстройство желудка." },
+      { en: "Do I need a prescription for this?", tr: "Ду ай ни́ид э прискри́пшн фо зис?", ru: "Для этого нужен рецепт?" },
+      { en: "I have high blood pressure.", tr: "Ай хэв хай блад прэ́шэ.", ru: "У меня высокое давление.",
+        tip: "Скажите это фармацевту, чтобы он подобрал подходящее лекарство. Diabetes — диабет, a heart condition — проблемы с сердцем." },
+      { en: "I don't feel well. I need to see a doctor.", tr: "Ай до́унт фи́ил уэл. Ай ни́ид ту си́и э до́ктэ.", ru: "Мне плохо. Мне нужен врач.",
+        tip: "Если не экстренно — звоните 111 (медпомощь NHS). Номер есть во вкладке «Я потерялся». И сообщите гиду и в свою страховую." },
+      { en: "Please call an ambulance. It's an emergency.", tr: "Пли́из кол эн э́мбьюлэнс. Итс эн има́ёджэнси.", ru: "Вызовите, пожалуйста, скорую. Это срочно.",
+        tip: "Экстренный номер в Британии — 999, звонок бесплатный с любого телефона." }
     ]},
     { id: "shop", title: "Магазин и рынок", icon: "🛍️", items: [
       { en: "I'm just looking, thank you.", tr: "Айм джаст лу́кинг, сэ́нк ю.", ru: "Я просто смотрю, спасибо." },
@@ -913,7 +941,8 @@ function renderHelp() {
         <li><span>Если связи нет — возвращайтесь в отель: «Показать таксисту» или метро до Russell Square.</span></li>
         <li><span>Обратитесь к полицейскому или сотруднику метро: в Лондоне это обычное дело.</span></li>
       </ul>
-      <a class="btn ghost" href="#phrases">Фразы на английском: «Я заблудился»</a>
+      <a class="btn ghost" href="#phrases" data-theme-link="street">Фразы на английском: «Я заблудился»</a>
+      <a class="btn ghost" href="#phrases" data-theme-link="health">Плохо себя чувствуете? Фразы для аптеки и врача</a>
     </article>
   </div>`;
 }
@@ -933,7 +962,7 @@ function renderTools() {
     </article>`}
     <a class="card" href="#phrases" style="text-decoration:none;color:inherit">
       <h3>🗣️ Разговорник с озвучкой</h3>
-      <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, кафе и рынка. Телефон произнесёт их с британским акцентом.</p>
+      <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
       <span class="btn">Открыть разговорник</span>
     </a>
     <article class="card">
@@ -999,6 +1028,8 @@ document.addEventListener("click", e => {
   if (say) { speak(say.dataset.say, Number(say.dataset.rate), say); return; }
   const big = e.target.closest("[data-big-en]");
   if (big) { showBig("", big.dataset.bigEn, "", big.dataset.bigRu); return; }
+  const tl = e.target.closest("[data-theme-link]");
+  if (tl) { phraseTheme = tl.dataset.themeLink; renderPhrases(); } // переход по href выполнится сам
   const th = e.target.closest("[data-theme]");
   if (th) { phraseTheme = th.dataset.theme; renderPhrases(); return; }
   if (e.target.closest("#taxi-close")) { $("#taxi").classList.remove("open"); return; }
