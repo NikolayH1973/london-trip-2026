@@ -121,6 +121,16 @@ ul.items li.opt::before { background: var(--optional); }
 .offline-bar { margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; background: var(--gold-soft); border: 1px solid var(--gold); font-size: .9rem; }
 .offline-bar[hidden] { display: none; }
 .install-steps { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
+.phrase .en { font-size: 1.2rem; font-weight: 700; line-height: 1.35; }
+.phrase .tr { color: var(--tube); font-size: 1rem; }
+.phrase .ru { color: var(--muted); }
+.speak-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.speak-row .btn { min-height: 48px; padding: 8px 6px; font-size: .9rem; }
+.btn[aria-pressed="true"] { outline: 3px solid var(--gold); }
+.basics { display: flex; flex-direction: column; gap: 8px; }
+.basics div { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: baseline; }
+.basics b { white-space: nowrap; }
+.back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; }
 .big-num { font-family: var(--font-display); font-size: 3.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
 
 /* Program */
@@ -244,15 +254,16 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
   <section class="view" id="v-places" aria-label="Места"></section>
   <section class="view" id="v-help" aria-label="Помощь"></section>
   <section class="view" id="v-tools" aria-label="Полезное"></section>
+  <section class="view" id="v-phrases" aria-label="Разговорник"></section>
 
   <footer class="note">Неофициальный помощник, сделан участником поездки. Порядок экскурсий может меняться — главное слово за гидом.</footer>
 </div>
 
-<div class="taxi" id="taxi" role="dialog" aria-modal="true" aria-label="Карточка для таксиста">
-  <div class="t1">Please take me to:</div>
-  <div class="t2" id="taxi-name"></div>
-  <div class="t3" id="taxi-addr"></div>
-  <div class="t1" id="taxi-near"></div>
+<div class="taxi" id="taxi" role="dialog" aria-modal="true" aria-label="Крупная карточка">
+  <div class="t1" id="big-1"></div>
+  <div class="t2" id="big-2"></div>
+  <div class="t3" id="big-3"></div>
+  <div class="t1" id="big-4"></div>
   <button type="button" id="taxi-close">Закрыть</button>
 </div>
 
@@ -374,6 +385,63 @@ const TOUR = {
     "Установить Citymapper — лучшее приложение для транспорта Лондона",
     "Скачать офлайн-карту Лондона в Google Maps",
     "Забронировать бесплатный вход в Sky Garden (если хотите)"
+  ],
+
+  /* Разговорник. en — фраза, tr — произношение (британское), ru — перевод, tip — когда и как говорить */
+  phrasesBasics: [
+    { en: "Sorry?", ru: "«Простите, что?» — так переспрашивают. И извиняются тоже словом sorry, даже если толкнули вас." },
+    { en: "Excuse me", ru: "Привлечь внимание или попросить пропустить." },
+    { en: "Cheers!", ru: "Неформальное «спасибо» и «пока». И тост в пабе." },
+    { en: "Lovely, thank you", ru: "«Отлично, спасибо» — британцы говорят lovely по любому приятному поводу." },
+    { en: "please", ru: "Добавляйте к каждой просьбе. Без please просьба звучит как приказ." }
+  ],
+  phrases: [
+    { id: "airport", title: "Аэропорт", icon: "✈️", items: [
+      { en: "Excuse me, where are the toilets, please?", tr: "Экскью́з ми, уэ́ар а зэ то́йлэтс, пли́из?", ru: "Простите, где туалет?",
+        tip: "Британцы говорят toilets или loo. Слово bathroom здесь означает ванную." },
+      { en: "Could you tell me where to check in for British Airways to Tel Aviv, please?", tr: "Куд ю тэл ми уэ́а ту чек ин фо Бри́тиш Э́эуэйз ту Тэл Ави́в, пли́из?", ru: "Подскажите, где регистрация British Airways на Тель-Авив?" },
+      { en: "I'm afraid my suitcase hasn't arrived.", tr: "Айм эфрэ́йд май сью́ткейс ха́зэнт эра́йвд.", ru: "К сожалению, мой чемодан не прилетел.",
+        tip: "I'm afraid… — вежливое начало для плохих новостей и жалоб." }
+    ]},
+    { id: "hotel", title: "Гостиница", icon: "🏨", items: [
+      { en: "Could I have the Wi-Fi password, please?", tr: "Куд ай хэв зэ уа́й-фай па́асвёд, пли́из?", ru: "Можно пароль от Wi-Fi?" },
+      { en: "Would it be possible to leave our luggage here until this evening?", tr: "Вуд ит би по́сибл ту ли́ив а́уэ ла́гидж хи́э анти́л зис и́ивнинг?", ru: "Можно оставить у вас багаж до вечера?",
+        tip: "Пригодится 9 декабря: выезд из номера до 11:00, а рейс вечером." },
+      { en: "I'm sorry, the heating in our room doesn't seem to be working.", tr: "Айм со́ри, зэ хи́итинг ин а́уэ руум да́зэнт си́им ту би уё́кинг.", ru: "Извините, в нашем номере, кажется, не работает отопление.",
+        tip: "Doesn't seem to be — мягкий британский способ пожаловаться, без обвинений." }
+    ]},
+    { id: "taxi", title: "Такси", icon: "🚕", items: [
+      { en: "Could you take us to this address, please?", tr: "Куд ю тэйк ас ту зис эдрэ́с, пли́из?", ru: "Отвезите нас, пожалуйста, по этому адресу.",
+        tip: "И покажите карточку отеля из вкладки «Я потерялся»." },
+      { en: "Roughly how much will it be?", tr: "Ра́фли хау мач уил ит би?", ru: "Примерно сколько это будет стоить?" },
+      { en: "Just here is fine, thank you. Keep the change.", tr: "Джаст хи́э из файн, сэ́нк ю. Ки́ип зэ чэ́йндж.", ru: "Здесь можно остановить, спасибо. Сдачи не надо.",
+        tip: "В чёрных кэбах принято округлять сумму вверх, примерно на 10%." }
+    ]},
+    { id: "street", title: "Улица и метро", icon: "🚇", items: [
+      { en: "Sorry to bother you, could you tell me the way to the British Museum?", tr: "Со́ри ту бо́зэ ю, куд ю тэл ми зэ уэ́й ту зэ Бри́тиш Мьюзи́эм?", ru: "Извините за беспокойство, как пройти к Британскому музею?",
+        tip: "Sorry to bother you — идеальное начало для вопроса незнакомцу. Вместо музея подставьте любое место." },
+      { en: "Excuse me, I'm lost. Could you help me, please?", tr: "Экскью́з ми, айм лост. Куд ю хэлп ми, пли́из?", ru: "Простите, я заблудился. Не могли бы вы помочь?" },
+      { en: "Is this the right platform for Russell Square?", tr: "Из зис зэ райт пла́тфом фо Ра́сл Скуэ́э?", ru: "Это правильная платформа до Russell Square?",
+        tip: "Russell Square — наша станция у отеля." }
+    ]},
+    { id: "cafe", title: "Кафе и паб", icon: "☕", items: [
+      { en: "Could we have a table for two, please?", tr: "Куд уи хэв э тэ́йбл фо ту, пли́из?", ru: "Можно столик на двоих?",
+        tip: "В пабе обычно не ждут официанта: заказывают и платят у стойки." },
+      { en: "Could I have a cup of tea with milk, please?", tr: "Куд ай хэв э кап ов ти́и уиз милк, пли́из?", ru: "Можно чашку чая с молоком?",
+        tip: "Чай здесь по умолчанию пьют с молоком. Если хотите без — no milk, please." },
+      { en: "Does this have any pork in it?", tr: "Даз зис хэв э́ни по́ок ин ит?", ru: "В этом блюде есть свинина?",
+        tip: "Сосиски, бобы и даже некоторые пироги часто бывают со свининой." },
+      { en: "Could we have the bill, please?", tr: "Куд уи хэв зэ бил, пли́из?", ru: "Принесите, пожалуйста, счёт.",
+        tip: "В Британии говорят bill, а не check. Проверьте, нет ли в счёте service charge — это уже чаевые." }
+    ]},
+    { id: "shop", title: "Магазин и рынок", icon: "🛍️", items: [
+      { en: "I'm just looking, thank you.", tr: "Айм джаст лу́кинг, сэ́нк ю.", ru: "Я просто смотрю, спасибо." },
+      { en: "How much is this, please?", tr: "Хау мач из зис, пли́из?", ru: "Сколько это стоит?" },
+      { en: "Do you take cards?", tr: "Ду ю тэйк ка́адз?", ru: "Вы принимаете карты?",
+        tip: "Карты берут почти везде, но на блошиных рынках у некоторых продавцов только наличные." },
+      { en: "Would you take twenty pounds for it?", tr: "Вуд ю тэйк туэ́нти па́ундз фор ит?", ru: "Отдадите за двадцать фунтов?",
+        tip: "Торговаться уместно на Портобелло и других блошиных рынках, но не в обычных магазинах. Делайте это с улыбкой." }
+    ]}
   ],
 
   /* Ветка метро от отеля: s = остановок от Russell Square без пересадок */
@@ -711,6 +779,72 @@ function renderPlaces() {
   </div>`;
 }
 
+/* ===== Разговорник ===== */
+let phraseTheme = "all";
+const CAN_SPEAK = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+let gbVoice = null;
+// Ищем британский голос: на iPhone это обычно Daniel или Serena
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices();
+    gbVoice = vs.find(v => v.lang === "en-GB" && /Daniel|Serena|Kate|Arthur|Martha|Google UK/i.test(v.name))
+           || vs.find(v => v.lang === "en-GB")
+           || vs.find(v => /^en/i.test(v.lang)) || null;
+  } catch {}
+}
+if (CAN_SPEAK) { pickVoice(); speechSynthesis.addEventListener?.("voiceschanged", pickVoice); }
+
+function speak(text, rate, btn) {
+  if (!CAN_SPEAK) return;
+  speechSynthesis.cancel(); // останавливаем предыдущую фразу
+  document.querySelectorAll("[data-say][aria-pressed='true']").forEach(b => b.setAttribute("aria-pressed", "false"));
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-GB";
+  if (gbVoice) u.voice = gbVoice;
+  u.rate = rate;
+  if (btn) { btn.setAttribute("aria-pressed", "true"); u.onend = u.onerror = () => btn.setAttribute("aria-pressed", "false"); }
+  speechSynthesis.speak(u);
+}
+
+function renderPhrases() {
+  const themes = TOUR.phrases;
+  const shown = themes.filter(t => phraseTheme === "all" || t.id === phraseTheme);
+  const total = themes.reduce((n, t) => n + t.items.length, 0);
+  $("#v-phrases").innerHTML = `<div class="stack">
+    <a class="back" href="#tools">← Полезное</a>
+    <div><h2>Разговорник</h2><p class="small muted">${total} вежливых фраз на британский манер. 🔊 — послушать, 🐢 — медленно, «Показать» — крупно на весь экран, чтобы дать прочитать собеседнику.</p></div>
+    ${CAN_SPEAK ? "" : `<p class="tip">Этот браузер не умеет озвучивать текст. Пользуйтесь кнопкой «Показать».</p>`}
+    <div class="chips" role="group" aria-label="Темы">
+      <button type="button" class="chip" data-theme="all" aria-pressed="${phraseTheme === "all"}">Все</button>
+      ${themes.map(t => `<button type="button" class="chip" data-theme="${t.id}" aria-pressed="${t.id === phraseTheme}">${t.icon} ${t.title}</button>`).join("")}
+    </div>
+    ${phraseTheme === "all" ? `<article class="card">
+      <h3>Пять слов, без которых в Англии никуда</h3>
+      <div class="basics">${TOUR.phrasesBasics.map(b => `<div><b>${esc(b.en)}</b><span class="small muted">${esc(b.ru)}</span></div>`).join("")}</div>
+    </article>` : ""}
+    ${shown.map(t => `
+      <h3 style="margin-top:6px">${t.icon} ${esc(t.title)}</h3>
+      ${t.items.map(ph => `<article class="card phrase">
+        <p class="en" lang="en-GB">${esc(ph.en)}</p>
+        <p class="tr">${esc(ph.tr)}</p>
+        <p class="ru">${esc(ph.ru)}</p>
+        ${ph.tip ? `<p class="tip">${esc(ph.tip)}</p>` : ""}
+        <div class="speak-row">
+          ${CAN_SPEAK ? `<button type="button" class="btn" data-say="${esc(ph.en)}" data-rate="0.9" aria-pressed="false">🔊 Сказать</button>
+          <button type="button" class="btn ghost" data-say="${esc(ph.en)}" data-rate="0.6" aria-pressed="false">🐢 Медленно</button>` : ""}
+          <button type="button" class="btn ghost" data-big-en="${esc(ph.en)}" data-big-ru="${esc(ph.ru)}" style="${CAN_SPEAK ? "" : "grid-column: 1 / -1"}">Показать</button>
+        </div>
+      </article>`).join("")}`).join("")}
+  </div>`;
+}
+
+/* Крупная карточка на весь экран (таксисту, официанту, продавцу) */
+function showBig(a, b, c, d) {
+  $("#big-1").textContent = a || ""; $("#big-2").textContent = b || "";
+  $("#big-3").textContent = c || ""; $("#big-4").textContent = d || "";
+  $("#taxi").classList.add("open"); $("#taxi-close").focus();
+}
+
 function telHref(p) { return "tel:" + p.replace(/[^\d+]/g, ""); }
 function waHref(p) { return "https://wa.me/" + p.replace(/\D/g, ""); }
 
@@ -755,6 +889,7 @@ function renderHelp() {
         <li><span>Если связи нет — возвращайтесь в отель: «Показать таксисту» или метро до Russell Square.</span></li>
         <li><span>Обратитесь к полицейскому или сотруднику метро: в Лондоне это обычное дело.</span></li>
       </ul>
+      <a class="btn ghost" href="#phrases">Фразы на английском: «Я заблудился»</a>
     </article>
   </div>`;
 }
@@ -772,6 +907,11 @@ function renderTools() {
         ? `<ol class="install-steps small"><li>Откройте эту страницу в <b>Safari</b></li><li>Нажмите кнопку «Поделиться» (квадрат со стрелкой вверх)</li><li>Выберите <b>«На экран Домой»</b> → «Добавить»</li></ol>`
         : `<ol class="install-steps small"><li>Откройте эту страницу в <b>Chrome</b></li><li>Нажмите меню <b>⋮</b> справа вверху</li><li>Выберите <b>«Добавить на главный экран»</b> или «Установить приложение»</li></ol>`}
     </article>`}
+    <a class="card" href="#phrases" style="text-decoration:none;color:inherit">
+      <h3>🗣️ Разговорник с озвучкой</h3>
+      <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, кафе и рынка. Телефон произнесёт их с британским акцентом.</p>
+      <span class="btn">Открыть разговорник</span>
+    </a>
     <article class="card">
       <h3>Конвертер</h3>
       <div class="conv">
@@ -808,15 +948,18 @@ function wireConverter() {
 }
 
 /* Навигация по вкладкам через #hash */
-const VIEWS = ["today", "program", "places", "help", "tools"];
+const VIEWS = ["today", "program", "places", "help", "tools", "phrases"];
+const TAB_FOR = { phrases: "tools" }; // какую вкладку подсвечивать для экранов без своей вкладки
 function show() {
   const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "today";
   VIEWS.forEach(n => $("#v-" + n).classList.toggle("active", n === v));
-  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  const tab = TAB_FOR[v] || v;
+  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.v === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  if (v !== "phrases" && CAN_SPEAK) speechSynthesis.cancel();
   window.scrollTo(0, 0);
 }
 
-function renderAll() { renderToday(); renderProgram(); renderPlaces(); renderHelp(); renderTools(); }
+function renderAll() { renderToday(); renderProgram(); renderPlaces(); renderHelp(); renderTools(); renderPhrases(); }
 
 /* Один общий обработчик кликов (event delegation) */
 document.addEventListener("click", e => {
@@ -827,7 +970,13 @@ document.addEventListener("click", e => {
   if (go) { preview = go.dataset.pvGo; renderToday(); renderProgram(); renderPlaces(); location.hash = "today"; return; }
   const cat = e.target.closest("[data-cat]");
   if (cat) { placeCat = cat.dataset.cat; renderPlaces(); return; }
-  if (e.target.closest("#taxi-open")) { $("#taxi").classList.add("open"); $("#taxi-close").focus(); return; }
+  if (e.target.closest("#taxi-open")) { showBig("Please take me to:", TOUR.hotel.name, TOUR.hotel.address, `Near ${TOUR.hotel.tube} station`); return; }
+  const say = e.target.closest("[data-say]");
+  if (say) { speak(say.dataset.say, Number(say.dataset.rate), say); return; }
+  const big = e.target.closest("[data-big-en]");
+  if (big) { showBig("", big.dataset.bigEn, "", big.dataset.bigRu); return; }
+  const th = e.target.closest("[data-theme]");
+  if (th) { phraseTheme = th.dataset.theme; renderPhrases(); return; }
   if (e.target.closest("#taxi-close")) { $("#taxi").classList.remove("open"); return; }
 });
 document.addEventListener("change", e => {
@@ -858,9 +1007,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") $("#taxi").c
   });
 })();
 
-$("#taxi-name").textContent = TOUR.hotel.name;
-$("#taxi-addr").textContent = TOUR.hotel.address;
-$("#taxi-near").textContent = `Near ${TOUR.hotel.tube} station`;
+
 
 renderAll();
 show();
