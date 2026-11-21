@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Лондон на Рождество — карманный гид</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one-column phone app, content cards on a cool London-fog ground,
+   bottom tab bar; pillar-box red for actions, Christmas-light gold for "now". */
+:root {
+  --bg: #eef1f5;
+  --surface: #ffffff;
+  --ink: #142033;
+  --muted: #5b6678;
+  --line: #d9dee6;
+  --accent: #c8102e;      /* pillar-box red */
+  --accent-ink: #ffffff;
+  --gold: #b8860b;        /* Christmas lights */
+  --gold-soft: #fbf3dc;
+  --tube: #003688;        /* Piccadilly line blue */
+  --optional: #6b4fa0;
+  --optional-soft: #efe9f8;
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Golos Text", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1522; --surface: #172235; --ink: #eef2f8; --muted: #a3afc2; --line: #2a3850;
+    --accent: #ff4d5e; --accent-ink: #1a0508; --gold: #f2c45a; --gold-soft: #2b2614;
+    --tube: #6f95ff; --optional: #c3a8ff; --optional-soft: #2a2340;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1522; --surface: #172235; --ink: #eef2f8; --muted: #a3afc2; --line: #2a3850;
+  --accent: #ff4d5e; --accent-ink: #1a0508; --gold: #f2c45a; --gold-soft: #2b2614;
+  --tube: #6f95ff; --optional: #c3a8ff; --optional-soft: #2a2340;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 18px; line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+a { color: var(--accent); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; }
+h2 { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.2; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+
+.app { max-width: 560px; margin: 0 auto; min-height: 100%;
+  padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 96px); }
+
+header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.eyebrow { font-size: .85rem; color: var(--muted); font-weight: 500; letter-spacing: .02em; }
+
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.card.now { border: 2px solid var(--gold); background: linear-gradient(var(--gold-soft), var(--surface) 70%); }
+.muted { color: var(--muted); }
+.small { font-size: .9rem; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; width: fit-content; }
+.pill.gold { background: var(--gold-soft); color: var(--gold); border: 1px solid var(--gold); }
+.pill.opt { background: var(--optional-soft); color: var(--optional); }
+.pill.todo { background: transparent; color: var(--accent); border: 1px dashed var(--accent); }
+
+.meet { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: baseline; padding: 12px 14px; border-radius: 12px; background: var(--bg); }
+.meet .time { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.meet .place { font-weight: 500; }
+
+ul.items { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+ul.items li { display: flex; gap: 10px; align-items: flex-start; }
+ul.items li::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: .6em; border-radius: 50%; background: var(--accent); }
+ul.items li.opt::before { background: var(--optional); }
+.tip { font-size: .95rem; padding: 10px 12px; border-left: 4px solid var(--gold); background: var(--gold-soft); border-radius: 0 10px 10px 0; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 12px 18px; border-radius: 12px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; text-decoration: none; cursor: pointer; text-align: center; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.maplink { align-self: center; font-size: .95rem; font-weight: 500; padding: 8px 12px; min-height: 44px; display: inline-flex; align-items: center; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: .95rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: .9rem; margin-bottom: 14px; }
+.preview-bar button { background: transparent; border: 1px solid currentColor; border-radius: 999px; padding: 6px 12px; cursor: pointer; color: inherit; }
+
+.big-num { font-family: var(--font-display); font-size: 3.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* Program */
+.day { position: relative; }
+.day .date { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.day .date b { font-variant-numeric: tabular-nums; }
+.day.today { border: 2px solid var(--gold); }
+
+/* Help */
+.address { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+.roundel { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; }
+.roundel i { width: 30px; height: 30px; border-radius: 50%; border: 6px solid var(--accent); position: relative; flex: none; }
+.roundel i::after { content: ""; position: absolute; left: -10px; right: -10px; top: 50%; height: 7px; transform: translateY(-50%); background: var(--tube); }
+.contact { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.contact:first-of-type { border-top: 0; }
+.contact .num { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .95rem; }
+.contact a.call { flex: none; min-width: 52px; min-height: 52px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 700; }
+.contact a.call.wa { background: #1f9d55; color: #fff; }
+.contact .call.off { background: var(--line); color: var(--muted); }
+
+.taxi { position: fixed; inset: 0; background: #ffffff; color: #000000; z-index: 50; display: none; flex-direction: column; justify-content: center; gap: 20px;
+  padding: calc(env(safe-area-inset-top) + 24px) 24px calc(env(safe-area-inset-bottom) + 24px); }
+.taxi.open { display: flex; }
+.taxi .t1 { font-size: 1.4rem; }
+.taxi .t2 { font-size: 2.3rem; font-weight: 700; line-height: 1.15; }
+.taxi .t3 { font-size: 1.6rem; line-height: 1.3; }
+.taxi button { align-self: flex-start; min-height: 52px; padding: 10px 20px; border-radius: 12px; border: 2px solid #000; background: #fff; color: #000; font-weight: 600; cursor: pointer; }
+
+/* Tools */
+.conv { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: .9rem; color: var(--muted); }
+.field .inp { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 0 14px; }
+.field .inp span { font-size: 1.3rem; font-weight: 600; color: var(--muted); width: 1.4em; }
+.field input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1.5rem; font-weight: 600; padding: 12px 0; font-variant-numeric: tabular-nums; }
+.field input:focus { outline: none; }
+.field .inp:focus-within { outline: 3px solid var(--gold); }
+.rate-row { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); flex-wrap: wrap; }
+.rate-row input { width: 80px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; padding: 6px 8px; font-variant-numeric: tabular-nums; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.quick div { background: var(--bg); border-radius: 8px; padding: 6px; text-align: center; }
+
+.check { display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.check:first-of-type { border-top: 0; }
+.check input { width: 26px; height: 26px; accent-color: var(--accent); flex: none; }
+.check input:checked + span { color: var(--muted); text-decoration: line-through; }
+.progress { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+
+.tips { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+/* Tabs */
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom); }
+nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+nav.tabs a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 2px 12px; text-decoration: none; color: var(--muted); font-size: .72rem; font-weight: 500; text-align: center; line-height: 1.2; }
+
+/* Places: line diagram */
+.line { list-style: none; margin: 0; padding: 0; position: relative; }
+.line::before { content: ""; position: absolute; left: 11px; top: 14px; bottom: 14px; width: 8px; border-radius: 4px; background: var(--tube); }
+.line li { position: relative; display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: start; padding: 7px 0; }
+.line .dot { width: 30px; height: 30px; display: grid; place-items: center; z-index: 1; }
+.line .dot i { width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 4px solid var(--tube); }
+.line li.home .dot i { width: 28px; height: 28px; border: 6px solid var(--accent); }
+.line .st { font-weight: 600; line-height: 1.25; }
+.line li.home .st { color: var(--accent); }
+.line .near { font-size: .88rem; color: var(--muted); line-height: 1.35; }
+.line .stops { font-size: .8rem; font-weight: 600; color: var(--tube); white-space: nowrap; padding-top: 3px; font-variant-numeric: tabular-nums; }
+.place-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .88rem; color: var(--muted); }
+.pill.cat-xmas { background: #e8f3ec; color: #17693a; }
+.pill.cat-view { background: #e6eefc; color: #1d4fa8; }
+.pill.cat-food { background: #fdeee4; color: #a4461a; }
+.pill.cat-flea { background: var(--optional-soft); color: var(--optional); }
+.pill.cat-sight { background: #fbe9ea; color: #a3122a; }
+.pill.cat-museum { background: #f1ece2; color: #6b5420; }
+.pill.free { background: #e8f3ec; color: #17693a; }
+:root[data-theme="dark"] .pill.cat-sight { background: #3a1820; color: #ff9aa6; }
+:root[data-theme="dark"] .pill.cat-museum { background: #332b1a; color: #e6c98a; }
+:root[data-theme="dark"] .pill.free { background: #183526; color: #7fd6a2; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pill.cat-sight { background: #3a1820; color: #ff9aa6; }
+  :root:not([data-theme="light"]) .pill.cat-museum { background: #332b1a; color: #e6c98a; }
+  :root:not([data-theme="light"]) .pill.free { background: #183526; color: #7fd6a2; }
+}
+.pill.ok { background: #e8f3ec; color: #17693a; }
+.pill.closed { background: #fbe9ea; color: #a3122a; }
+.pill.direct { background: transparent; color: var(--tube); border: 1px solid var(--tube); }
+:root[data-theme="dark"] .pill.cat-xmas, :root[data-theme="dark"] .pill.ok { background: #183526; color: #7fd6a2; }
+:root[data-theme="dark"] .pill.cat-view { background: #1a2a4a; color: #8fb3ff; }
+:root[data-theme="dark"] .pill.cat-food { background: #3a2417; color: #ffb48a; }
+:root[data-theme="dark"] .pill.closed { background: #3a1820; color: #ff9aa6; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pill.cat-xmas, :root:not([data-theme="light"]) .pill.ok { background: #183526; color: #7fd6a2; }
+  :root:not([data-theme="light"]) .pill.cat-view { background: #1a2a4a; color: #8fb3ff; }
+  :root:not([data-theme="light"]) .pill.cat-food { background: #3a2417; color: #ffb48a; }
+  :root:not([data-theme="light"]) .pill.closed { background: #3a1820; color: #ff9aa6; }
+}
+nav.tabs a svg { width: 26px; height: 26px; }
+nav.tabs a[aria-current="page"] { color: var(--accent); font-weight: 700; }
+nav.tabs a.sos[aria-current="page"], nav.tabs a.sos { }
+
+.view { display: none; }
+.view.active { display: block; }
+footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-align: center; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <span class="eyebrow" id="hdr-eyebrow">3–9 декабря · Метрополь-Каспи · гид Алекс Табак</span>
+    <h1 id="hdr-title">Лондон на Рождество</h1>
+  </header>
+
+  <section class="view" id="v-today" aria-label="Сегодня"></section>
+  <section class="view" id="v-program" aria-label="Программа"></section>
+  <section class="view" id="v-places" aria-label="Места"></section>
+  <section class="view" id="v-help" aria-label="Помощь"></section>
+  <section class="view" id="v-tools" aria-label="Полезное"></section>
+
+  <footer class="note">Неофициальный помощник, сделан участником поездки. Порядок экскурсий может меняться — главное слово за гидом.</footer>
+</div>
+
+<div class="taxi" id="taxi" role="dialog" aria-modal="true" aria-label="Карточка для таксиста">
+  <div class="t1">Please take me to:</div>
+  <div class="t2" id="taxi-name"></div>
+  <div class="t3" id="taxi-addr"></div>
+  <div class="t1" id="taxi-near"></div>
+  <button type="button" id="taxi-close">Закрыть</button>
+</div>
+
+<nav class="tabs" aria-label="Разделы">
+  <div class="in">
+    <a href="#today" data-v="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Сегодня</a>
+    <a href="#program" data-v="program"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Программа</a>
+    <a href="#places" data-v="places"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Места</a>
+    <a href="#help" data-v="help" class="sos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Я потерялся</a>
+    <a href="#tools" data-v="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Полезное</a>
+  </div>
+</nav>
+
+<script>
+/* =========================================================
+   ДАННЫЕ ТУРА. Всё, что относится к Лондону, — только здесь.
+   Код ниже ничего не знает про Лондон и просто рисует эти данные.
+   TODO = нужно уточнить у гида.
+   ========================================================= */
+const TOUR = {
+  title: "Лондон на Рождество",
+  start: "2026-12-03",
+  end:   "2026-12-09",
+  tz: "Europe/London",
+  flights: {
+    out:  { code: "BA", from: "Тель-Авив", to: "Лондон", dep: "06:20", arr: "10:05" },
+    back: { code: "BA", from: "Лондон", to: "Тель-Авив", dep: "20:30", arr: "03:25" }
+  },
+  hotel: {
+    name: "Royal National Hotel",
+    address: "38-51 Bedford Way, London WC1H 0DG",
+    phone: "+44 20 7637 2488",
+    tube: "Russell Square",
+    line: "Piccadilly",
+    note: "Главный вход — с Bedford Way. Не путать с City Sleeper: это западное крыло со своим отдельным входом.",
+    checkin: "14:00", checkout: "11:00",
+    maps: "https://www.google.com/maps/dir/?api=1&destination=Royal+National+Hotel+38-51+Bedford+Way+London+WC1H+0DG"
+  },
+  guide: { name: "Алекс Табак", phone: "+972 52-385-9588" },
+  currency: { code: "GBP", symbol: "£", homeSymbol: "₪", rate: 4.05 },
+  contacts: [
+    { label: "Экстренные службы (полиция, скорая, пожарные)", phone: "999" },
+    { label: "Медпомощь, не экстренная (NHS)", phone: "111" },
+    { label: "Посольство Израиля", phone: "+44 20 7957 9500", note: "2 Palace Green, W8 4QB · пн–чт 9:30–12:00" },
+    { label: "Консульство — WhatsApp", phone: "+44 7498 316363", wa: true }
+  ],
+  days: [
+    { date: "2026-12-03", title: "Прилёт и первое знакомство",
+      meeting: { time: "10:05", place: "Хитроу, зал прилёта — гид встречает группу" },
+      items: [
+        { t: "Трансфер из аэропорта на автобусе" },
+        { t: "Обзорная экскурсия: Темза, Биг-Бен, Даунинг-стрит, Уайтхолл, Трафальгарская площадь" },
+        { t: "Заселение в отель (с 14:00)" },
+        { t: "Вечерняя прогулка «Лондон в сиянии огней»" }
+      ],
+      tip: "Ранний вылет: спать в самолёте, в Лондоне будет длинный день. Ценное и тёплую куртку держите в ручной клади — до заселения чемоданы будут в автобусе." },
+    { date: "2026-12-04", title: "Аристократический Лондон",
+      meeting: { time: null, place: "TODO: время и точка сбора" },
+      items: [
+        { t: "Вестминстер, Пэлл-Мэлл" },
+        { t: "Смена караула у Букингемского дворца (если будет в этот день)" },
+        { t: "Традиционное послеобеденное чаепитие — включено" },
+        { t: "Вход в Вестминстерское аббатство", opt: true }
+      ],
+      tip: "Смена караула собирает толпу: держитесь рядом с гидом и заранее договоритесь, где встречаетесь, если потеряетесь." },
+    { date: "2026-12-05", title: "Виндзор и рождественский Ковент-Гарден",
+      meeting: { time: null, place: "TODO: время и точка сбора" },
+      items: [
+        { t: "Виндзорский замок: королевские апартаменты, часовня Ордена Подвязки, кукольный дом королевы Мэри", opt: true },
+        { t: "Вечер: Ковент-Гарден, рождественский базар — включено" }
+      ],
+      tip: "Если не едете в Виндзор, у вас свободное утро. В «Полезном» есть идеи, что посмотреть рядом с отелем." },
+    { date: "2026-12-06", title: "Темза и Тауэр",
+      meeting: { time: null, place: "TODO: время и точка сбора" },
+      items: [
+        { t: "Круиз по Темзе — включено" },
+        { t: "Тауэр: королевские драгоценности, вороны, бифитеры", opt: true },
+        { t: "Вечер в традиционном пабе" }
+      ],
+      tip: "На воде холодно и ветрено, даже если в городе тепло. Шапка и шарф пригодятся." },
+    { date: "2026-12-07", title: "Сохо, Чайна-таун и музеи",
+      meeting: { time: null, place: "TODO: время и точка сбора" },
+      items: [
+        { t: "Пикадилли-серкус, Сохо, Чайна-таун" },
+        { t: "Национальная галерея" },
+        { t: "Музеи Южного Кенсингтона" },
+        { t: "Британский музей — бесплатно, 3 минуты от отеля" }
+      ],
+      tip: "Британский музей рядом с отелем, туда можно вернуться самостоятельно в любой день." },
+    { date: "2026-12-08", title: "Стратфорд-на-Эйвоне и Оксфорд",
+      meeting: { time: null, place: "TODO: время и точка сбора" },
+      items: [
+        { t: "Стратфорд-на-Эйвоне — родина Шекспира", opt: true },
+        { t: "Экскурсия по колледжам Оксфорда", opt: true }
+      ],
+      tip: "Долгий выезд на целый день. Возьмите воду, перекус и заряженный пауэрбанк." },
+    { date: "2026-12-09", title: "Последний день и вылет",
+      meeting: { time: null, place: "TODO: время сбора с вещами" },
+      items: [
+        { t: "Выезд из номера до 11:00, багаж сдать в камеру хранения отеля" },
+        { t: "Бейкер-стрит — дом Шерлока Холмса" },
+        { t: "Оксфорд-стрит или музей мадам Тюссо" },
+        { t: "Трансфер в аэропорт, вылет в 20:30, прилёт в Израиль в 03:25" }
+      ],
+      tip: "Паспорт держите при себе, а не в чемодане в камере хранения." }
+  ],
+  checklist: [
+    "Паспорт действует на весь срок поездки",
+    "ETA одобрен, письмо-подтверждение сохранено",
+    "Медицинская страховка",
+    "Переходник на британскую розетку (тип G)",
+    "Зонт и непромокаемая обувь",
+    "Тёплая куртка, шапка, шарф",
+    "Банковская карта (отель не принимает наличные)",
+    "Немного фунтов наличными",
+    "Пауэрбанк и зарядки",
+    "Роуминг или eSIM",
+    "Личные лекарства в ручной клади",
+    "Установить Citymapper — лучшее приложение для транспорта Лондона",
+    "Скачать офлайн-карту Лондона в Google Maps",
+    "Забронировать бесплатный вход в Sky Garden (если хотите)"
+  ],
+
+  /* Ветка метро от отеля: s = остановок от Russell Square без пересадок */
+  line: {
+    name: "Piccadilly",
+    stations: [
+      { n: "King's Cross St. Pancras", s: 1, near: "Вокзалы King's Cross и St Pancras" },
+      { n: "Russell Square", s: 0, home: true, near: "Наш отель · Британский музей" },
+      { n: "Holborn", s: 1, near: "Пересадка на красную линию Central" },
+      { n: "Covent Garden", s: 2, near: "Рождественский рынок · Seven Dials Market" },
+      { n: "Leicester Square", s: 3, near: "Ярмарка и каток · Чайна-таун · Национальная галерея" },
+      { n: "Piccadilly Circus", s: 4, near: "Огни Пикадилли · Сохо · Риджент-стрит" },
+      { n: "Green Park", s: 5, near: "Букингемский дворец" },
+      { n: "Hyde Park Corner", s: 6, near: "Winter Wonderland" },
+      { n: "Knightsbridge", s: 7, near: "Harrods и его фуд-холл" },
+      { n: "South Kensington", s: 8, near: "Музеи естествознания, V&A и науки" },
+      { n: "… Heathrow", s: null, near: "Аэропорт, около часа" }
+    ]
+  },
+
+  /* Места. cat: xmas | view | food | flea.
+     days — дни недели, когда открыто (0 = вс … 6 = сб). Нет поля = каждый день.
+     direct — сколько остановок по Piccadilly без пересадок (null = с пересадкой). */
+  places: [
+    /* program — дата дня программы, когда группа там будет. free — вход бесплатный. */
+    { cat: "sight", name: "Биг-Бен и здание Парламента", q: "Big Ben London", program: "2026-12-03", free: true,
+      station: "Westminster", direct: null, hours: "снаружи — всегда",
+      text: "Главный символ Лондона. Лучшие фото — с Вестминстерского моста или с противоположного берега Темзы, особенно вечером, когда включается подсветка." },
+    { cat: "sight", name: "Вестминстерское аббатство", q: "Westminster Abbey", program: "2026-12-04",
+      station: "Westminster", direct: null, hours: "вход платный, по программе — за доплату",
+      text: "Здесь коронуют британских монархов, здесь похоронены Ньютон и Дарвин. Снаружи смотреть бесплатно, внутрь — по билету." },
+    { cat: "sight", name: "Букингемский дворец", q: "Buckingham Palace", program: "2026-12-04", free: true,
+      station: "Green Park", direct: 5, hours: "снаружи — всегда",
+      text: "Резиденция короля. Зимой смена караула проходит не каждый день, точное расписание лучше уточнить у гида накануне." },
+    { cat: "sight", name: "Трафальгарская площадь", q: "Trafalgar Square London", program: "2026-12-03", free: true,
+      station: "Charing Cross", direct: null, hours: "всегда",
+      text: "Колонна Нельсона, львы и Национальная галерея. В декабре здесь стоит главная ёлка города. От Leicester Square 5 минут пешком." },
+    { cat: "sight", name: "Тауэрский мост", q: "Tower Bridge London", program: "2026-12-06", free: true,
+      station: "Tower Hill", direct: null, hours: "по мосту — всегда бесплатно",
+      text: "Тот самый разводной мост. Перейти по нему можно бесплатно, а верхняя галерея со стеклянным полом платная." },
+    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", q: "St Paul's Cathedral London", free: true,
+      station: "St. Paul's", direct: null, hours: "собор — по билету, мост — всегда",
+      text: "Огромный купол Рена. Внутрь собора вход платный, но красивее всего пройти от него по пешеходному мосту Миллениум через Темзу прямо к галерее Тейт Модерн." },
+    { cat: "sight", name: "Пикадилли-серкус", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
+      station: "Piccadilly Circus", direct: 4, hours: "всегда",
+      text: "Лондонский «Таймс-сквер» со светящимися экранами. Отсюда начинается Риджент-стрит с рождественской иллюминацией над улицей." },
+    { cat: "sight", name: "Вокзал King's Cross", q: "King's Cross Station London", free: true,
+      station: "King's Cross St. Pancras", direct: 1, hours: "всегда",
+      text: "Одна остановка от отеля. Внутри — знаменитая тележка «Платформа 9¾» из «Гарри Поттера», а рядом — роскошный викторианский вокзал Сент-Панкрас." },
+
+    { cat: "museum", name: "Британский музей", q: "British Museum London", program: "2026-12-07", free: true,
+      station: "Russell Square", direct: 0, hours: "ежедневно 10–17, в пятницу до 20:30",
+      text: "Три минуты пешком от отеля. Розеттский камень, мумии Египта, мраморы Парфенона. Вход бесплатный, но бесплатный билет на время лучше взять на сайте заранее. С сентября 2026 здесь показывают гобелен из Байё — на него нужен отдельный билет на время." },
+    { cat: "museum", name: "Национальная галерея", q: "National Gallery London", program: "2026-12-07", free: true,
+      station: "Charing Cross / Leicester Square", direct: 3, hours: "ежедневно",
+      text: "Ван Гог, Тёрнер, Леонардо, Рембрандт — вся классика живописи в одном здании на Трафальгарской площади." },
+    { cat: "museum", name: "Национальная портретная галерея", q: "National Portrait Gallery London", free: true,
+      station: "Leicester Square", direct: 3, hours: "ежедневно",
+      text: "Сразу за Национальной галереей. Портреты всех знаменитых британцев — от Генриха VIII до современных звёзд." },
+    { cat: "museum", name: "Музей естествознания", q: "Natural History Museum London", program: "2026-12-07", free: true,
+      station: "South Kensington", direct: 8, hours: "ежедневно 10–17:50",
+      text: "Скелет синего кита под потолком, зал динозавров, само здание — как собор. Бесплатно, но лучше взять бесплатный билет на время: в будни зимой обычно свободнее." },
+    { cat: "museum", name: "Музей Виктории и Альберта (V&A)", q: "Victoria and Albert Museum London", free: true,
+      station: "South Kensington", direct: 8, hours: "ежедневно",
+      text: "Мировой музей дизайна: мода, ювелирка, фарфор, мебель. Очень понравится тем, кто любит блошиные рынки и антиквариат." },
+    { cat: "museum", name: "Музей науки", q: "Science Museum London", free: true,
+      station: "South Kensington", direct: 8, hours: "ежедневно",
+      text: "Паровозы, космические капсулы, первые компьютеры. Стоит рядом с двумя предыдущими музеями." },
+    { cat: "museum", name: "Тейт Модерн", q: "Tate Modern London", free: true,
+      station: "Blackfriars / Southwark", direct: null, hours: "ежедневно",
+      text: "Современное искусство в бывшей электростанции на берегу Темзы. С верхнего этажа бесплатно видно собор Святого Павла." },
+    { cat: "museum", name: "Музей сэра Джона Соуна", q: "Sir John Soane's Museum", free: true,
+      station: "Holborn", direct: 1, hours: "не каждый день — проверьте на сайте",
+      text: "Необычный дом-музей архитектора XIX века: каждая стена увешана картинами и древностями. Маленький, но незабываемый. Одна остановка от отеля." },
+
+    { cat: "xmas", name: "Рождество в Ковент-Гардене", q: "Covent Garden Piazza London",
+      station: "Covent Garden", direct: 2, hours: "пн–сб 10–21, вс 12–17",
+      text: "Огромная ёлка, гирлянды и рождественские лавки в старом крытом рынке. Вечером 5 декабря вы будете здесь с группой." },
+    { cat: "xmas", name: "Ярмарка на Лестер-сквер", q: "Leicester Square London",
+      station: "Leicester Square", direct: 3, hours: "каждый день",
+      text: "Деревянные домики и каток вокруг памятника Шекспиру. Рядом Чайна-таун, удобно совместить с ужином." },
+    { cat: "xmas", name: "Winter Wonderland в Гайд-парке", q: "Hyde Park Winter Wonderland",
+      station: "Hyde Park Corner", direct: 6, hours: "10–22", book: true,
+      text: "Самая большая рождественская ярмарка Британии: колесо обозрения, каток, аттракционы, баварская пивная. Билет на вход нужно купить заранее на конкретный час. Закладывайте 3–4 часа." },
+    { cat: "xmas", name: "Зимний рынок на Саут-Банк", q: "Southbank Centre Winter Market",
+      station: "Waterloo / Embankment", direct: null, hours: "каждый день",
+      text: "Рынок на набережной Темзы с видом на Лондонский глаз. Красиво вечером, когда горят огни на воде." },
+    { cat: "xmas", name: "Рынок на Трафальгарской площади", q: "Trafalgar Square London",
+      station: "Charing Cross", direct: null, hours: "каждый день",
+      text: "Небольшой рынок у главной ёлки Лондона, которую каждый год дарит Норвегия. Пешком 5 минут от Лестер-сквер." },
+
+    { cat: "view", name: "Sky Garden", q: "Sky Garden 1 Sky Garden Walk London",
+      station: "Monument", direct: null, hours: "пн–пт 10–18, сб–вс 11–21", book: true,
+      text: "Бесплатная смотровая площадка с садом на 35-м этаже. Вход только по бесплатным билетам на сайте, при бронировании нужно указать имена. Если билетов нет, можно спросить у входа: иногда пускают без брони." },
+    { cat: "view", name: "Холм Примроуз-Хилл", q: "Primrose Hill London",
+      station: "Chalk Farm", direct: null, hours: "всегда, бесплатно",
+      text: "Тихий холм в парке с панорамой всего центра. Хорошо совместить с Кэмден-маркетом, это рядом." },
+    { cat: "view", name: "The Shard", q: "The View from The Shard",
+      station: "London Bridge", direct: null, hours: "платно, по билетам",
+      text: "Самый высокий небоскрёб Лондона, площадка выше Sky Garden. Платно. Рядом Боро-маркет: сначала поесть, потом наверх." },
+
+    { cat: "food", name: "Боро-маркет", q: "Borough Market London",
+      station: "London Bridge", direct: null, hours: "в декабре каждый день; пн–пт 10–17, сб 9–17, вс 10–16",
+      text: "Главный гастрономический рынок Лондона: сыры, выпечка, уличная еда со всего мира. В субботу после обеда не протолкнуться, лучше в будни утром." },
+    { cat: "food", name: "Фуд-холл Harrods", q: "Harrods Food Halls Knightsbridge",
+      station: "Knightsbridge", direct: 7, hours: "каждый день",
+      text: "Роскошные залы с деликатесами и сладостями. Даже если ничего не покупать, это отдельная экскурсия. Удобно после музеев Южного Кенсингтона." },
+    { cat: "food", name: "Чайна-таун", q: "Chinatown London",
+      station: "Leicester Square", direct: 3, hours: "каждый день",
+      text: "Дим-самы, утка по-пекински, булочки бао. По программе вы будете здесь 7 декабря." },
+    { cat: "food", name: "Seven Dials Market", q: "Seven Dials Market London",
+      station: "Covent Garden", direct: 2, hours: "каждый день",
+      text: "Крытый фуд-холл у Ковент-Гардена: десятки прилавков, каждый выбирает своё. Удобно, если в компании разные вкусы." },
+    { cat: "food", name: "Кошерный Голдерс-Грин", q: "Golders Green Road London",
+      station: "Golders Green", direct: null, hours: "пятница — до вечера, в субботу почти всё закрыто", days: [0,1,2,3,4,5],
+      text: "Еврейский район с кошерными ресторанами, пекарнями и магазинами. Северная линия метро." },
+
+    { cat: "flea", name: "Портобелло-роуд", q: "Portobello Road Market London",
+      station: "Notting Hill Gate / Ladbroke Grove", direct: null, hours: "сб — главный день; пт — антиквариат и винтаж", days: [5,6],
+      text: "Самый знаменитый антикварный рынок мира: в субботу больше 1500 прилавков. Внимание: 5 декабря, суббота, совпадает с поездкой в Виндзор. Придётся выбирать или ехать в пятницу, 4-го, после программы." },
+    { cat: "flea", name: "Антикварный рынок Бермондси", q: "Bermondsey Square Antiques Market",
+      station: "London Bridge / Borough", direct: null, hours: "только пт, 6–14", days: [5],
+      text: "Больше 200 прилавков: фарфор, серебро, стекло. Рынок для знатоков, начинается очень рано. В вашей поездке это только 4 декабря." },
+    { cat: "flea", name: "Олд-Спиталфилдс", q: "Old Spitalfields Market",
+      station: "Liverpool Street", direct: null, hours: "каждый день; антиквариат — по четвергам",
+      text: "Красивый викторианский крытый рынок: дизайнеры, винтаж, еда. По четвергам большой антикварный рынок, но 3 декабря у вас день прилёта." },
+    { cat: "flea", name: "Цветочный рынок Коламбия-роуд", q: "Columbia Road Flower Market",
+      station: "Hoxton", direct: null, hours: "только вс, примерно 8–15", days: [0],
+      text: "Улица превращается в море цветов, вокруг маленькие винтажные лавки. Рядом Брик-лейн с воскресным рынком. В поездке это 6 декабря, лучше утром." },
+    { cat: "flea", name: "Кэмден-маркет", q: "Camden Market London",
+      station: "Camden Town", direct: null, hours: "каждый день",
+      text: "Огромный рынок альтернативной моды, винтажа и уличной еды у канала. Можно совместить с Примроуз-Хилл." }
+  ],
+  tips: [
+    { h: "Oyster Card (£30 уже на карте)", p: "В метро прикладывайте карту и на входе, и на выходе, иначе спишут максимальный тариф. В автобусе — только при входе. Пополнить можно в автоматах на любой станции. Бесконтактная банковская карта работает так же." },
+    { h: "Переходите дорогу внимательно", p: "Движение левостороннее: сначала смотрите направо. На многих переходах так и написано на асфальте: LOOK RIGHT." },
+    { h: "Погода в декабре", p: "Обычно от +3 до +9 °C, часто дождь и ветер, темнеет около 16:00. Одевайтесь слоями." },
+    { h: "Чаевые", p: "В ресторанах в счёт часто уже включён service charge, обычно 12,5%. Если его нет, принято оставить 10–12%. В пабах у стойки чаевые не ждут." },
+    { h: "Рядом с отелем", p: "Британский музей — 3 минуты пешком. Russell Square — 2 минуты: прямая ветка Piccadilly до Пикадилли-серкус, Ковент-Гардена и Хитроу." }
+  ]
+};
+
+/* =========================================================
+   ДВИЖОК
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+// Безопасное хранилище: в некоторых браузерах localStorage недоступен
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+
+const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const WDAYS = ["воскресенье","понедельник","вторник","среда","четверг","пятница","суббота"];
+const parse = iso => { const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d); };
+const fmt = iso => { const d = parse(iso); return `${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+const wday = iso => WDAYS[parse(iso).getDay()];
+// "Сегодня" по лондонскому времени: важно, когда телефон ещё живёт по израильскому
+function londonToday() {
+  try { return new Intl.DateTimeFormat("en-CA", { timeZone: TOUR.tz }).format(new Date()); }
+  catch { const d = new Date(); return d.toISOString().slice(0,10); }
+}
+const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
+function plural(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+
+let preview = null; // дата для предпросмотра (до поездки)
+
+function placeHtml(place) {
+  return place.startsWith("TODO")
+    ? `<span class="pill todo">Уточнить у гида</span>`
+    : `<span class="place">${esc(place)}</span>`;
+}
+
+function dayItems(day) {
+  return `<ul class="items">${day.items.map(i =>
+    `<li class="${i.opt ? "opt" : ""}"><span>${esc(i.t)}${i.opt ? ` <span class="pill opt">за доплату</span>` : ""}</span></li>`).join("")}</ul>`;
+}
+
+function renderToday() {
+  const real = londonToday();
+  const today = preview || real;
+  const idx = TOUR.days.findIndex(d => d.date === today);
+  let html = "";
+
+  if (preview) {
+    html += `<div class="preview-bar"><span>Предпросмотр: ${fmt(preview)}</span><button type="button" id="pv-exit">Вернуться к сегодня</button></div>`;
+  }
+
+  if (idx >= 0) {
+    const d = TOUR.days[idx], next = TOUR.days[idx + 1];
+    html += `<div class="stack">
+      <article class="card now">
+        <span class="pill gold">День ${idx + 1} из ${TOUR.days.length} · ${wday(d.date)}, ${fmt(d.date)}</span>
+        <h2>${esc(d.title)}</h2>
+        <div class="meet">
+          <span class="time">${d.meeting.time ? esc(d.meeting.time) : "—:—"}</span>
+          ${placeHtml(d.meeting.place)}
+        </div>
+        ${dayItems(d)}
+        ${d.tip ? `<p class="tip">${esc(d.tip)}</p>` : ""}
+      </article>
+      ${next ? `<article class="card"><span class="eyebrow">Завтра · ${fmt(next.date)}</span><h3>${esc(next.title)}</h3>
+        <p class="muted small">Сбор: ${next.meeting.time ? esc(next.meeting.time) : "уточнить у гида"}</p></article>` : ""}
+      <div class="btn-row">
+        ${TOUR.guide.phone ? `<a class="btn" href="${waHref(TOUR.guide.phone)}" target="_blank" rel="noopener">Написать гиду</a>` : ""}
+        <a class="btn ghost" href="#help">Отель и телефоны</a>
+      </div>
+    </div>`;
+  } else if (today < TOUR.start) {
+    const n = daysBetween(today, TOUR.start);
+    const list = TOUR.checklist, done = store.get("checks", []);
+    const cnt = list.filter((_, i) => done.includes(i)).length;
+    const f = TOUR.flights.out;
+    html += `<div class="stack">
+      <article class="card now">
+        <span class="eyebrow">До вылета</span>
+        <div><span class="big-num">${n}</span> <span class="muted">${plural(n,"день","дня","дней")}</span></div>
+        <p>Рейс ${f.code}: ${f.from} ${f.dep} → ${f.to} ${f.arr}, ${wday(TOUR.start)}, ${fmt(TOUR.start)}.</p>
+        <p class="small muted">Взять ли зонт? Скорее всего, да.</p>
+      </article>
+      <article class="card">
+        <h3>Сборы: готово ${cnt} из ${list.length}</h3>
+        <div class="progress"><i style="width:${Math.round(cnt / list.length * 100)}%"></i></div>
+        ${cnt < list.length ? `<p class="small">Следующее: ${esc(list.find((_, i) => !done.includes(i)))}</p>` : `<p class="small">Всё собрано!</p>`}
+        <a class="btn ghost" href="#tools">Открыть чек-лист</a>
+      </article>
+      <article class="card">
+        <h3>Посмотреть, как будет выглядеть день в поездке</h3>
+        <div class="chips">${TOUR.days.map((d, i) => `<button type="button" class="chip" data-pv="${d.date}">День ${i + 1} · ${parse(d.date).getDate()}.12</button>`).join("")}</div>
+      </article>
+    </div>`;
+  } else {
+    html += `<article class="card"><h2>С возвращением!</h2><p>Надеемся, Лондон понравился. Программа и полезное остаются здесь.</p></article>`;
+  }
+  $("#v-today").innerHTML = html;
+}
+
+function renderProgram() {
+  const today = preview || londonToday();
+  $("#v-program").innerHTML = `<div class="stack">
+    <p class="small muted">Порядок экскурсий может меняться. Фиолетовые пункты — за доплату.</p>
+    ${TOUR.days.map((d, i) => `
+      <article class="card day ${d.date === today ? "today" : ""}">
+        <div class="date"><span class="eyebrow">День ${i + 1} · ${wday(d.date)}</span><b>${fmt(d.date)}</b></div>
+        <h3>${esc(d.title)}</h3>
+        ${dayItems(d)}
+        <p class="small muted">Сбор: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.place.startsWith("TODO") ? "уточнить у гида" : esc(d.meeting.place)}</p>
+      </article>`).join("")}
+  </div>`;
+}
+
+const CATS = { all: "Все", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", flea: "Блошиные рынки" };
+let placeCat = "all";
+
+// Все даты поездки, в которые место открыто (по дням недели)
+function tripDatesFor(p) {
+  if (!p.days) return null;
+  return TOUR.days.map(d => d.date).filter(iso => p.days.includes(parse(iso).getDay()));
+}
+// Запрос для карт: добавляем "London", если его нет, чтобы карта не нашла одноимённое место в другом городе
+const mapQuery = q => /london/i.test(q) ? q : q + ", London";
+// Google Maps: универсальная ссылка, на телефоне откроет приложение, если оно установлено
+function mapsPlace(q) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(mapQuery(q)); }
+// Apple Maps: на iPhone/iPad/Mac открывает встроенные «Карты»
+function applePlace(q) { return "https://maps.apple.com/?q=" + encodeURIComponent(mapQuery(q)); }
+const IS_APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+
+function mapsTransit(q) {
+  return "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(mapQuery(q)) + "&travelmode=transit";
+}
+
+function renderPlaces() {
+  const today = preview || londonToday();
+  const inTrip = today >= TOUR.start && today <= TOUR.end;
+  const wd = parse(today).getDay();
+  const L = TOUR.line;
+  const list = TOUR.places.filter(p => placeCat === "all" || p.cat === placeCat);
+
+  $("#v-places").innerHTML = `<div class="stack">
+    <article class="card">
+      <h2>Одна ветка — почти весь Лондон</h2>
+      <p class="small muted">От отеля по синей линии ${esc(L.name)} без пересадок.</p>
+      <ol class="line">
+        ${L.stations.map(s => `<li class="${s.home ? "home" : ""}">
+          <span class="dot"><i></i></span>
+          <div><div class="st">${esc(s.n)}</div><div class="near">${esc(s.near)}</div></div>
+          <span class="stops">${s.home ? "вы здесь" : s.s ? s.s + " ост." : ""}</span>
+        </li>`).join("")}
+      </ol>
+    </article>
+
+    <div class="chips" role="group" aria-label="Категории">
+      ${Object.entries(CATS).map(([k, v]) => `<button type="button" class="chip" data-cat="${k}" aria-pressed="${k === placeCat}">${v}</button>`).join("")}
+    </div>
+
+    ${list.map(p => {
+      const dates = tripDatesFor(p);
+      const openToday = !p.days || p.days.includes(wd);
+      return `<article class="card">
+        <div class="chips" style="gap:6px">
+          <span class="pill cat-${p.cat}">${CATS[p.cat]}</span>
+          ${p.free && p.cat !== "museum" ? `<span class="pill free">Бесплатно</span>` : ""}
+          ${p.book ? `<span class="pill todo">Бронь заранее</span>` : ""}
+          ${inTrip ? (openToday ? `<span class="pill ok">Сегодня открыто</span>` : `<span class="pill closed">Сегодня закрыто</span>`) : ""}
+        </div>
+        <h3>${esc(p.name)}</h3>
+        <p>${esc(p.text)}</p>
+        <div class="place-meta">
+          ${p.program ? `<span>📌 <b>По программе: ${wday(p.program)}, ${fmt(p.program)}</b></span>` : ""}
+          <span>🚇 ${esc(p.station)}${p.direct === 0 ? ` · <b style="color:var(--tube)">пешком от отеля</b>` : p.direct ? ` · <b style="color:var(--tube)">${p.direct} ост. без пересадок</b>` : ""}</span>
+          <span>🕒 ${esc(p.hours)}</span>
+          ${dates ? `<span>📅 В поездке: ${dates.length ? dates.map(d => ["вс","пн","вт","ср","чт","пт","сб"][parse(d).getDay()] + " " + fmt(d)).join(", ") : "не совпадает"}</span>` : ""}
+        </div>
+        <div class="btn-row">
+          <a class="btn ghost" href="${mapsPlace(p.q)}" target="_blank" rel="noopener">📍 На карте</a>
+          <a class="btn ghost" href="${mapsTransit(p.q)}" target="_blank" rel="noopener">🚇 Как добраться</a>
+        </div>
+        ${IS_APPLE ? `<a class="maplink" href="${applePlace(p.q)}" target="_blank" rel="noopener">Открыть в Apple Картах</a>` : ""}
+      </article>`;
+    }).join("")}
+    <p class="small muted">Часы работы в декабре могут меняться, перед поездкой лучше проверить на сайте места.</p>
+  </div>`;
+}
+
+function telHref(p) { return "tel:" + p.replace(/[^\d+]/g, ""); }
+function waHref(p) { return "https://wa.me/" + p.replace(/\D/g, ""); }
+
+function renderHelp() {
+  const h = TOUR.hotel, g = TOUR.guide;
+  $("#v-help").innerHTML = `<div class="stack">
+    <article class="card now">
+      <span class="eyebrow">Наш отель</span>
+      <h2>${esc(h.name)}</h2>
+      <p class="address">${esc(h.address)}</p>
+      <span class="roundel"><i aria-hidden="true"></i>${esc(h.tube)} · линия ${esc(h.line)} · 2 мин</span>
+      <p class="small muted">${esc(h.note)}</p>
+      <div class="btn-row">
+        <button type="button" class="btn" id="taxi-open">Показать таксисту</button>
+        <a class="btn ghost" href="${h.maps}" target="_blank" rel="noopener">Маршрут в картах</a>
+      </div>
+      ${IS_APPLE ? `<a class="maplink" href="${applePlace(h.name + ", " + h.address)}" target="_blank" rel="noopener">Открыть отель в Apple Картах</a>` : ""}
+    </article>
+    <article class="card">
+      <h3>Телефоны</h3>
+      <div>
+        <div class="contact">
+          <div><div>Гид · ${esc(g.name)}</div><div class="num">${g.phone ? esc(g.phone) : "номер появится позже"}</div></div>
+          ${g.phone ? `<a class="call wa" href="${waHref(g.phone)}" target="_blank" rel="noopener" aria-label="Написать гиду в WhatsApp">WA</a>` : `<span class="call off" style="min-width:52px;min-height:52px;display:grid;place-items:center;border-radius:50%">…</span>`}
+        </div>
+        <div class="contact">
+          <div><div>Отель · ресепшен 24/7</div><div class="num">${esc(h.phone)}</div></div>
+          <a class="call" href="${telHref(h.phone)}" aria-label="Позвонить в отель">☎</a>
+        </div>
+        ${TOUR.contacts.map(c => `
+        <div class="contact">
+          <div><div>${esc(c.label)}</div><div class="num">${esc(c.phone)}${c.note ? " · " + esc(c.note) : ""}</div></div>
+          ${c.wa ? `<a class="call wa" href="${waHref(c.phone)}" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>`
+                 : `<a class="call" href="${telHref(c.phone)}" aria-label="Позвонить">☎</a>`}
+        </div>`).join("")}
+      </div>
+    </article>
+    <article class="card">
+      <h3>Если отстали от группы</h3>
+      <ul class="items">
+        <li><span>Оставайтесь на месте, где видели группу последний раз, и напишите гиду.</span></li>
+        <li><span>Если связи нет — возвращайтесь в отель: «Показать таксисту» или метро до Russell Square.</span></li>
+        <li><span>Обратитесь к полицейскому или сотруднику метро: в Лондоне это обычное дело.</span></li>
+      </ul>
+    </article>
+  </div>`;
+}
+
+function renderTools() {
+  const c = TOUR.currency;
+  const rate = store.get("rate", c.rate);
+  const list = TOUR.checklist, done = store.get("checks", []);
+  $("#v-tools").innerHTML = `<div class="stack">
+    <article class="card">
+      <h3>Конвертер</h3>
+      <div class="conv">
+        <div class="field"><label for="in-gbp">Фунты</label><div class="inp"><span>${c.symbol}</span><input id="in-gbp" inputmode="decimal" placeholder="0" autocomplete="off"></div></div>
+        <div class="field"><label for="in-ils">Шекели</label><div class="inp"><span>${c.homeSymbol}</span><input id="in-ils" inputmode="decimal" placeholder="0" autocomplete="off"></div></div>
+      </div>
+      <div class="quick" id="quick"></div>
+      <div class="rate-row"><label for="in-rate">Курс: 1 ${c.symbol} =</label><input id="in-rate" inputmode="decimal" value="${rate}"> ${c.homeSymbol} <span>· курс примерный, поправьте под свой банк</span></div>
+    </article>
+    <article class="card">
+      <h3>Чек-лист сборов</h3>
+      <div>${list.map((t, i) => `<label class="check"><input type="checkbox" data-ck="${i}" ${done.includes(i) ? "checked" : ""}><span>${esc(t)}</span></label>`).join("")}</div>
+      <p class="small muted">Отметки сохраняются только на этом телефоне.</p>
+    </article>
+    <div class="tips">
+      ${TOUR.tips.map(t => `<article class="card"><h3>${esc(t.h)}</h3><p>${esc(t.p)}</p></article>`).join("")}
+    </div>
+  </div>`;
+  wireConverter();
+}
+
+function wireConverter() {
+  const g = $("#in-gbp"), s = $("#in-ils"), r = $("#in-rate");
+  const num = v => parseFloat(String(v).replace(",", "."));
+  const round = v => (Math.round(v * 100) / 100).toString();
+  const rate = () => { const v = num(r.value); return v > 0 ? v : TOUR.currency.rate; };
+  const quick = () => {
+    $("#quick").innerHTML = [5, 10, 20, 50].map(v => `<div>${TOUR.currency.symbol}${v} ≈ ${Math.round(v * rate())}${TOUR.currency.homeSymbol}</div>`).join("");
+  };
+  g.addEventListener("input", () => { const v = num(g.value); s.value = isNaN(v) ? "" : round(v * rate()); });
+  s.addEventListener("input", () => { const v = num(s.value); g.value = isNaN(v) ? "" : round(v / rate()); });
+  r.addEventListener("input", () => { if (num(r.value) > 0) store.set("rate", num(r.value)); quick(); g.dispatchEvent(new Event("input")); });
+  quick();
+}
+
+/* Навигация по вкладкам через #hash */
+const VIEWS = ["today", "program", "places", "help", "tools"];
+function show() {
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "today";
+  VIEWS.forEach(n => $("#v-" + n).classList.toggle("active", n === v));
+  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.v === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  window.scrollTo(0, 0);
+}
+
+function renderAll() { renderToday(); renderProgram(); renderPlaces(); renderHelp(); renderTools(); }
+
+/* Один общий обработчик кликов (event delegation) */
+document.addEventListener("click", e => {
+  const pv = e.target.closest("[data-pv]");
+  if (pv) { preview = pv.dataset.pv; renderToday(); renderProgram(); renderPlaces(); window.scrollTo(0, 0); return; }
+  if (e.target.closest("#pv-exit")) { preview = null; renderToday(); renderProgram(); renderPlaces(); return; }
+  const cat = e.target.closest("[data-cat]");
+  if (cat) { placeCat = cat.dataset.cat; renderPlaces(); return; }
+  if (e.target.closest("#taxi-open")) { $("#taxi").classList.add("open"); $("#taxi-close").focus(); return; }
+  if (e.target.closest("#taxi-close")) { $("#taxi").classList.remove("open"); return; }
+});
+document.addEventListener("change", e => {
+  const ck = e.target.closest("[data-ck]");
+  if (!ck) return;
+  const i = Number(ck.dataset.ck);
+  let done = store.get("checks", []);
+  done = ck.checked ? [...new Set([...done, i])] : done.filter(x => x !== i);
+  store.set("checks", done);
+  renderToday();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("#taxi").classList.remove("open"); });
+
+$("#taxi-name").textContent = TOUR.hotel.name;
+$("#taxi-addr").textContent = TOUR.hotel.address;
+$("#taxi-near").textContent = `Near ${TOUR.hotel.tube} station`;
+
+renderAll();
+show();
+window.addEventListener("hashchange", show);
+</script>
+</body>
+</html>
