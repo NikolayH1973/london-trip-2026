@@ -1306,8 +1306,9 @@ setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - 
     };
     const t0 = Date.now(), ts = () => ((Date.now() - t0) / 1000).toFixed(1) + "с";
     const log = e => {
-      const p = e.touches && e.touches[0] || e.changedTouches && e.changedTouches[0] || e;
-      lines.push(`${ts()} ${e.type} → ${short(e.target)} (${Math.round(p.clientX)},${Math.round(p.clientY)})${e.defaultPrevented ? " prevented" : ""}`);
+      const p = e.changedTouches && e.changedTouches[0] || e;
+      const fingers = e.touches ? ` пальцев:${e.touches.length}` : "";
+      lines.push(`${ts()} ${e.type} → ${short(e.target)} (${Math.round(p.clientX)},${Math.round(p.clientY)})${fingers}${e.defaultPrevented ? " prevented" : ""}`);
       if (e.type === "click") setTimeout(() => {
         lines.push(`   экран: ${(document.querySelector(".view.active") || {}).id} ${location.hash}`);
         draw();
@@ -1333,12 +1334,28 @@ setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - 
   }
 })();
 
-/* Подстраховка навигации: переключаем экран сами, не полагаясь только на событие hashchange */
-document.querySelectorAll("nav.tabs a").forEach(a => a.addEventListener("click", e => {
-  e.preventDefault();
-  if (location.hash !== "#" + a.dataset.v) location.hash = a.dataset.v; // запись в историю: «назад» вернёт на прошлую вкладку
+/* Навигация по меню.
+   Обычно экран переключается по событию click. Но если телефон видит два касания
+   одновременно (на некоторых устройствах бывает «фантомное» касание), браузер считает это
+   жестом и click не присылает. Событие pointerup при этом приходит правильно,
+   поэтому переключаем экран по pointerup, а click оставляем для мыши и клавиатуры. */
+function navTo(v) {
+  if (location.hash !== "#" + v) location.hash = v; // запись в историю: «назад» вернёт на прошлую вкладку
   show();
-}));
+}
+document.querySelectorAll("nav.tabs a").forEach(a => {
+  let lastPointer = 0;
+  a.addEventListener("pointerup", e => {
+    if (e.pointerType === "mouse") return;    // мышью — обычный click
+    lastPointer = Date.now();
+    navTo(a.dataset.v);
+  });
+  a.addEventListener("click", e => {
+    e.preventDefault();
+    if (Date.now() - lastPointer < 800) return; // уже переключили по pointerup, второй раз не нужно
+    navTo(a.dataset.v);
+  });
+});
 
 /* Плашка «Нет интернета» */
 function updateOnline() { $("#offline-bar").hidden = navigator.onLine; }
