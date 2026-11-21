@@ -70,6 +70,12 @@ button { font: inherit; color: inherit; }
   padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 96px); }
 
 header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.clocks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.clock { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; }
+.clock .lbl { font-size: .8rem; color: var(--muted); }
+.clock .t { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.clock .note { font-size: .78rem; color: var(--muted); }
+.clock .note.night { color: var(--optional); font-weight: 600; }
 .eyebrow { font-size: .85rem; color: var(--muted); font-weight: 500; letter-spacing: .02em; }
 
 .stack { display: flex; flex-direction: column; gap: 14px; }
@@ -228,6 +234,7 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
   <header class="top">
     <span class="eyebrow" id="hdr-eyebrow">3–9 декабря · Метрополь-Каспи · гид Алекс Табак</span>
     <h1 id="hdr-title">Лондон на Рождество</h1>
+    <div class="clocks" id="clocks" aria-live="off"></div>
   </header>
 
   <div class="offline-bar" id="offline-bar" role="status" hidden>Нет интернета — показана сохранённая версия. Карты и WhatsApp заработают, когда появится связь.</div>
@@ -865,6 +872,35 @@ if ("serviceWorker" in navigator && (location.protocol === "https:" || location.
     navigator.serviceWorker.register("/sw.js").catch(() => {});
   });
 }
+
+/* Двойные часы: Лондон / Израиль.
+   Часовые пояса задаём названиями (IANA), а не «+2 часа»:
+   браузер сам учтёт переход на летнее/зимнее время в обеих странах. */
+const ZONES = { london: "Europe/London", home: "Asia/Jerusalem" };
+function partsIn(tz, d) {
+  const p = new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(d);
+  const get = t => Number(p.find(x => x.type === t).value);
+  return { h: get("hour"), m: get("minute") };
+}
+const hhmm = ({ h, m }) => String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+function renderClocks() {
+  try {
+    const now = new Date();
+    const L = partsIn(ZONES.london, now), H = partsIn(ZONES.home, now);
+    // Разница в часах между поясами (в декабре Израиль впереди на 2 часа)
+    let diff = ((H.h * 60 + H.m) - (L.h * 60 + L.m)) / 60;
+    if (diff > 12) diff -= 24;
+    if (diff < -12) diff += 24;
+    const night = H.h >= 23 || H.h < 7; // дома ночь — лучше не звонить
+    $("#clocks").innerHTML = `
+      <div class="clock"><span class="lbl">🇬🇧 Лондон</span><span class="t">${hhmm(L)}</span><span class="note">местное время</span></div>
+      <div class="clock"><span class="lbl">🇮🇱 Израиль</span><span class="t">${hhmm(H)}</span>
+        <span class="note ${night ? "night" : ""}">${night ? "🌙 дома ночь" : (diff > 0 ? "+" : "") + diff + " ч от Лондона"}</span></div>`;
+  } catch { $("#clocks").hidden = true; }
+}
+renderClocks();
+// Обновляем ровно в начале каждой минуты, а дальше — каждые 60 секунд
+setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - Date.now() % 60000);
 
 /* Плашка «Нет интернета» */
 function updateOnline() { $("#offline-bar").hidden = navigator.onLine; }
