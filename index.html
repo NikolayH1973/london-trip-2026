@@ -219,6 +219,8 @@ nav.tabs a span { max-width: 100%; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
 .near-btn { width: 100%; }
+.near-help summary { cursor: pointer; font-size: .9rem; font-weight: 600; color: var(--tube); min-height: 36px; display: flex; align-items: center; }
+.near-help[open] summary { margin-bottom: 6px; }
 .near-panel { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
 .near-panel.ok { border: 2px solid var(--tube); }
 .near-panel.warn { border: 2px solid var(--gold); background: var(--gold-soft); }
@@ -908,6 +910,19 @@ function locate(demo) {
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 }
 
+function nearHelp() {
+  return `<details class="near-help"><summary>Как это работает?</summary>
+    <ul class="items small">
+      <li><span><b>Телефон спросит разрешение на геолокацию</b> — нажмите «Разрешить». Это нужно, чтобы узнать, где вы стоите.</span></li>
+      <li><span><b>Ваше местоположение никуда не отправляется.</b> Расчёт идёт прямо в телефоне, никто его не видит.</span></li>
+      <li><span><b>Работает без интернета</b> — GPS не нужна связь, а все места уже сохранены в приложении.</span></li>
+      <li><span><b>Расстояние примерное</b> — по улицам, спокойным шагом. Для маршрута нажмите «Как добраться» у места.</span></li>
+      <li><span><b>Под землёй не работает:</b> в метро GPS не ловит. Нажмите кнопку, когда выйдете на улицу.</span></li>
+      <li><span>Работает с фильтрами: выберите «Еда» — увидите ближайшую еду, «Для фото» — ближайшие фото-точки.</span></li>
+    </ul>
+  </details>`;
+}
+
 function nearPanel() {
   const hhmm2 = d => String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
   if (nearState === "loading") return `<div class="near-panel">📍 Определяю, где вы… Если телефон спросит разрешение на геолокацию — нажмите «Разрешить».</div>`;
@@ -927,8 +942,13 @@ function nearPanel() {
   if (near) return `<div class="near-panel ok">
       <div>📍 <b>${near.demo ? "Пример: вы у отеля" : "Ближайшие к вам"}</b> <span class="small muted">· ${near.demo ? "Royal National Hotel" : "обновлено в " + hhmm2(near.at)}</span></div>
       <p class="small muted">Расстояние — примерное, по улицам. Сначала самые близкие.</p>
+      ${nearHelp()}
       <div class="btn-row"><button type="button" class="btn ghost" data-near="go">🔄 Обновить</button><button type="button" class="btn ghost" data-near="off">Обычный порядок</button></div></div>`;
-  return `<button type="button" class="btn near-btn" data-near="go">📍 Что интересного рядом со мной?</button>`;
+  return `<div class="near-panel">
+    <button type="button" class="btn near-btn" data-near="go">📍 Что интересного рядом со мной?</button>
+    <p class="small muted">Покажет места от ближайшего к дальнему, с расстоянием и временем пешком.</p>
+    ${nearHelp()}
+  </div>`;
 }
 
 function renderPlaces() {
