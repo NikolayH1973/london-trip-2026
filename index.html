@@ -228,6 +228,8 @@ nav.tabs a span { max-width: 100%; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
 .near-btn { width: 100%; }
+.alt-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 14px; }
+.alt-links .maplink { color: var(--muted); font-size: .88rem; min-height: 36px; }
 .app-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
 .app-row:first-of-type { border-top: 0; }
 .ticket-btn { width: 100%; background: var(--tube); color: #fff; }
@@ -865,6 +867,13 @@ function mapsPlace(q) { return "https://www.google.com/maps/search/?api=1&query=
 function applePlace(q) { return "https://maps.apple.com/?q=" + encodeURIComponent(mapQuery(q)); }
 const IS_APPLE = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
 
+// Citymapper: официальная ссылка на маршрут. Обязательна только конечная точка (endcoord),
+// старт — текущее местоположение. Если приложение установлено, откроется оно, иначе сайт.
+function cmLink(ll, name) {
+  return "https://citymapper.com/directions?endcoord=" + encodeURIComponent(ll[0] + "," + ll[1]) +
+         "&endname=" + encodeURIComponent(name);
+}
+
 function mapsTransit(q) {
   return "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(mapQuery(q)) + "&travelmode=transit";
 }
@@ -1068,7 +1077,10 @@ function renderPlaces() {
           <a class="btn ghost" href="${mapsPlace(p.q)}" target="_blank" rel="noopener">📍 На карте</a>
           <a class="btn ghost" href="${mapsTransit(p.q)}" target="_blank" rel="noopener">🚇 Как добраться</a>
         </div>
-        ${IS_APPLE ? `<a class="maplink" href="${applePlace(p.q)}" target="_blank" rel="noopener">Открыть в Apple Картах</a>` : ""}
+        <div class="alt-links">
+          ${p.ll ? `<a class="maplink" href="${cmLink(p.ll, p.q)}" target="_blank" rel="noopener">или маршрут в Citymapper</a>` : ""}
+          ${IS_APPLE ? `<a class="maplink" href="${applePlace(p.q)}" target="_blank" rel="noopener">или в Apple Картах</a>` : ""}
+        </div>
       </article>`;
     }).join("")}
     <p class="small muted">Часы работы в декабре могут меняться, перед поездкой лучше проверить на сайте места.</p>
@@ -1198,7 +1210,10 @@ function renderHelp() {
         <a class="btn ghost" href="${h.maps}" target="_blank" rel="noopener">Маршрут в картах</a>
       </div>
       <p class="hint">«Показать таксисту» откроет адрес крупно на весь экран — просто покажите телефон водителю.</p>
-      ${IS_APPLE ? `<a class="maplink" href="${applePlace(h.name + ", " + h.address)}" target="_blank" rel="noopener">Открыть отель в Apple Картах</a>` : ""}
+      <div class="alt-links">
+        <a class="maplink" href="${cmLink(h.ll, h.name)}" target="_blank" rel="noopener">или маршрут до отеля в Citymapper</a>
+        ${IS_APPLE ? `<a class="maplink" href="${applePlace(h.name + ", " + h.address)}" target="_blank" rel="noopener">или в Apple Картах</a>` : ""}
+      </div>
     </article>
     <article class="card">
       <h3>Телефоны</h3>
