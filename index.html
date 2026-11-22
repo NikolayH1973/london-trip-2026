@@ -228,6 +228,7 @@ nav.tabs a span { max-width: 100%; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
 .near-btn { width: 100%; }
+.wx { font-size: .95rem; }
 .alt-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 14px; }
 .alt-links .maplink { color: var(--muted); font-size: .88rem; min-height: 36px; }
 .app-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
@@ -305,7 +306,7 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
   <section class="view" id="v-tools" aria-label="Полезное"></section>
   <section class="view" id="v-phrases" aria-label="Разговорник"></section>
 
-  <footer class="note">Неофициальный помощник, сделан участником поездки. Порядок экскурсий может меняться — главное слово за гидом.</footer>
+  <footer class="note">Неофициальный помощник, сделан участником поездки. Порядок экскурсий может меняться — главное слово за гидом. Прогноз погоды: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo.com</a></footer>
 </div>
 
 <div class="taxi" id="taxi" role="dialog" aria-modal="true" aria-label="Крупная карточка">
@@ -771,6 +772,72 @@ function dayItems(day) {
     `<li class="${i.opt ? "opt" : ""}"><span>${esc(i.t)}${i.opt ? ` <span class="pill opt">за доплату</span>` : ""}</span></li>`).join("")}</ul>`;
 }
 
+/* ===== Погода (Open-Meteo, бесплатно, без ключа) =====
+   Один запрос на 16 дней для района отеля. Ответ сохраняем в телефоне:
+   без интернета показываем последний прогноз с пометкой, когда он получен. */
+const WX_URL = "https://api.open-meteo.com/v1/forecast?latitude=" + TOUR.hotel.ll[0] + "&longitude=" + TOUR.hotel.ll[1] +
+  "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunset" +
+  "&timezone=Europe%2FLondon&forecast_days=16";
+let WX = store.get("wx", null); // { at: время получения, days: { "2026-12-03": {...} } }
+
+// Коды погоды WMO → значок и слово
+function wxWord(code) {
+  if (code === 0) return ["☀️", "ясно"];
+  if (code <= 2) return ["⛅", "переменная облачность"];
+  if (code === 3) return ["☁️", "пасмурно"];
+  if (code === 45 || code === 48) return ["🌫️", "туман"];
+  if (code >= 51 && code <= 57) return ["🌦️", "морось"];
+  if (code >= 61 && code <= 67) return ["🌧️", "дождь"];
+  if (code >= 71 && code <= 77) return ["🌨️", "снег"];
+  if (code >= 80 && code <= 82) return ["🌧️", "ливни"];
+  if (code >= 85 && code <= 86) return ["🌨️", "снегопад"];
+  if (code >= 95) return ["⛈️", "гроза"];
+  return ["🌡️", ""];
+}
+
+function wxLine(date, compact) {
+  const w = WX && WX.days && WX.days[date];
+  if (!w) return compact ? "" : `<p class="wx muted">🌦️ Прогноз погоды появится примерно за неделю до этого дня.</p>`;
+  const [icon, word] = wxWord(w.code);
+  const ahead = daysBetween(londonToday(), date);           // сколько дней до этой даты
+  const ageH = (Date.now() - WX.at) / 3600000;              // сколько часов прогнозу
+  const t = new Date(WX.at), stamp = `${t.getDate()}.${String(t.getMonth() + 1).padStart(2, "0")} ${String(t.getHours()).padStart(2, "0")}:${String(t.getMinutes()).padStart(2, "0")}`;
+  return `<p class="wx">${icon} <b>${Math.round(w.max)}° / ${Math.round(w.min)}°</b> · ${word}` +
+    `${w.pop != null && w.pop >= 20 ? ` · дождь ${w.pop}%` : ""}` +
+    `${!compact && w.sunset ? ` · темнеет в ${w.sunset}` : ""}` +
+    `${ahead > 7 ? ` <span class="muted">(предварительно)</span>` : ""}` +
+    `${ageH > 6 ? ` <span class="muted">· прогноз от ${stamp}</span>` : ""}</p>`;
+}
+
+async function loadWeather() {
+  if (!navigator.onLine) return;                          // нет сети — живём с сохранённым
+  if (WX && Date.now() - WX.at < 3 * 3600000) return;     // свежее 3 часов — не дёргаем сервер
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);      // в метро сеть «полуживая» — не ждём вечно
+  try {
+    const r = await fetch(WX_URL, { signal: ctrl.signal });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    const d = j.daily, days = {};
+    d.time.forEach((date, i) => {
+      days[date] = {
+        code: d.weather_code[i],
+        max: d.temperature_2m_max[i],
+        min: d.temperature_2m_min[i],
+        pop: d.precipitation_probability_max ? d.precipitation_probability_max[i] : null,
+        sunset: (d.sunset[i] || "").slice(11, 16)          // "2026-12-06T15:52" → "15:52"
+      };
+    });
+    WX = { at: Date.now(), days };
+    store.set("wx", WX);
+    renderToday(); renderProgram();
+  } catch (e) {
+    // Сервис не ответил — молча оставляем старый прогноз (или ничего). Приложение не ломается.
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function renderToday() {
   const real = londonToday();
   const today = preview || real;
@@ -793,6 +860,7 @@ function renderToday() {
       <article class="card now">
         <span class="pill gold">День ${idx + 1} из ${TOUR.days.length} · ${wday(d.date)}, ${fmt(d.date)}</span>
         <h2>${esc(d.title)}</h2>
+        ${wxLine(d.date)}
         <div class="meet">
           <span class="time">${d.meeting.time ? esc(d.meeting.time) : "—:—"}</span>
           ${placeHtml(d.meeting.place)}
@@ -817,7 +885,7 @@ function renderToday() {
         <span class="eyebrow">До вылета</span>
         <div><span class="big-num">${n}</span> <span class="muted">${plural(n,"день","дня","дней")}</span></div>
         <p>Рейс ${f.code}: ${f.from} ${f.dep} → ${f.to} ${f.arr}, ${wday(TOUR.start)}, ${fmt(TOUR.start)}.</p>
-        <p class="small muted">Взять ли зонт? Скорее всего, да.</p>
+        ${WX && WX.days && WX.days[TOUR.start] ? `<div><span class="small muted">Погода в Лондоне в день прилёта:</span>${wxLine(TOUR.start)}</div>` : `<p class="small muted">Взять ли зонт? Скорее всего, да. Прогноз появится здесь примерно за неделю до вылета.</p>`}
       </article>
       <article class="card">
         <h3>Сборы: готово ${cnt} из ${list.length}</h3>
@@ -844,6 +912,7 @@ function renderProgram() {
       <article class="card day ${d.date === today ? "today" : ""}">
         <div class="date"><span class="eyebrow">День ${i + 1} · ${wday(d.date)}</span><b>${fmt(d.date)}</b></div>
         <h3>${esc(d.title)}</h3>
+        ${wxLine(d.date, true)}
         ${dayItems(d)}
         <p class="small muted">Сбор: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.place.startsWith("TODO") ? "уточнить у гида" : esc(d.meeting.place)}</p>
         <button type="button" class="btn ghost" data-pv-go="${d.date}">Открыть день подробно</button>
@@ -1406,6 +1475,8 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") $("#taxi").c
 
 renderAll();
 show();
+loadWeather();
+window.addEventListener("online", loadWeather);
 
 /* Офлайн-режим: регистрируем Service Worker (файл sw.js рядом с index.html).
    Работает только на настоящем сайте (https или localhost); в «песочнице» тихо пропускаем. */
