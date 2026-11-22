@@ -219,6 +219,9 @@ nav.tabs a span { max-width: 100%; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
 .near-btn { width: 100%; }
+.hint { font-size: .85rem; color: var(--muted); line-height: 1.4; }
+details.guide summary { cursor: pointer; min-height: 36px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+details.guide[open] summary { margin-bottom: 8px; }
 .near-help summary { cursor: pointer; font-size: .9rem; font-weight: 600; color: var(--tube); min-height: 36px; display: flex; align-items: center; }
 .near-help[open] summary { margin-bottom: 6px; }
 .near-panel { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
@@ -743,6 +746,7 @@ function renderToday() {
         <div class="day-dots">${TOUR.days.map((x, i) => `<button type="button" class="dot-btn" data-pv="${x.date}" aria-label="День ${i + 1}" ${i === idx ? 'aria-current="true"' : ""}>${i + 1}</button>`).join("")}</div>
         <button type="button" class="nav-btn" ${next ? `data-pv="${next.date}"` : "disabled"} aria-label="Следующий день">→</button>
       </nav>
+      <p class="hint">Листайте дни стрелками, номерами или свайпом влево-вправо.</p>
       <article class="card now">
         <span class="pill gold">День ${idx + 1} из ${TOUR.days.length} · ${wday(d.date)}, ${fmt(d.date)}</span>
         <h2>${esc(d.title)}</h2>
@@ -792,7 +796,7 @@ function renderToday() {
 function renderProgram() {
   const today = preview || londonToday();
   $("#v-program").innerHTML = `<div class="stack">
-    <p class="small muted">Порядок экскурсий может меняться. Фиолетовые пункты — за доплату.</p>
+    <p class="small muted">Порядок экскурсий может меняться. Фиолетовые пункты — за доплату. «Открыть день подробно» покажет день с временем сбора и советом.</p>
     ${TOUR.days.map((d, i) => `
       <article class="card day ${d.date === today ? "today" : ""}">
         <div class="date"><span class="eyebrow">День ${i + 1} · ${wday(d.date)}</span><b>${fmt(d.date)}</b></div>
@@ -1151,6 +1155,7 @@ function renderHelp() {
         <button type="button" class="btn" id="taxi-open">Показать таксисту</button>
         <a class="btn ghost" href="${h.maps}" target="_blank" rel="noopener">Маршрут в картах</a>
       </div>
+      <p class="hint">«Показать таксисту» откроет адрес крупно на весь экран — просто покажите телефон водителю.</p>
       ${IS_APPLE ? `<a class="maplink" href="${applePlace(h.name + ", " + h.address)}" target="_blank" rel="noopener">Открыть отель в Apple Картах</a>` : ""}
     </article>
     <article class="card">
@@ -1199,6 +1204,19 @@ function renderTools() {
           <p class="small">Тогда оно откроется одним касанием и будет работать даже без интернета: в метро, в самолёте, без роуминга. Достаточно один раз открыть его с интернетом.</p>
           ${installHtml()}
         </article>`}
+    <details class="card guide">
+      <summary><b>📘 Как пользоваться приложением</b> <span class="small muted">· 1 минута</span></summary>
+      <ul class="items small">
+        <li><span><b>Сегодня</b> — план дня, время и место сбора, кнопка «Написать гиду». Дни листаются стрелками, номерами или свайпом.</span></li>
+        <li><span><b>Программа</b> — все 7 дней. Фиолетовые пункты — за доплату.</span></li>
+        <li><span><b>Места</b> — красная кнопка «Рядом со мной» покажет ближайшее. Фильтры сверху: еда, музеи, «Для фото». У каждого места — «На карте», «Как добраться» и схема метро от отеля.</span></li>
+        <li><span><b>Схема метро</b> в «Местах» — нажмите на станцию, чтобы увидеть, что рядом.</span></li>
+        <li><span><b>Я потерялся</b> — адрес отеля для такси, важные телефоны, фразы на английском.</span></li>
+        <li><span><b>Разговорник</b> (в «Полезном») — 🔊 произнесёт фразу, 🐢 медленно, «Показать» — крупно для собеседника.</span></li>
+        <li><span><b>Часы вверху</b> — время в Лондоне и в Израиле. «Дома ночь» — лучше не звонить.</span></li>
+        <li><span><b>Без интернета</b> — откройте приложение один раз с интернетом, дальше оно работает и в метро, и в самолёте.</span></li>
+      </ul>
+    </details>
     <a class="card" href="#phrases" style="text-decoration:none;color:inherit">
       <h3>🗣️ Разговорник с озвучкой</h3>
       <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
@@ -1206,6 +1224,7 @@ function renderTools() {
     </a>
     <article class="card">
       <h3>Конвертер</h3>
+      <p class="hint">Введите сумму в любое поле — второе посчитается само.</p>
       <div class="conv">
         <div class="field"><label for="in-gbp">Фунты</label><div class="inp"><span>${c.symbol}</span><input id="in-gbp" inputmode="decimal" placeholder="0" autocomplete="off"></div></div>
         <div class="field"><label for="in-ils">Шекели</label><div class="inp"><span>${c.homeSymbol}</span><input id="in-ils" inputmode="decimal" placeholder="0" autocomplete="off"></div></div>
