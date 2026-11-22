@@ -797,7 +797,7 @@ function wxWord(code) {
 
 function wxLine(date, compact) {
   const w = WX && WX.days && WX.days[date];
-  if (!w) return compact ? "" : `<p class="wx muted">🌦️ Прогноз погоды появится примерно за неделю до этого дня.</p>`;
+  if (!w) return compact ? "" : `<p class="wx muted">🌦️ Прогноза на этот день пока нет — он появляется примерно за 2 недели и обновляется сам.</p>`;
   const [icon, word] = wxWord(w.code);
   const ahead = daysBetween(londonToday(), date);           // сколько дней до этой даты
   const ageH = (Date.now() - WX.at) / 3600000;              // сколько часов прогнозу
@@ -885,7 +885,7 @@ function renderToday() {
         <span class="eyebrow">До вылета</span>
         <div><span class="big-num">${n}</span> <span class="muted">${plural(n,"день","дня","дней")}</span></div>
         <p>Рейс ${f.code}: ${f.from} ${f.dep} → ${f.to} ${f.arr}, ${wday(TOUR.start)}, ${fmt(TOUR.start)}.</p>
-        ${WX && WX.days && WX.days[TOUR.start] ? `<div><span class="small muted">Погода в Лондоне в день прилёта:</span>${wxLine(TOUR.start)}</div>` : `<p class="small muted">Взять ли зонт? Скорее всего, да. Прогноз появится здесь примерно за неделю до вылета.</p>`}
+        ${WX && WX.days && WX.days[TOUR.start] ? `<div><span class="small muted">Погода в Лондоне в день прилёта:</span>${wxLine(TOUR.start)}</div>` : `<p class="small muted">Взять ли зонт? Скорее всего, да. Прогноз появится здесь примерно за 2 недели до вылета.</p>`}
       </article>
       <article class="card">
         <h3>Сборы: готово ${cnt} из ${list.length}</h3>
