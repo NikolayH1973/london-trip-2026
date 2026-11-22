@@ -228,6 +228,8 @@ nav.tabs a span { max-width: 100%; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
 .near-btn { width: 100%; }
+.app-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
+.app-row:first-of-type { border-top: 0; }
 .ticket-btn { width: 100%; background: var(--tube); color: #fff; }
 .hint { font-size: .85rem; color: var(--muted); line-height: 1.4; }
 details.guide summary { cursor: pointer; min-height: 36px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
@@ -437,7 +439,7 @@ const TOUR = {
     "Пауэрбанк и зарядки",
     "Роуминг или eSIM",
     "Личные лекарства в ручной клади",
-    "Установить Citymapper — лучшее приложение для транспорта Лондона",
+    "Установить Citymapper или TfL Go (кнопки — в «Полезном»)",
     "Скачать офлайн-карту Лондона в Google Maps",
     "Забронировать бесплатный вход в Sky Garden (если хотите)",
     "Забронировать бесплатный билет в новый London Museum (если хотите)"
@@ -550,6 +552,14 @@ const TOUR = {
       { en: "Would you take twenty pounds for it?", tr: "Вуд ю тэйк туэ́нти па́ундз фор ит?", ru: "Отдадите за двадцать фунтов?",
         tip: "Торговаться уместно на Портобелло и других блошиных рынках, но не в обычных магазинах. Делайте это с улыбкой." }
     ]}
+  ],
+
+  /* Приложения для транспорта. ios — проверенные ссылки App Store; web — официальная страница (на ней кнопка Google Play) */
+  apps: [
+    { name: "Citymapper", ios: "https://apps.apple.com/app/id469463298", web: "https://citymapper.com",
+      text: "Маршруты на метро, автобусе и пешком с точным временем и пересадками. Есть русский язык." },
+    { name: "TfL Go", ios: "https://apps.apple.com/app/id1419541638", web: "https://tfl.gov.uk/go",
+      text: "Официальное приложение транспорта Лондона: живая схема метро, закрытия и перебои, режим «без ступенек» — только станции с лифтами. На английском, но поддерживает крупный шрифт." }
   ],
 
   /* Ветка метро от отеля: s = остановок от Russell Square без пересадок */
@@ -1256,6 +1266,15 @@ function renderTools() {
       <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
       <span class="btn">Открыть разговорник</span>
     </a>
+    <article class="card">
+      <h3>📱 Приложения для транспорта</h3>
+      <p class="hint">Оба бесплатные. Хватит одного; установите заранее, дома по Wi-Fi.</p>
+      ${TOUR.apps.map(a => `<div class="app-row">
+        <div><b>${esc(a.name)}</b><p class="small muted">${esc(a.text)}</p></div>
+        <a class="btn ghost" href="${IS_APPLE ? a.ios : a.web}" target="_blank" rel="noopener">${IS_APPLE ? " App Store" : "Скачать"}</a>
+      </div>`).join("")}
+      ${IS_APPLE ? "" : `<p class="hint">Кнопка «Скачать» откроет официальную страницу приложения — там нажмите «Google Play».</p>`}
+    </article>
     <article class="card">
       <h3>Конвертер</h3>
       <p class="hint">Введите сумму в любое поле — второе посчитается само.</p>
