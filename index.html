@@ -228,6 +228,7 @@ nav.tabs a span { max-width: 100%; }
 .st-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
 .st-list a { color: var(--ink); }
 .near-btn { width: 100%; }
+.ticket-btn { width: 100%; background: var(--tube); color: #fff; }
 .hint { font-size: .85rem; color: var(--muted); line-height: 1.4; }
 details.guide summary { cursor: pointer; min-height: 36px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 details.guide[open] summary { margin-bottom: 8px; }
@@ -586,10 +587,10 @@ const TOUR = {
     { cat: "sight", name: "Трафальгарская площадь", ll: [51.508, -0.1281], photo: "Поднимитесь на террасу перед Национальной галереей: площадь, ёлка, колонна Нельсона и уходящий к Биг-Бену Уайтхолл — в одном кадре.", route: [["Piccadilly",3,"Leicester Square"],["walk",5]], q: "Trafalgar Square London", program: "2026-12-03", free: true,
       station: "Charing Cross", direct: null, hours: "всегда",
       text: "Колонна Нельсона, львы и Национальная галерея. В декабре здесь стоит главная ёлка города. От Leicester Square 5 минут пешком." },
-    { cat: "sight", name: "Тауэрский мост", ll: [51.5055, -0.0754], photo: "Мост целиком — из парка Potters Fields на южном берегу, лучше всего с подсветкой в синий час. Другой ракурс — с набережной у Тауэра на северном берегу.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",6,"Tower Hill","в сторону Aldgate"],["walk",10]], q: "Tower Bridge London", program: "2026-12-06", free: true,
+    { cat: "sight", name: "Тауэрский мост", site: "https://www.towerbridge.org.uk/tickets", siteLabel: "Билеты на галерею со стеклянным полом — официальный сайт", ll: [51.5055, -0.0754], photo: "Мост целиком — из парка Potters Fields на южном берегу, лучше всего с подсветкой в синий час. Другой ракурс — с набережной у Тауэра на северном берегу.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",6,"Tower Hill","в сторону Aldgate"],["walk",10]], q: "Tower Bridge London", program: "2026-12-06", free: true,
       station: "Tower Hill", direct: null, hours: "по мосту — всегда бесплатно",
       text: "Тот самый разводной мост. Перейти по нему можно бесплатно, а верхняя галерея со стеклянным полом платная." },
-    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", ll: [51.5138, -0.0984], photo: "Встаньте на южной половине моста Миллениум лицом к собору: линии моста ведут взгляд прямо к куполу. Для купола крупным планом — бесплатная крыша One New Change рядом.", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"]], q: "St Paul's Cathedral London", free: true,
+    { cat: "sight", name: "Собор Святого Павла и мост Миллениум", site: "https://www.stpauls.co.uk/tickets", siteLabel: "Билеты в собор — официальный сайт", ll: [51.5138, -0.0984], photo: "Встаньте на южной половине моста Миллениум лицом к собору: линии моста ведут взгляд прямо к куполу. Для купола крупным планом — бесплатная крыша One New Change рядом.", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"]], q: "St Paul's Cathedral London", free: true,
       station: "St. Paul's", direct: null, hours: "собор — по билету, мост — всегда",
       text: "Огромный купол Рена. Внутрь собора вход платный, но красивее всего пройти от него по пешеходному мосту Миллениум через Темзу прямо к галерее Тейт Модерн." },
     { cat: "sight", name: "Пикадилли-серкус", ll: [51.5101, -0.134], photo: "Светящиеся экраны и рядом Риджент-стрит с рождественскими гирляндами над улицей. Поднимите телефон чуть выше голов прохожих — гирлянды уйдут в перспективу.", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
@@ -599,7 +600,7 @@ const TOUR = {
       station: "King's Cross St. Pancras", direct: 1, hours: "всегда",
       text: "Одна остановка от отеля. Внутри — знаменитая тележка «Платформа 9¾» из «Гарри Поттера», а рядом — роскошный викторианский вокзал Сент-Панкрас." },
 
-    { cat: "museum", name: "Британский музей", ll: [51.5194, -0.127], photo: "Большой двор под сетчатой стеклянной крышей: снимайте снизу вверх, чтобы узор крыши заполнил кадр.", q: "British Museum London", program: "2026-12-07", free: true,
+    { cat: "museum", name: "Британский музей", site: "https://www.britishmuseum.org/visiting", siteLabel: "Бесплатный билет на время — официальный сайт", ll: [51.5194, -0.127], photo: "Большой двор под сетчатой стеклянной крышей: снимайте снизу вверх, чтобы узор крыши заполнил кадр.", q: "British Museum London", program: "2026-12-07", free: true,
       station: "Russell Square", direct: 0, hours: "ежедневно 10–17, в пятницу до 20:30",
       text: "Три минуты пешком от отеля. Розеттский камень, мумии Египта, мраморы Парфенона. Вход бесплатный, но бесплатный билет на время лучше взять на сайте заранее. С сентября 2026 здесь показывают гобелен из Байё — на него нужен отдельный билет на время." },
     { cat: "museum", name: "Национальная галерея", ll: [51.5089, -0.1283], q: "National Gallery London", program: "2026-12-07", free: true, route: [["Piccadilly",3,"Leicester Square"],["walk",5]],
@@ -608,7 +609,7 @@ const TOUR = {
     { cat: "museum", name: "Национальная портретная галерея", ll: [51.5094, -0.1281], q: "National Portrait Gallery London", free: true,
       station: "Leicester Square", direct: 3, hours: "ежедневно",
       text: "Сразу за Национальной галереей. Портреты всех знаменитых британцев — от Генриха VIII до современных звёзд." },
-    { cat: "museum", name: "Музей естествознания", ll: [51.4967, -0.1764], photo: "Главный зал со скелетом синего кита — снимайте сверху, с площадки большой лестницы.", q: "Natural History Museum London", program: "2026-12-07", free: true,
+    { cat: "museum", name: "Музей естествознания", site: "https://www.nhm.ac.uk/visit", siteLabel: "Бесплатный билет на время — официальный сайт", ll: [51.4967, -0.1764], photo: "Главный зал со скелетом синего кита — снимайте сверху, с площадки большой лестницы.", q: "Natural History Museum London", program: "2026-12-07", free: true,
       station: "South Kensington", direct: 8, hours: "ежедневно 10–17:50",
       text: "Скелет синего кита под потолком, зал динозавров, само здание — как собор. Бесплатно, но лучше взять бесплатный билет на время: в будни зимой обычно свободнее." },
     { cat: "museum", name: "Музей Виктории и Альберта (V&A)", ll: [51.4966, -0.1722], q: "Victoria and Albert Museum London", free: true,
@@ -623,7 +624,7 @@ const TOUR = {
     { cat: "museum", name: "Музей сэра Джона Соуна", ll: [51.517, -0.1174], q: "Sir John Soane's Museum", free: true,
       station: "Holborn", direct: 1, hours: "не каждый день — проверьте на сайте",
       text: "Необычный дом-музей архитектора XIX века: каждая стена увешана картинами и древностями. Маленький, но незабываемый. Одна остановка от отеля." },
-    { cat: "museum", name: "London Museum — новый музей Лондона", q: "London Museum West Smithfield", ll: [51.5181, -0.1027], free: true, book: true,
+    { cat: "museum", name: "London Museum — новый музей Лондона", site: "https://www.londonmuseum.org.uk", siteLabel: "Бесплатный билет на время — официальный сайт", q: "London Museum West Smithfield", ll: [51.5181, -0.1027], free: true, book: true,
       route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",1,"Farringdon","Circle, H&C или Metropolitan"],["walk",5]],
       photo: "Само здание — отреставрированный викторианский рынок с огромным куполом. Снимайте под куполом снизу вверх.",
       station: "Farringdon", direct: null, hours: "вс–чт 10–18, пт–сб 10–23",
@@ -644,9 +645,9 @@ const TOUR = {
     { cat: "xmas", name: "Ярмарка на Лестер-сквер", ll: [51.5103, -0.1301], q: "Leicester Square London",
       station: "Leicester Square", direct: 3, hours: "каждый день",
       text: "Деревянные домики и каток вокруг памятника Шекспиру. Рядом Чайна-таун, удобно совместить с ужином." },
-    { cat: "xmas", name: "Winter Wonderland в Гайд-парке", route: [["Piccadilly",6,"Hyde Park Corner"],["walk",8]], ll: [51.5072, -0.1561], q: "Hyde Park Winter Wonderland",
+    { cat: "xmas", name: "Winter Wonderland в Гайд-парке", site: "https://hydeparkwinterwonderland.com", siteLabel: "Билеты — официальный сайт", route: [["Piccadilly",6,"Hyde Park Corner"],["walk",8]], ll: [51.5072, -0.1561], q: "Hyde Park Winter Wonderland",
       station: "Hyde Park Corner", direct: 6, hours: "10–22", book: true,
-      text: "Самая большая рождественская ярмарка Британии: колесо обозрения, каток, аттракционы, баварская пивная. Билет на вход нужно купить заранее на конкретный час. Закладывайте 3–4 часа." },
+      text: "Самая большая рождественская ярмарка Британии: колесо обозрения, каток, аттракционы, баварская пивная. Билет на вход нужно взять заранее на конкретный час. В «непиковые» часы (обычно днём в будни) вход бесплатный, но билет всё равно нужно забронировать. Закладывайте 3–4 часа." },
     { cat: "xmas", name: "Зимний рынок на Саут-Банк", ll: [51.5058, -0.1167], photo: "Поднимитесь на пешеходные мосты Golden Jubilee рядом: оттуда Лондонский глаз и Парламент над рекой — особенно в синий час.", route: [["Piccadilly",5,"Green Park"],["Jubilee",2,"Waterloo","на восток"],["walk",5]], q: "Southbank Centre Winter Market",
       station: "Waterloo / Embankment", direct: null, hours: "каждый день",
       text: "Рынок на набережной Темзы с видом на Лондонский глаз. Красиво вечером, когда горят огни на воде." },
@@ -654,7 +655,7 @@ const TOUR = {
       station: "Charing Cross", direct: null, hours: "каждый день",
       text: "Небольшой рынок у главной ёлки Лондона, которую каждый год дарит Норвегия. Пешком 5 минут от Лестер-сквер." },
 
-    { cat: "view", name: "Sky Garden", ll: [51.5112, -0.0835], photo: "Панорама на Темзу, Тауэрский мост и The Shard сверху. Чтобы не было бликов от стекла, прижмите телефон вплотную к стеклу. В выходные открыто до 21:00.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",7,"Monument","в сторону Aldgate"],["walk",5]], q: "Sky Garden 1 Sky Garden Walk London",
+    { cat: "view", name: "Sky Garden", site: "https://skygarden.london", siteLabel: "Бесплатный билет — официальный сайт", ll: [51.5112, -0.0835], photo: "Панорама на Темзу, Тауэрский мост и The Shard сверху. Чтобы не было бликов от стекла, прижмите телефон вплотную к стеклу. В выходные открыто до 21:00.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Circle",7,"Monument","в сторону Aldgate"],["walk",5]], q: "Sky Garden 1 Sky Garden Walk London",
       station: "Monument", direct: null, hours: "пн–пт 10–18, сб–вс 11–21", book: true,
       text: "Бесплатная смотровая площадка с садом на 35-м этаже. Вход только по бесплатным билетам на сайте, при бронировании нужно указать имена. Если билетов нет, можно спросить у входа: иногда пускают без брони." },
     { cat: "view", name: "Холм Примроуз-Хилл", ll: [51.5394, -0.1608], photo: "Лучшая панорама Лондона с земли, бесплатно. Приходите к закату (около 15:50). Приблизьте зумом — небоскрёбы Сити «сожмутся» в плотную красивую стену.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",3,"Chalk Farm","поезд на Edgware"],["walk",10]], q: "Primrose Hill London",
@@ -670,7 +671,7 @@ const TOUR = {
       photo: "С моста видны Лондонский глаз, Парламент и Биг-Бен над рекой. Лучше всего — в синий час, примерно 16:00–16:30.",
       station: "Embankment / Charing Cross", direct: null, hours: "всегда",
       text: "Пешеходные мосты по обе стороны железнодорожного моста Hungerford. Один из лучших бесплатных видов на Темзу, особенно вечером." },
-    { cat: "view", name: "The Shard", ll: [51.5045, -0.0865], photo: "Сверху видно, как Темза змеёй уходит к горизонту. Билет лучше брать на время незадолго до заката — застанете и день, и огни.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"]], q: "The View from The Shard",
+    { cat: "view", name: "The Shard", site: "https://www.theviewfromtheshard.com", siteLabel: "Билеты — официальный сайт", ll: [51.5045, -0.0865], photo: "Сверху видно, как Темза змеёй уходит к горизонту. Билет лучше брать на время незадолго до заката — застанете и день, и огни.", route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"]], q: "The View from The Shard",
       station: "London Bridge", direct: null, hours: "платно, по билетам",
       text: "Самый высокий небоскрёб Лондона, площадка выше Sky Garden. Платно. Рядом Боро-маркет: сначала поесть, потом наверх." },
 
@@ -1052,6 +1053,7 @@ function renderPlaces() {
           ${dates ? `<span>📅 В поездке: ${dates.length ? dates.map(d => ["вс","пн","вт","ср","чт","пт","сб"][parse(d).getDay()] + " " + fmt(d)).join(", ") : "не совпадает"}</span>` : ""}
         </div>
         ${routeHtml(p)}
+        ${p.site ? `<a class="btn ticket-btn" href="${p.site}" target="_blank" rel="noopener">🎟 ${esc(p.siteLabel)}</a>` : ""}
         <div class="btn-row">
           <a class="btn ghost" href="${mapsPlace(p.q)}" target="_blank" rel="noopener">📍 На карте</a>
           <a class="btn ghost" href="${mapsTransit(p.q)}" target="_blank" rel="noopener">🚇 Как добраться</a>
@@ -1240,6 +1242,7 @@ function renderTools() {
         <li><span><b>Сегодня</b> — план дня, время и место сбора, кнопка «Написать гиду». Дни листаются стрелками, номерами или свайпом.</span></li>
         <li><span><b>Программа</b> — все 7 дней. Фиолетовые пункты — за доплату.</span></li>
         <li><span><b>Места</b> — красная кнопка «Рядом со мной» покажет ближайшее. Фильтры сверху: еда, музеи, «Для фото». У каждого места — «На карте», «Как добраться» и схема метро от отеля.</span></li>
+        <li><span><b>🎟 Билеты</b> — у мест, куда нужна бронь, есть кнопка с переходом на официальный сайт. Только официальные: перепродавцы часто берут деньги даже за бесплатные билеты.</span></li>
         <li><span><b>Схема метро</b> в «Местах» — нажмите на станцию, чтобы увидеть, что рядом.</span></li>
         <li><span><b>Я потерялся</b> — адрес отеля для такси, важные телефоны, фразы на английском.</span></li>
         <li><span><b>Разговорник</b> (в «Полезном») — 🔊 произнесёт фразу, 🐢 медленно, «Показать» — крупно для собеседника.</span></li>
