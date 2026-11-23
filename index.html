@@ -249,6 +249,9 @@ details.guide[open] summary { margin-bottom: 8px; }
 .pill.cat-view { background: #e6eefc; color: #1d4fa8; }
 .pill.cat-food { background: #fdeee4; color: #a4461a; }
 .pill.cat-flea { background: var(--optional-soft); color: var(--optional); }
+.pill.cat-pub { background: #f3ead8; color: #7a4a0c; }
+:root[data-theme="dark"] .pill.cat-pub { background: #33270f; color: #f0c674; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill.cat-pub { background: #33270f; color: #f0c674; } }
 .pill.cat-sight { background: #fbe9ea; color: #a3122a; }
 .pill.cat-museum { background: #f1ece2; color: #6b5420; }
 .pill.free { background: #e8f3ec; color: #17693a; }
@@ -704,6 +707,27 @@ const TOUR = {
       station: "Golders Green", direct: null, hours: "пятница — до вечера, в субботу почти всё закрыто", days: [0,1,2,3,4,5],
       text: "Еврейский район с кошерными ресторанами, пекарнями и магазинами. Северная линия метро." },
 
+    { cat: "pub", name: "Lore of the Land — паб Гая Ричи", ll: [51.5237, -0.1404], route: [["walk",13,"через Тоттенхэм-Корт-роуд"]], q: "Lore of the Land 4 Conway Street London",
+      station: "пешком от отеля (ближайшее метро — Warren Street)", direct: null, hours: "пн 15–22, вт–чт 12–23, пт 12–24, сб 12–23, вс 12–19",
+      text: "Паб, который режиссёр «Джентльменов» открыл в 2019 году, в 13 минутах пешком от отеля. Внизу — викторианский бар, туда приходят без брони. Наверху — ресторан, его бронируют заранее. Пиво Gritchie из фильма с конца 2024 года больше не варят, спросите у бармена, вдруг осталось." },
+    { cat: "pub", name: "The Blues Kitchen — музыка и танцы", ll: [51.5374, -0.1408], route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",2,"Camden Town","на север"],["walk",4]], q: "The Blues Kitchen Camden",
+      station: "Camden Town", direct: null, hours: "пн–вт 12–24, ср–чт до 1, пт до 2:30, сб до 3",
+      text: "Живой блюз, соул и фанк, а после 21:00 — танцпол. Американская кухня: рёбрышки, бургеры, больше 80 сортов бурбона. В пятницу и субботу вечером — две живые программы и DJ до ночи, вход по билету (около £6–10, лучше купить онлайн заранее). Только 18+. Рядом Кэмден-маркет, можно совместить." },
+    { cat: "pub", name: "Ain't Nothin' But — блюз-бар в Сохо", ll: [51.5129, -0.1393], route: [["Piccadilly",4,"Piccadilly Circus"],["walk",8,"по Риджент-стрит к Карнаби"]], q: "Ain't Nothin' But Blues Bar Kingly Street London",
+      station: "Piccadilly Circus / Oxford Circus", direct: null, hours: "пн–ср 17–1, чт 13–1, пт–сб 13–2, вс 13–23:30",
+      text: "Маленький блюз-бар с 1993 года, живая музыка каждый вечер. К ночи у столиков часто начинают танцевать. На ранние выступления вход бесплатный. Тесно, поэтому приходите пораньше. Удобно после огней Риджент-стрит." },
+    { cat: "pub", name: "Museum Tavern", ll: [51.5180, -0.1255], route: [["walk",11,"к Британскому музею"]], q: "Museum Tavern 49 Great Russell Street London",
+      station: "пешком от отеля", direct: null, hours: "каждый день",
+      text: "Викторианский паб напротив Британского музея, ближайший «настоящий» паб к отелю. Подходит для первого вечера. Как устроен паб: заказываете и платите у стойки, официантов нет, чаевые не нужны. Маринованные яйца есть не везде, а scotch egg и pork pie обычно со свининой. В декабре вечером в пабах тесно, спокойнее с 15 до 17." },
+    { cat: "pub", name: "The George Inn", ll: [51.5042, -0.0900], route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",5,"London Bridge","на юг"],["walk",5]], q: "The George Inn Borough High Street London",
+      station: "London Bridge", direct: null, hours: "каждый день",
+      photo: "Деревянные галереи над мощёным двором: снимайте со двора, захватив вывеску со святым Георгием.",
+      text: "Единственный в Лондоне сохранившийся постоялый двор с галереями, отстроен в 1676 году, принадлежит Национальному фонду. Его упоминал Диккенс. В двух шагах от Боро-маркета, удобно совместить." },
+    { cat: "pub", name: "The Churchill Arms", ll: [51.5069, -0.1948], route: [["Piccadilly",1,"Holborn"],["Central",7,"Notting Hill Gate","на запад"],["walk",5]], q: "The Churchill Arms Kensington Church Street London",
+      station: "Notting Hill Gate", direct: null, hours: "каждый день, огни после 17:00",
+      photo: "Фасад, весь покрытый ёлками и огнями. Лучше в сумерках, около 16:00–16:30: небо ещё синее, огни уже горят.",
+      text: "«Самый рождественский паб Лондона»: около сотни ёлок и десятки тысяч огней на фасаде. В 2026 году огни включили 12 ноября. Внутри — тайская кухня. Рядом Портобелло-роуд, можно совместить." },
+
     { cat: "flea", name: "Портобелло-роуд", ll: [51.514, -0.202], photo: "Пастельные дома вдоль улицы — классический кадр. Приходите пораньше, пока нет толпы.", route: [["Piccadilly",1,"Holborn"],["Central",7,"Notting Hill Gate","на запад"],["walk",10]], q: "Portobello Road Market London",
       station: "Notting Hill Gate / Ladbroke Grove", direct: null, hours: "сб — главный день; пт — антиквариат и винтаж", days: [5,6],
       text: "Самый знаменитый антикварный рынок мира: в субботу больше 1500 прилавков. Внимание: 5 декабря, суббота, совпадает с поездкой в Виндзор. Придётся выбирать или ехать в пятницу, 4-го, после программы." },
@@ -920,7 +944,7 @@ function renderProgram() {
   </div>`;
 }
 
-const CATS = { all: "Все", photo: "📷 Для фото", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", flea: "Блошиные рынки" };
+const CATS = { all: "Все", photo: "📷 Для фото", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", pub: "🍺 Пабы и музыка", flea: "Блошиные рынки" };
 let placeCat = "all";
 
 // Все даты поездки, в которые место открыто (по дням недели)
