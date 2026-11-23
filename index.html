@@ -289,6 +289,7 @@ details.guide[open] summary { margin-bottom: 8px; }
 .cats-more { border-top: 1px dashed var(--line); padding-top: 8px; }
 /* Главная кнопка карточки места — цвета линии Piccadilly */
 .btn.go-btn { background: var(--tube); color: var(--tube-ink); }
+#options { scroll-margin-top: 16px; }
 .opt-card { border-top: 1px solid var(--line); padding-top: 10px; scroll-margin-top: 16px; }
 .opt-card summary { cursor: pointer; list-style: none; display: flex; flex-direction: column; gap: 2px; min-height: 44px; }
 .opt-card summary::-webkit-details-marker { display: none; }
@@ -900,7 +901,7 @@ function airportHtml() {
 function dayItems(day) {
   return `<ul class="items">${day.items.map(i =>
     `<li class="${i.opt ? "opt" : ""}"><span>${esc(i.t)}${i.opt
-      ? ` <a class="pill opt" href="#tools/opt-${i.opt}" data-go="tools/opt-${i.opt}">за доплату${(o => o && optPrice(o) ? " · " + esc(optPrice(o)) : "")(TOUR.options.find(x => x.id === i.opt))} · подробнее ›</a>` : ""}</span></li>`).join("")}</ul>`;
+      ? ` <a class="pill opt" href="#program/opt-${i.opt}" data-go="program/opt-${i.opt}">за доплату${(o => o && optPrice(o) ? " · " + esc(optPrice(o)) : "")(TOUR.options.find(x => x.id === i.opt))} · подробнее ›</a>` : ""}</span></li>`).join("")}</ul>`;
 }
 
 /* ===== Опции (экскурсии за доплату) =====
@@ -1163,6 +1164,7 @@ function renderToday() {
 function renderProgram() {
   const today = preview || londonToday();
   $("#v-program").innerHTML = `<div class="stack">
+    <a class="pill opt" href="#program/options" data-go="program/options">🟣 Опции за доплату: ${TOUR.options.length} ${plural(TOUR.options.length, "экскурсия", "экскурсии", "экскурсий")} ↓</a>
     <p class="small muted">Порядок экскурсий может немного меняться — например, из-за погоды. Фиолетовые пункты — за доплату. «Открыть день подробно» покажет день с временем сбора и советом.</p>
     ${TOUR.days.map((d, i) => `
       <article class="card day ${d.date === today ? "today" : ""}">
@@ -1174,6 +1176,7 @@ function renderProgram() {
         <p class="small muted">${i === 0 ? "В Лондоне" : "Сбор"}: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.wa ? esc(waText(d.meeting).replace("Гид", "гид")) : esc(d.meeting.place)}</p>
         <button type="button" class="btn ghost" data-pv-go="${d.date}">Открыть день подробно</button>
       </article>`).join("")}
+    ${optionsHtml()}
   </div>`;
 }
 
@@ -1771,12 +1774,11 @@ function renderTools() {
           <p class="small">Тогда оно откроется одним касанием и будет работать даже без интернета: в метро, в самолёте, без роуминга. Достаточно один раз открыть его с интернетом.</p>
           ${installHtml()}
         </article>`}
-    ${optionsHtml()}
     <details class="card guide">
       <summary><b>📘 Как пользоваться приложением</b> <span class="small muted">· 1 минута</span></summary>
       <ul class="items small">
         <li><span><b>Сегодня</b> — план дня, время и место сбора, кнопка «Написать гиду». Дни листаются стрелками, номерами или свайпом.</span></li>
-        <li><span><b>Программа</b> — все 7 дней. Фиолетовые пункты — опции за доплату: «подробнее» откроет описание и кнопку записи к гиду.</span></li>
+        <li><span><b>Программа</b> — все 7 дней. Фиолетовые пункты — опции за доплату: «подробнее» откроет описание и кнопку записи к гиду. Все опции вместе — в конце программы.</span></li>
         <li><span><b>Места</b> — полки: ярмарки, места на вечер, рядом с отелем, бесплатное. Плитка «Что рядом со мной» покажет ближайшее к вам, «Схема метро» — что у каждой станции. Внизу — все категории.</span></li>
         <li><span><b>🎟 Билеты</b> — у мест, куда нужна бронь, есть кнопка с переходом на официальный сайт. Только официальные: перепродавцы часто берут деньги даже за бесплатные билеты.</span></li>
         <li><span><b>Схема метро</b> в «Местах» — нажмите на станцию, чтобы увидеть, что рядом.</span></li>
@@ -1847,6 +1849,8 @@ const scrollMem = {};   // прокрутка на каждом адресе —
 const backStack = [];   // адреса, с которых ушли вперёд по ссылке (для стрелки «назад» в приложении)
 let navKind = "back";   // как попали на текущий адрес: "go" — вперёд по ссылке, "back" — назад или из истории
 function show() {
+  // Опции раньше жили в «Полезном»: старые ссылки #tools/opt-… и #tools/options ведём на «Программу»
+  if (/^#tools\/opt/.test(location.hash)) { location.replace("#program/" + location.hash.split("/")[1]); return; }
   const parts = location.hash.slice(1).split("/");
   const v = VIEWS.includes(parts[0]) ? parts[0] : "today";
   VIEWS.forEach(n => $("#v-" + n).classList.toggle("active", n === v));
@@ -1858,7 +1862,8 @@ function show() {
     if (placeRoute[0] === "near") autoLocate();
   }
   if (v !== "phrases" && CAN_SPEAK) speechSynthesis.cancel();
-  const target = v === "tools" && parts[1] ? document.getElementById(parts[1]) : null;
+  // Адрес вида #program/opt-tower: открыть вкладку и прокрутить к элементу с этим id (раскрыв, если он сворачивается)
+  const target = v !== "places" && parts[1] ? $("#v-" + v).querySelector("#" + CSS.escape(parts[1])) : null;
   if (target) { target.open = true; navKind = "back"; requestAnimationFrame(() => target.scrollIntoView({ block: "start" })); return; }
   if (navKind === "go") window.scrollTo(0, 0);           // новый экран — с начала
   else {                                                  // вернулись — туда же, где были
