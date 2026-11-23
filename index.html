@@ -414,6 +414,13 @@ const TOUR = {
     maps: "https://www.google.com/maps/dir/?api=1&destination=Royal+National+Hotel+38-51+Bedford+Way+London+WC1H+0DG"
   },
   guide: { name: "Алекс Табак", phone: "+972 52-385-9588" },
+  // Сбор в Израиле — из сообщения гида 23 ноября. Время = вылет минус hoursBefore (гид уточнит по билетам)
+  airport: {
+    name: "Бен-Гурион, терминал 3",
+    hoursBefore: 3,
+    where: "3-й этаж, вход № 32. Войдя, слева в 10 метрах — стойка «נקודת מפגש» (точка встречи).",
+    q: "Ben Gurion Airport Terminal 3"
+  },
   currency: { code: "GBP", symbol: "£", homeSymbol: "₪", rate: 4.05 },
   contacts: [
     { label: "Экстренные службы (полиция, скорая, пожарные)", phone: "999" },
@@ -839,6 +846,28 @@ function placeHtml(place) {
     : `<span class="place">${esc(place)}</span>`;
 }
 
+/* Сбор в аэропорту Бен-Гурион: время считаем из времени вылета, чтобы при смене рейса поправить одно место */
+function airportTime() {
+  const [hh, mm] = TOUR.flights.out.dep.split(":").map(Number);
+  const t = (hh * 60 + mm - TOUR.airport.hoursBefore * 60 + 1440) % 1440;   // +1440: не уйти в минус до полуночи
+  return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
+}
+function airportHtml() {
+  const a = TOUR.airport, q = encodeURIComponent(a.q);
+  // Иврит внутри русского текста оборачиваем в <bdi>: он пишется справа налево и иначе «перемешает» кавычки
+  const where = esc(a.where).replace("נקודת מפגש", '<bdi dir="rtl" lang="he" style="white-space:nowrap">נקודת מפגש</bdi>');
+  return `<div class="meet">
+      <span class="time">${airportTime()}</span>
+      <span class="place">Сбор в аэропорту: ${esc(a.name)}</span>
+      <span></span>
+      <span class="small">${where}<br><span class="muted">По Израилю, за ${a.hoursBefore} часа до вылета в ${TOUR.flights.out.dep}. Точное время гид сообщит, когда будут билеты.</span></span>
+    </div>
+    <div class="btn-row">
+      <a class="btn ghost" href="https://waze.com/ul?q=${q}&navigate=yes" target="_blank" rel="noopener">🚗 Waze</a>
+      <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">📍 Google Карты</a>
+    </div>`;
+}
+
 function dayItems(day) {
   return `<ul class="items">${day.items.map(i =>
     `<li class="${i.opt ? "opt" : ""}"><span>${esc(i.t)}${i.opt ? ` <span class="pill opt">за доплату</span>` : ""}</span></li>`).join("")}</ul>`;
@@ -933,6 +962,7 @@ function renderToday() {
         <span class="pill gold">День ${idx + 1} из ${TOUR.days.length} · ${wday(d.date)}, ${fmt(d.date)}</span>
         <h2>${esc(d.title)}</h2>
         ${wxLine(d.date)}
+        ${idx === 0 ? airportHtml() : ""}
         <div class="meet">
           <span class="time">${d.meeting.time ? esc(d.meeting.time) : "—:—"}</span>
           ${placeHtml(d.meeting.place)}
@@ -958,6 +988,11 @@ function renderToday() {
         <div><span class="big-num">${n}</span> <span class="muted">${plural(n,"день","дня","дней")}</span></div>
         <p>Рейс ${f.code}: ${f.from} ${f.dep} → ${f.to} ${f.arr}, ${wday(TOUR.start)}, ${fmt(TOUR.start)}.</p>
         ${WX && WX.days && WX.days[TOUR.start] ? `<div><span class="small muted">Погода в Лондоне в день прилёта:</span>${wxLine(TOUR.start)}</div>` : `<p class="small muted">Взять ли зонт? Скорее всего, да. Прогноз появится здесь примерно за 2 недели до вылета.</p>`}
+      </article>
+      <article class="card">
+        <h3>✈️ В день вылета · ${wday(TOUR.start)}, ${fmt(TOUR.start)}</h3>
+        ${airportHtml()}
+        <p class="tip">Сбор ночью: выезжать из дома нужно в ночь со среды на четверг.</p>
       </article>
       <article class="card">
         <h3>Сборы: готово ${cnt} из ${list.length}</h3>
@@ -986,7 +1021,8 @@ function renderProgram() {
         <h3>${esc(d.title)}</h3>
         ${wxLine(d.date, true)}
         ${dayItems(d)}
-        <p class="small muted">Сбор: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.place.startsWith("TODO") ? "уточнить у гида" : esc(d.meeting.place)}</p>
+        ${i === 0 ? `<p class="small muted">Сбор в Израиле: ${airportTime()} · ${esc(TOUR.airport.name)}, вход 32</p>` : ""}
+        <p class="small muted">${i === 0 ? "В Лондоне" : "Сбор"}: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.place.startsWith("TODO") ? "уточнить у гида" : esc(d.meeting.place)}</p>
         <button type="button" class="btn ghost" data-pv-go="${d.date}">Открыть день подробно</button>
       </article>`).join("")}
   </div>`;
