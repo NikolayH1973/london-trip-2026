@@ -391,7 +391,7 @@ window.addEventListener("unhandledrejection", e => DIAG_ERRORS.push("promise: " 
 /* =========================================================
    ДАННЫЕ ТУРА. Всё, что относится к Лондону, — только здесь.
    Код ниже ничего не знает про Лондон и просто рисует эти данные.
-   TODO = нужно уточнить у гида.
+   meeting.wa — гид не знает заранее и присылает в WhatsApp: показываем, что именно ждать.
    ========================================================= */
 const TOUR = {
   title: "Лондон на Рождество",
@@ -439,7 +439,7 @@ const TOUR = {
       ],
       tip: "Ранний вылет: спать в самолёте, в Лондоне будет длинный день. Ценное и тёплую куртку держите в ручной клади — до заселения чемоданы будут в автобусе." },
     { date: "2026-12-04", title: "Аристократический Лондон",
-      meeting: { time: null, place: "TODO: время и точка сбора" },
+      meeting: { time: null, wa: "время и место" },
       items: [
         { t: "Вестминстер, Пэлл-Мэлл" },
         { t: "Смена караула у Букингемского дворца (если будет в этот день)" },
@@ -448,14 +448,14 @@ const TOUR = {
       ],
       tip: "Смена караула собирает толпу: держитесь рядом с гидом и заранее договоритесь, где встречаетесь, если потеряетесь." },
     { date: "2026-12-05", title: "Виндзор и рождественский Ковент-Гарден",
-      meeting: { time: null, place: "TODO: время и точка сбора" },
+      meeting: { time: null, wa: "время и место" },
       items: [
         { t: "Виндзорский замок: королевские апартаменты, часовня Ордена Подвязки, кукольный дом королевы Мэри", opt: true },
         { t: "Вечер: Ковент-Гарден, рождественский базар — включено" }
       ],
       tip: "Если не едете в Виндзор, у вас свободное утро. В «Полезном» есть идеи, что посмотреть рядом с отелем." },
     { date: "2026-12-06", title: "Темза и Тауэр",
-      meeting: { time: null, place: "TODO: время и точка сбора" },
+      meeting: { time: null, wa: "время и место" },
       items: [
         { t: "Круиз по Темзе — включено" },
         { t: "Тауэр: королевские драгоценности, вороны, бифитеры", opt: true },
@@ -463,7 +463,7 @@ const TOUR = {
       ],
       tip: "На воде холодно и ветрено, даже если в городе тепло. Шапка и шарф пригодятся." },
     { date: "2026-12-07", title: "Сохо, Чайна-таун и музеи",
-      meeting: { time: null, place: "TODO: время и точка сбора" },
+      meeting: { time: null, wa: "время и место" },
       items: [
         { t: "Пикадилли-серкус, Сохо, Чайна-таун" },
         { t: "Национальная галерея" },
@@ -472,14 +472,14 @@ const TOUR = {
       ],
       tip: "Британский музей рядом с отелем, туда можно вернуться самостоятельно в любой день." },
     { date: "2026-12-08", title: "Стратфорд-на-Эйвоне и Оксфорд",
-      meeting: { time: null, place: "TODO: время и точка сбора" },
+      meeting: { time: null, wa: "время и место" },
       items: [
         { t: "Стратфорд-на-Эйвоне — родина Шекспира", opt: true },
         { t: "Экскурсия по колледжам Оксфорда", opt: true }
       ],
       tip: "Долгий выезд на целый день. Возьмите воду, перекус и заряженный пауэрбанк." },
     { date: "2026-12-09", title: "Последний день и вылет",
-      meeting: { time: null, place: "TODO: время сбора с вещами" },
+      meeting: { time: null, wa: "время выезда с вещами" },
       items: [
         { t: "Выезд из номера до 11:00, багаж сдать в камеру хранения отеля" },
         { t: "Бейкер-стрит — дом Шерлока Холмса" },
@@ -840,10 +840,12 @@ function plural(n, one, few, many) {
 
 let preview = null; // дата для предпросмотра (до поездки)
 
-function placeHtml(place) {
-  return place.startsWith("TODO")
-    ? `<span class="pill todo">Уточнить у гида</span>`
-    : `<span class="place">${esc(place)}</span>`;
+// Подпись сбора: известное место — как есть; иначе — что гид пришлёт в WhatsApp
+const waText = m => `Гид пришлёт ${m.wa} в WhatsApp`;
+function placeHtml(m) {
+  return m.wa
+    ? `<span class="place">📲 ${esc(waText(m))}</span>`
+    : `<span class="place">${esc(m.place)}</span>`;
 }
 
 /* Сбор в аэропорту Бен-Гурион: время считаем из времени вылета, чтобы при смене рейса поправить одно место */
@@ -964,14 +966,14 @@ function renderToday() {
         ${wxLine(d.date)}
         ${idx === 0 ? airportHtml() : ""}
         <div class="meet">
-          <span class="time">${d.meeting.time ? esc(d.meeting.time) : "—:—"}</span>
-          ${placeHtml(d.meeting.place)}
+          <span class="time">${d.meeting.time ? esc(d.meeting.time) : "Сбор"}</span>
+          ${placeHtml(d.meeting)}
         </div>
         ${dayItems(d)}
         ${d.tip ? `<p class="tip">${esc(d.tip)}</p>` : ""}
       </article>
       ${next ? `<button type="button" class="card next-card" data-pv="${next.date}"><span class="eyebrow">${today === real ? "Завтра" : "Следующий день"} · ${fmt(next.date)} →</span><h3>${esc(next.title)}</h3>
-        <p class="muted small">Сбор: ${next.meeting.time ? esc(next.meeting.time) : "уточнить у гида"}</p></button>` : ""}
+        <p class="muted small">Сбор: ${next.meeting.time ? esc(next.meeting.time) : esc(waText(next.meeting).replace("Гид", "гид"))}</p></button>` : ""}
       <div class="btn-row">
         ${TOUR.guide.phone ? `<a class="btn" href="${waHref(TOUR.guide.phone)}" target="_blank" rel="noopener">Написать гиду</a>` : ""}
         <a class="btn ghost" href="#help">Отель и телефоны</a>
@@ -1014,7 +1016,7 @@ function renderToday() {
 function renderProgram() {
   const today = preview || londonToday();
   $("#v-program").innerHTML = `<div class="stack">
-    <p class="small muted">Порядок экскурсий может меняться. Фиолетовые пункты — за доплату. «Открыть день подробно» покажет день с временем сбора и советом.</p>
+    <p class="small muted">Порядок экскурсий может немного меняться — например, из-за погоды. Фиолетовые пункты — за доплату. «Открыть день подробно» покажет день с временем сбора и советом.</p>
     ${TOUR.days.map((d, i) => `
       <article class="card day ${d.date === today ? "today" : ""}">
         <div class="date"><span class="eyebrow">День ${i + 1} · ${wday(d.date)}</span><b>${fmt(d.date)}</b></div>
@@ -1022,7 +1024,7 @@ function renderProgram() {
         ${wxLine(d.date, true)}
         ${dayItems(d)}
         ${i === 0 ? `<p class="small muted">Сбор в Израиле: ${airportTime()} · ${esc(TOUR.airport.name)}, вход 32</p>` : ""}
-        <p class="small muted">${i === 0 ? "В Лондоне" : "Сбор"}: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.place.startsWith("TODO") ? "уточнить у гида" : esc(d.meeting.place)}</p>
+        <p class="small muted">${i === 0 ? "В Лондоне" : "Сбор"}: ${d.meeting.time ? esc(d.meeting.time) + " · " : ""}${d.meeting.wa ? esc(waText(d.meeting).replace("Гид", "гид")) : esc(d.meeting.place)}</p>
         <button type="button" class="btn ghost" data-pv-go="${d.date}">Открыть день подробно</button>
       </article>`).join("")}
   </div>`;
