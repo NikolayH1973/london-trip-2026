@@ -292,8 +292,8 @@ details.guide[open] summary { margin-bottom: 8px; }
 .opt-card { border-top: 1px solid var(--line); padding-top: 10px; scroll-margin-top: 16px; }
 .opt-card summary { cursor: pointer; list-style: none; display: flex; flex-direction: column; gap: 2px; min-height: 44px; }
 .opt-card summary::-webkit-details-marker { display: none; }
-.opt-card summary b::after { content: " ▾"; color: var(--muted); font-weight: 400; }
-.opt-card[open] summary b::after { content: " ▴"; }
+.opt-card summary .opt-t::after { content: " ▾"; color: var(--muted); font-weight: 400; }
+.opt-card[open] summary .opt-t::after { content: " ▴"; }
 .opt-card[open] > :not(summary) { margin-top: 10px; }
 a.pill.opt { text-decoration: none; white-space: nowrap; }
 .flight-st { font-size: 1.2rem; font-weight: 700; margin: 0; }
@@ -900,12 +900,17 @@ function airportHtml() {
 function dayItems(day) {
   return `<ul class="items">${day.items.map(i =>
     `<li class="${i.opt ? "opt" : ""}"><span>${esc(i.t)}${i.opt
-      ? ` <a class="pill opt" href="#tools/opt-${i.opt}" data-go="tools/opt-${i.opt}">за доплату · подробнее ›</a>` : ""}</span></li>`).join("")}</ul>`;
+      ? ` <a class="pill opt" href="#tools/opt-${i.opt}" data-go="tools/opt-${i.opt}">за доплату${(o => o && optPrice(o) ? " · " + esc(optPrice(o)) : "")(TOUR.options.find(x => x.id === i.opt))} · подробнее ›</a>` : ""}</span></li>`).join("")}</ul>`;
 }
 
 /* ===== Опции (экскурсии за доплату) =====
    Каждая — раскрывающаяся карточка: заголовок и «зацепка» гида видны сразу, полный текст — по нажатию.
    Кнопка «Записаться» открывает WhatsApp гида с готовым текстом (wa.me умеет принимать ?text=). */
+// Пробные цены — только по ссылке ?pricetest, чтобы посмотреть, как выглядит блок с ценами.
+// Гид и группа без этого параметра видят настоящие цены (поле price) или «Цену уточнит гид».
+const PRICE_TEST = new URLSearchParams(location.search).has("pricetest");
+const SAMPLE_PRICE = { windsor: "£80", museum: "£50", tower: "£70", stratford: "£70", oxford: "£70" };
+const optPrice = o => o.price || (PRICE_TEST && SAMPLE_PRICE[o.id] ? SAMPLE_PRICE[o.id] + " 🧪" : null);
 function optionsHtml() {
   const g = TOUR.guide;
   const day = iso => `${wday(iso)}, ${fmt(iso)}`;
@@ -917,12 +922,13 @@ function optionsHtml() {
       return `<details class="opt-card" id="opt-${o.id}">
         <summary>
           <span class="eyebrow">${day(o.date)}</span>
-          <b>${esc(o.title)}</b>
+          <b class="opt-t">${esc(o.title)}</b>
           <span class="small muted">${esc(o.hook)}</span>
+          ${optPrice(o) ? `<span class="small"><b>${esc(optPrice(o))}</b></span>` : ""}
         </summary>
         <p>${esc(o.text)}</p>
         <div class="place-meta">
-          <span>💷 ${o.price ? esc(o.price) : "Цену уточнит гид"}</span>
+          <span>💷 ${optPrice(o) ? esc(optPrice(o)) + " с человека" : "Цену уточнит гид"}</span>
           ${o.includes ? `<span>✅ Включено: ${esc(o.includes)}</span>` : ""}
         </div>
         <a class="btn ghost" href="${waHref(g.phone)}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">✍️ Записаться — написать гиду</a>
