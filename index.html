@@ -29,6 +29,7 @@
   --gold: #b8860b;        /* Christmas lights */
   --gold-soft: #fbf3dc;
   --tube: #003688;        /* Piccadilly line blue */
+  --tube-ink: #ffffff;    /* текст на синем фоне */
   --optional: #6b4fa0;
   --optional-soft: #efe9f8;
   --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
@@ -39,14 +40,14 @@
   :root:not([data-theme="light"]) {
     --bg: #0d1522; --surface: #172235; --ink: #eef2f8; --muted: #a3afc2; --line: #2a3850;
     --accent: #ff4d5e; --accent-ink: #1a0508; --gold: #f2c45a; --gold-soft: #2b2614;
-    --tube: #6f95ff; --optional: #c3a8ff; --optional-soft: #2a2340;
+    --tube: #6f95ff; --tube-ink: #0d1522; --optional: #c3a8ff; --optional-soft: #2a2340;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0d1522; --surface: #172235; --ink: #eef2f8; --muted: #a3afc2; --line: #2a3850;
   --accent: #ff4d5e; --accent-ink: #1a0508; --gold: #f2c45a; --gold-soft: #2b2614;
-  --tube: #6f95ff; --optional: #c3a8ff; --optional-soft: #2a2340;
+  --tube: #6f95ff; --tube-ink: #0d1522; --optional: #c3a8ff; --optional-soft: #2a2340;
   color-scheme: dark;
 }
 
@@ -115,6 +116,7 @@ ul.items li.opt::before { background: var(--optional); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: .95rem; }
+a.chip { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); text-decoration: none; }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
 .preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: .9rem; margin-bottom: 14px; }
@@ -233,7 +235,7 @@ nav.tabs a span { max-width: 100%; }
 .alt-links .maplink { color: var(--muted); font-size: .88rem; min-height: 36px; }
 .app-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); }
 .app-row:first-of-type { border-top: 0; }
-.ticket-btn { width: 100%; background: var(--tube); color: #fff; }
+.ticket-btn { width: 100%; background: transparent; color: var(--tube); border: 1px solid var(--tube); }
 .hint { font-size: .85rem; color: var(--muted); line-height: 1.4; }
 details.guide summary { cursor: pointer; min-height: 36px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 details.guide[open] summary { margin-bottom: 8px; }
@@ -245,6 +247,52 @@ details.guide[open] summary { margin-bottom: 8px; }
 .near-dist { font-weight: 700; color: var(--tube); }
 .photo-tip { font-size: .95rem; padding: 10px 12px; border-radius: 10px; background: var(--bg); border-left: 4px solid var(--tube); }
 .place-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .88rem; color: var(--muted); }
+
+/* ===== Новый экран «Места»: плитки, полки, строки ===== */
+/* Две равные плитки-инструмента наверху. Без красного: красный = «выбрано» и «вы здесь» */
+.tools2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tool { display: flex; gap: 10px; align-items: flex-start; padding: 12px; min-height: 64px; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--surface); color: var(--ink); text-decoration: none; }
+.tool svg { flex: none; width: 24px; height: 24px; color: var(--tube); margin-top: 1px; }
+.tool b { display: block; font-size: 1rem; line-height: 1.25; }
+.tool small { display: block; font-size: .78rem; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+/* Полка: заголовок + ряд плиток с прокруткой вбок */
+.shelf-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.shelf-h h2 { font-size: 1.12rem; margin: 0; }
+.shelf-h a { flex: none; font-size: .9rem; font-weight: 600; color: var(--tube); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+/* margin -16px + padding 16px: ряд доходит до краёв экрана, а первая плитка стоит ровно по сетке */
+.rail { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 4px -16px 0; padding: 2px 16px 6px;
+  scroll-padding-left: 16px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.rail::-webkit-scrollbar { display: none; }
+/* 42% ширины: видно две плитки и краешек третьей — это подсказка «листай вбок» */
+.tile { flex: 0 0 42%; max-width: 190px; scroll-snap-align: start; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px;
+  padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); text-decoration: none; }
+.tile b { font-size: .95rem; line-height: 1.3; margin-top: 6px; }
+.tile small { font-size: .78rem; color: var(--muted); line-height: 1.3; }
+/* Иконка категории — квадрат с цветами той же категории, что у плашек .pill.cat-… */
+.ico.pill { width: 2.4rem; height: 2.4rem; padding: 0; border-radius: 10px; justify-content: center; font-size: 1.2rem; flex: none; }
+/* Строка списка: иконка · название и подпись · стрелка */
+.plist { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.prow { display: flex; gap: 12px; align-items: center; padding: 10px 12px; min-height: 60px; color: var(--ink); text-decoration: none; }
+.prow + .prow { border-top: 1px solid var(--line); }
+.prow-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.prow-t b { font-size: 1rem; line-height: 1.3; }
+.prow-t small { font-size: .82rem; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+.prow .chev, .tile .chev { color: var(--muted); font-size: 1.3rem; }
+.t-near { color: var(--tube); font-weight: 600; }
+.t-closed { color: var(--accent); font-weight: 600; }
+/* Заголовок под-экрана: стрелка «назад» + название */
+.sub-h { display: flex; align-items: center; gap: 6px; }
+.sub-h h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; flex: 1; min-width: 0; }
+.back { flex: none; width: 44px; height: 44px; margin-left: -10px; display: grid; place-items: center; border: 0; background: none; color: var(--ink); cursor: pointer; border-radius: 12px; }
+.back svg { width: 24px; height: 24px; }
+.cats-more { border-top: 1px dashed var(--line); padding-top: 8px; }
+/* Главная кнопка карточки места — цвета линии Piccadilly */
+.btn.go-btn { background: var(--tube); color: var(--tube-ink); }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.steps li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.steps .n { flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .9rem;
+  background: var(--bg); color: var(--tube); border: 1px solid var(--line); }
 .pill.cat-xmas { background: #e8f3ec; color: #17693a; }
 .pill.cat-view { background: #e6eefc; color: #1d4fa8; }
 .pill.cat-food { background: #fdeee4; color: #a4461a; }
@@ -609,7 +657,7 @@ const TOUR = {
     { cat: "sight", name: "Собор Святого Павла и мост Миллениум", site: "https://www.stpauls.co.uk/tickets", siteLabel: "Билеты в собор — официальный сайт", ll: [51.5138, -0.0984], photo: "Встаньте на южной половине моста Миллениум лицом к собору: линии моста ведут взгляд прямо к куполу. Для купола крупным планом — бесплатная крыша One New Change рядом.", route: [["Piccadilly",1,"Holborn"],["Central",2,"St. Paul's","на восток"]], q: "St Paul's Cathedral London", free: true,
       station: "St. Paul's", direct: null, hours: "собор — по билету, мост — всегда",
       text: "Огромный купол Рена. Внутрь собора вход платный, но красивее всего пройти от него по пешеходному мосту Миллениум через Темзу прямо к галерее Тейт Модерн." },
-    { cat: "sight", name: "Пикадилли-серкус", ll: [51.5101, -0.134], photo: "Светящиеся экраны и рядом Риджент-стрит с рождественскими гирляндами над улицей. Поднимите телефон чуть выше голов прохожих — гирлянды уйдут в перспективу.", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
+    { cat: "sight", name: "Пикадилли-серкус", eve: true, ll: [51.5101, -0.134], photo: "Светящиеся экраны и рядом Риджент-стрит с рождественскими гирляндами над улицей. Поднимите телефон чуть выше голов прохожих — гирлянды уйдут в перспективу.", q: "Piccadilly Circus London", program: "2026-12-07", free: true,
       station: "Piccadilly Circus", direct: 4, hours: "всегда",
       text: "Лондонский «Таймс-сквер» со светящимися экранами. Отсюда начинается Риджент-стрит с рождественской иллюминацией над улицей." },
     { cat: "sight", name: "Вокзал King's Cross", ll: [51.5308, -0.1238], photo: "Загляните в соседний вокзал Сент-Панкрас: огромный арочный свод, статуя «Место встречи», а под Рождество — большая ёлка.", q: "King's Cross Station London", free: true,
@@ -682,7 +730,7 @@ const TOUR = {
       photo: "Купол собора Святого Павла почти на расстоянии вытянутой руки — такого ракурса больше нигде нет. Красиво и днём, и с вечерней подсветкой.",
       station: "St. Paul's", direct: null, hours: "ежедневно, бесплатно",
       text: "Бесплатная терраса на 6-м этаже торгового центра прямо напротив собора Святого Павла. Лифт — внутри центра. Удобно совместить с собором и мостом Миллениум." },
-    { cat: "view", name: "Мосты Golden Jubilee", ll: [51.5066, -0.1206], q: "Golden Jubilee Bridges London", free: true,
+    { cat: "view", name: "Мосты Golden Jubilee", eve: true, ll: [51.5066, -0.1206], q: "Golden Jubilee Bridges London", free: true,
       route: [["Piccadilly",3,"Leicester Square"],["walk",10]],
       photo: "С моста видны Лондонский глаз, Парламент и Биг-Бен над рекой. Лучше всего — в синий час, примерно 16:00–16:30.",
       station: "Embankment / Charing Cross", direct: null, hours: "всегда",
@@ -697,10 +745,10 @@ const TOUR = {
     { cat: "food", name: "Фуд-холл Harrods", ll: [51.4994, -0.1632], q: "Harrods Food Halls Knightsbridge",
       station: "Knightsbridge", direct: 7, hours: "каждый день",
       text: "Роскошные залы с деликатесами и сладостями. Даже если ничего не покупать, это отдельная экскурсия. Удобно после музеев Южного Кенсингтона." },
-    { cat: "food", name: "Чайна-таун", ll: [51.5116, -0.131], q: "Chinatown London",
+    { cat: "food", name: "Чайна-таун", eve: true, ll: [51.5116, -0.131], q: "Chinatown London",
       station: "Leicester Square", direct: 3, hours: "каждый день",
       text: "Дим-самы, утка по-пекински, булочки бао. По программе вы будете здесь 7 декабря." },
-    { cat: "food", name: "Seven Dials Market", ll: [51.5141, -0.1263], q: "Seven Dials Market London",
+    { cat: "food", name: "Seven Dials Market", eve: true, ll: [51.5141, -0.1263], q: "Seven Dials Market London",
       station: "Covent Garden", direct: 2, hours: "каждый день",
       text: "Крытый фуд-холл у Ковент-Гардена: десятки прилавков, каждый выбирает своё. Удобно, если в компании разные вкусы." },
     { cat: "food", name: "Кошерный Голдерс-Грин", ll: [51.578, -0.198], route: [["Piccadilly",1,"King's Cross St. Pancras"],["Northern",6,"Golders Green","поезд на Edgware или Golders Green"],["walk",8]], q: "Golders Green Road London",
@@ -944,8 +992,7 @@ function renderProgram() {
   </div>`;
 }
 
-const CATS = { all: "Все", photo: "📷 Для фото", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", pub: "🍺 Пабы и музыка", flea: "Блошиные рынки" };
-let placeCat = "all";
+const CATS = { all: "Все места", photo: "Для фото", sight: "Достопримечательности", museum: "Бесплатные музеи", xmas: "Ярмарки", view: "Виды", food: "Еда", pub: "Пабы и музыка", flea: "Блошиные рынки" };
 
 // Все даты поездки, в которые место открыто (по дням недели)
 function tripDatesFor(p) {
@@ -1063,9 +1110,9 @@ function nearHelp() {
       <li><span><b>Телефон спросит разрешение на геолокацию</b> — нажмите «Разрешить». Это нужно, чтобы узнать, где вы стоите.</span></li>
       <li><span><b>Ваше местоположение никуда не отправляется.</b> Расчёт идёт прямо в телефоне, никто его не видит.</span></li>
       <li><span><b>Работает без интернета</b> — GPS не нужна связь, а все места уже сохранены в приложении.</span></li>
-      <li><span><b>Расстояние примерное</b> — по улицам, спокойным шагом. Для маршрута нажмите «Как добраться» у места.</span></li>
-      <li><span><b>Под землёй не работает:</b> в метро GPS не ловит. Нажмите кнопку, когда выйдете на улицу.</span></li>
-      <li><span>Работает с фильтрами: выберите «Еда» — увидите ближайшую еду, «Для фото» — ближайшие фото-точки.</span></li>
+      <li><span><b>Расстояние примерное</b> — по улицам, спокойным шагом. Для маршрута нажмите на место → «Как добраться».</span></li>
+      <li><span><b>Под землёй не работает:</b> в метро GPS не ловит. Нажмите «Обновить», когда выйдете на улицу.</span></li>
+      <li><span>Пока вы рядом, списки категорий тоже показывают ближайшие места первыми.</span></li>
     </ul>
   </details>`;
 }
@@ -1089,37 +1136,222 @@ function nearPanel() {
   if (near) return `<div class="near-panel ok">
       <div>📍 <b>${near.demo ? "Пример: вы у отеля" : "Ближайшие к вам"}</b> <span class="small muted">· ${near.demo ? "Royal National Hotel" : "обновлено в " + hhmm2(near.at)}</span></div>
       <p class="small muted">Расстояние — примерное, по улицам. Сначала самые близкие.</p>
-      ${nearHelp()}
-      <div class="btn-row"><button type="button" class="btn ghost" data-near="go">🔄 Обновить</button><button type="button" class="btn ghost" data-near="off">Обычный порядок</button></div></div>`;
-  return `<div class="near-panel">
-    <button type="button" class="btn near-btn" data-near="go">📍 Что интересного рядом со мной?</button>
-    <p class="small muted">Покажет места от ближайшего к дальнему, с расстоянием и временем пешком.</p>
-    ${nearHelp()}
+      <button type="button" class="btn ghost" data-near="go">🔄 Обновить</button></div>`;
+  return `<div class="near-panel"><button type="button" class="btn go-btn" data-near="go">📍 Найти, где я</button></div>`;
+}
+
+/* ===== Экран «Места» =====
+   Один раздел — несколько «под-экранов». Какой показать, решает адрес после #:
+     #places             главный: две плитки, полки, категории
+     #places/cat/pub     список одной категории
+     #places/shelf/eve   полка целиком
+     #places/p/12        карточка места (12 — номер места в TOUR.places)
+     #places/metro       схема ветки Piccadilly
+     #places/near        что рядом со мной
+   Адрес после # попадает в историю браузера, поэтому системная кнопка «назад»
+   на Android и свайп назад на iPhone работают сами, без дополнительного кода. */
+let placeRoute = [];      // части адреса после "places/", например ["cat", "pub"]
+let moreCats = false;     // раскрыта ли строка «ещё 3»
+const MAIN_CATS = ["xmas", "sight", "museum", "food", "pub"];   // кнопки на виду
+const MORE_CATS = ["view", "photo", "flea"];                    // кнопки под «ещё»
+const CAT_ICON = { sight: "🏛️", museum: "🖼️", xmas: "🎄", view: "🌆", food: "🍽️", pub: "🍺", flea: "🧸", photo: "📷", all: "📋" };
+const SVG_BACK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>`;
+const SVG_NEAR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>`;
+const SVG_TUBE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M8 21l2-4M16 21l-2-4"/></svg>`;
+
+// "Lore of the Land — паб Гая Ричи" → название "Lore of the Land" и подпись "паб Гая Ричи"
+const placeTitle = p => p.name.split(" — ")[0];
+const placeTag = p => p.name.split(" — ")[1] || "";
+const placeId = p => TOUR.places.indexOf(p);
+const placesWord = n => n + " " + plural(n, "место", "места", "мест");
+
+// Примерное время в пути от отеля, мин: пешком + ~2 мин на остановку + 3 мин на вход в метро + 5 мин на пересадку.
+// Нужно только для сортировки «что ближе» — сами эти минуты нигде не показываем.
+function tripMin(p) {
+  const r = routeOf(p); if (!r) return 99;
+  let min = 0, tube = 0;
+  r.forEach(l => { if (l[0] === "walk") min += l[1]; else { min += l[1] * 2 + 3; tube++; } });
+  return min + Math.max(0, tube - 1) * 5;
+}
+// Пешком от отеля, мин: из маршрута, если он только пешком, иначе — по прямой × 1,25 (как в «Рядом со мной»)
+function hotelWalk(p) {
+  const r = routeOf(p);
+  if (r && r.every(l => l[0] === "walk")) return r.reduce((s, l) => s + l[1], 0);
+  return p.ll ? haversine(TOUR.hotel.ll, p.ll) * 1.25 / 75 : 99;
+}
+// Знаем ли мы, где человек, «прямо сейчас»: не дольше 15 минут назад и не пример у отеля
+const nearFresh = () => !!near && !near.demo && nearState === "" && Date.now() - near.at < 15 * 60000;
+
+// Короткая подпись «как далеко»: от человека (если знаем), иначе — от отеля по маршруту
+function howFar(p, useNear) {
+  if (useNear && p.ll) return `<span class="t-near">${fmtDist(walkM(p))}</span>`;
+  const r = routeOf(p); if (!r) return "";
+  const tube = r.filter(l => l[0] !== "walk");
+  const walk = r.filter(l => l[0] === "walk").reduce((s, l) => s + l[1], 0);
+  if (!tube.length) return `${walk} мин пешком`;
+  if (tube.length > 1) return "метро с пересадкой";
+  return stopsWord(tube[0][1]) + (walk ? ` + ${walk} мин` : "");
+}
+// Только в дни поездки: место сегодня закрыто (по дням недели)?
+function closedToday(p) {
+  const today = preview || londonToday();
+  return today >= TOUR.start && today <= TOUR.end && !!p.days && !p.days.includes(parse(today).getDay());
+}
+
+// Строка списка: иконка · название и подпись «что это · как далеко» · стрелка
+function placeRow(p, useNear) {
+  const meta = [placeTag(p) ? esc(placeTag(p)) : "", howFar(p, useNear),
+                closedToday(p) ? `<span class="t-closed">сегодня закрыто</span>` : ""].filter(Boolean).join(" · ");
+  return `<a class="prow" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
+    <span class="ico pill cat-${p.cat}" aria-hidden="true">${CAT_ICON[p.cat]}</span>
+    <span class="prow-t"><b>${esc(placeTitle(p))}</b>${meta ? `<small>${meta}</small>` : ""}</span>
+    <span class="chev" aria-hidden="true">›</span></a>`;
+}
+// Плитка на полке
+function placeTile(p) {
+  return `<a class="tile" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
+    <span class="ico pill cat-${p.cat}" aria-hidden="true">${CAT_ICON[p.cat]}</span>
+    <b>${esc(placeTitle(p))}</b>
+    ${placeTag(p) ? `<small>${esc(placeTag(p))}</small>` : ""}
+    <small>${howFar(p)}</small></a>`;
+}
+// Заголовок под-экрана: стрелка «назад» + название (+ мелкая подпись справа)
+function subHeader(title, extra) {
+  return `<div class="sub-h"><button type="button" class="back" data-back aria-label="Назад">${SVG_BACK}</button>
+    <h2>${esc(title)}</h2>${extra ? `<span class="small muted">${extra}</span>` : ""}</div>`;
+}
+
+/* Полки главного экрана. Порядок постоянный — человек запоминает, где что лежит.
+   Меняется только содержимое полки «вечер»: до поездки — первый вечер, в поездке — сегодняшний. */
+function shelves() {
+  const today = preview || londonToday();
+  const before = today < TOUR.start, inTrip = today >= TOUR.start && today <= TOUR.end;
+  const byTrip = (a, b) => tripMin(a) - tripMin(b);
+  const evening = p => p.eve || p.cat === "pub" || p.cat === "xmas";
+  // «Легко после перелёта»: пешком или по синей ветке без пересадок, не дальше 4 остановок
+  const easy = p => { const t = (routeOf(p) || []).filter(l => l[0] !== "walk");
+    return t.length === 0 || (t.length === 1 && t[0][0] === "Piccadilly" && t[0][1] <= 4); };
+  const S = [{ id: "xmas", title: "Рождественские ярмарки", sub: "все работают в ваши даты",
+               list: TOUR.places.filter(p => p.cat === "xmas").sort(byTrip) }];
+  if (before || today === TOUR.start) S.push({ id: "eve", title: before ? "Первый вечер" : "Сегодня вечером",
+    sub: `${wday(TOUR.start)}, ${fmt(TOUR.start)} · рядом, после перелёта`,
+    list: TOUR.places.filter(p => evening(p) && easy(p)).sort(byTrip) });
+  else if (inTrip) S.push({ id: "eve", title: "Сегодня вечером", sub: `${wday(today)}, ${fmt(today)}`,
+    list: TOUR.places.filter(p => evening(p) && !closedToday(p)).sort(byTrip) });
+  S.push({ id: "hotel", title: "Рядом с отелем", sub: "пешком до 20 минут",
+    list: TOUR.places.filter(p => hotelWalk(p) <= 20).sort((a, b) => hotelWalk(a) - hotelWalk(b)) });
+  S.push({ id: "free", title: "Бесплатно", sub: "музеи и виды без билетов",
+    list: TOUR.places.filter(p => p.free && (p.cat === "museum" || p.cat === "view")).sort(byTrip) });
+  return S.filter(s => s.list.length);
+}
+
+/* Под-экран 1: главный */
+function placesHome() {
+  const chip = k => `<a class="chip" href="#places/cat/${k}" data-go="places/cat/${k}">${CAT_ICON[k]} ${esc(CATS[k])}</a>`;
+  return `<div class="stack">
+    <div class="tools2">
+      <a class="tool" href="#places/near" data-go="places/near">${SVG_NEAR}<span><b>Что рядом<br>со мной</b><small>места вокруг вас</small></span></a>
+      <a class="tool" href="#places/metro" data-go="places/metro">${SVG_TUBE}<span><b>Схема<br>метро</b><small>что у каждой станции</small></span></a>
+    </div>
+    ${shelves().map(s => `<section aria-label="${esc(s.title)}">
+      <div class="shelf-h"><div><h2>${esc(s.title)}</h2><p class="small muted">${esc(s.sub)}</p></div>
+        <a href="#places/shelf/${s.id}" data-go="places/shelf/${s.id}">Все ${s.list.length}</a></div>
+      <div class="rail">${s.list.slice(0, 8).map(placeTile).join("")}</div>
+    </section>`).join("")}
+    <section aria-label="Все категории">
+      <div class="shelf-h"><h2>Все категории</h2></div>
+      <div class="chips" style="margin-top:8px">${MAIN_CATS.map(chip).join("")}
+        <button type="button" class="chip" data-more-cats aria-expanded="${moreCats}">${moreCats ? "скрыть ▴" : `ещё ${MORE_CATS.length} ▾`}</button></div>
+      ${moreCats ? `<div class="chips cats-more" style="margin-top:8px">${MORE_CATS.map(chip).join("")}</div>` : ""}
+      <a class="maplink" style="padding-left:0" href="#places/cat/all" data-go="places/cat/all">📋 Все места списком (${TOUR.places.length}) ›</a>
+    </section>
   </div>`;
 }
 
-function renderPlaces() {
+/* Под-экран 2: список (категория или целая полка) */
+function placesList(title, list, top) {
+  const nf = nearFresh();
+  if (nf) list = list.slice().sort((a, b) => walkM(a) - walkM(b));
+  return `<div class="stack">
+    ${subHeader(title, placesWord(list.length))}
+    ${nf ? `<p class="small t-near">📍 Сначала ближайшие к вам</p>` : ""}
+    ${top || ""}
+    <div class="plist">${list.map(p => placeRow(p, nf)).join("")}</div>
+    <p class="small muted">${nf ? "Расстояние — от того места, где вы стоите." : "Остановки и минуты — от отеля."} Часы работы в декабре могут меняться, перед поездкой лучше проверить на сайте места.</p>
+  </div>`;
+}
+
+const PHOTO_LIGHT = `<article class="card now">
+      <h3>📷 Свет в ваши даты (3–9 декабря)</h3>
+      <ul class="items small">
+        <li><span><b>Закат около 15:52</b> — в эти дни самые ранние закаты года.</span></li>
+        <li><span><b>Мягкий «золотой» свет</b> — примерно с 15:00. Солнце низко весь день, тени длинные и красивые.</span></li>
+        <li><span><b>Синий час — примерно 16:00–16:30</b>: небо ещё синее, а подсветка мостов и зданий уже горит. Лучшее время для городских пейзажей.</span></li>
+        <li><span><b>Рассвет около 7:50</b> — утренние кадры без толпы до завтрака.</span></li>
+      </ul>
+      <p class="small muted">Совет: в синий час держите телефон неподвижно (облокотитесь на парапет) — снимок будет чётче.</p>
+    </article>`;
+
+/* Под-экран 3: карточка места. Сверху — решение и действие, ниже — подробности */
+function placePage(p) {
   const today = preview || londonToday();
   const inTrip = today >= TOUR.start && today <= TOUR.end;
-  const wd = parse(today).getDay();
-  const L = TOUR.line;
-  let list = TOUR.places.filter(p => placeCat === "all" || (placeCat === "photo" ? p.photo : p.cat === placeCat));
-  const sorting = near && nearState !== "far";
-  if (sorting) list = list.slice().sort((a, b) => walkM(a) - walkM(b));
-
-  $("#v-places").innerHTML = `<div class="stack">
-    ${nearPanel()}
+  const dates = tripDatesFor(p);
+  const nf = nearFresh();
+  return `<div class="stack">
+    <div class="sub-h"><button type="button" class="back" data-back aria-label="Назад">${SVG_BACK}</button>
+      <div class="chips" style="gap:6px">
+        <span class="pill cat-${p.cat}">${CAT_ICON[p.cat]} ${CATS[p.cat]}</span>
+        ${p.free && p.cat !== "museum" ? `<span class="pill free">Бесплатно</span>` : ""}
+        ${p.book ? `<span class="pill todo">Бронь заранее</span>` : ""}
+        ${inTrip ? (closedToday(p) ? `<span class="pill closed">Сегодня закрыто</span>` : `<span class="pill ok">Сегодня открыто</span>`) : ""}
+      </div></div>
     <article class="card">
-      <h2>Одна ветка — почти весь Лондон</h2>
-      <p class="small muted">От отеля по синей линии ${esc(L.name)} без пересадок. Нажмите на станцию, чтобы увидеть места рядом.</p>
+      <div>
+        <h2 style="margin:0">${esc(placeTitle(p))}</h2>
+        ${placeTag(p) ? `<p class="muted" style="margin:2px 0 0">${esc(placeTag(p))}</p>` : ""}
+        <p class="small" style="margin:6px 0 0">${nf ? howFar(p, true) : howFar(p)}</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn ghost" href="${mapsPlace(p.q)}" target="_blank" rel="noopener">📍 На карте</a>
+        <a class="btn go-btn" href="${mapsTransit(p.q)}" target="_blank" rel="noopener">🚇 Как добраться</a>
+      </div>
+      ${p.site ? `<a class="btn ticket-btn" href="${p.site}" target="_blank" rel="noopener">🎟 ${esc(p.siteLabel)}</a>` : ""}
+      <p>${esc(p.text)}</p>
+      ${p.photo ? `<p class="photo-tip"><b>📷 Для фото:</b> ${esc(p.photo)}</p>` : ""}
+      <div class="place-meta">
+        ${p.program ? `<span>📌 <b>По программе: ${wday(p.program)}, ${fmt(p.program)}</b></span>` : ""}
+        <span>🕒 ${esc(p.hours)}</span>
+        ${dates ? `<span>📅 В поездке: ${dates.length ? dates.map(d => ["вс","пн","вт","ср","чт","пт","сб"][parse(d).getDay()] + " " + fmt(d)).join(", ") : "не совпадает"}</span>` : ""}
+        <span>🚇 ${esc(p.station)}</span>
+      </div>
+      ${routeHtml(p)}
+      <div class="alt-links">
+        ${p.ll ? `<a class="maplink" href="${cmLink(p.ll, p.q)}" target="_blank" rel="noopener">маршрут в Citymapper</a>` : ""}
+        ${IS_APPLE ? `<a class="maplink" href="${applePlace(p.q)}" target="_blank" rel="noopener">в Apple Картах</a>` : ""}
+      </div>
+    </article>
+    <p class="small muted">Часы работы в декабре могут меняться, перед поездкой лучше проверить на сайте места.</p>
+  </div>`;
+}
+
+/* Под-экран 4: схема ветки. Нажатие на станцию раскрывает места рядом, нажатие на место — его карточка */
+function placesMetro() {
+  const L = TOUR.line;
+  const item = p => `<li><a class="prow" style="min-height:48px;padding:6px 0" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
+      <span class="ico pill cat-${p.cat}" style="width:2rem;height:2rem;font-size:1rem" aria-hidden="true">${CAT_ICON[p.cat]}</span>
+      <span class="prow-t"><b style="font-size:.95rem">${esc(placeTitle(p))}</b></span><span class="chev" aria-hidden="true">›</span></a></li>`;
+  return `<div class="stack">
+    ${subHeader("Схема метро")}
+    <article class="card">
+      <p class="small muted">От отеля по синей линии ${esc(L.name)} без пересадок. Нажмите на станцию — покажем, что рядом.</p>
       <ol class="line">
         ${L.stations.map(s => {
-          const near = TOUR.places.filter(p => sameSt(nearPiccadilly(p), s.n));
+          const here = TOUR.places.filter(p => sameSt(nearPiccadilly(p), s.n));
           const chg = TOUR.places.filter(p => sameSt(changeAt(p), s.n));
-          const item = p => `<li><span class="pill cat-${p.cat}" style="font-size:.7rem">${CATS[p.cat]}</span> <a href="${mapsPlace(p.q)}" target="_blank" rel="noopener">${esc(p.name)}</a></li>`;
-          const body = (near.length || chg.length) ? `<details class="st-more">
-              <summary>${near.length ? `${near.length} ${plural(near.length, "место", "места", "мест")} рядом` : ""}${near.length && chg.length ? " · " : ""}${chg.length ? `пересадка к ${chg.length}` : ""}</summary>
-              ${near.length ? `<ul class="st-list">${near.map(item).join("")}</ul>` : ""}
+          const body = (here.length || chg.length) ? `<details class="st-more">
+              <summary>${here.length ? `${placesWord(here.length)} рядом` : ""}${here.length && chg.length ? " · " : ""}${chg.length ? `пересадка к ${chg.length}` : ""}</summary>
+              ${here.length ? `<ul class="st-list">${here.map(item).join("")}</ul>` : ""}
               ${chg.length ? `<p class="small muted" style="margin-top:6px">Здесь пересадка к:</p><ul class="st-list">${chg.map(item).join("")}</ul>` : ""}
             </details>` : "";
           return `<li class="${s.home ? "home" : ""}">
@@ -1129,55 +1361,55 @@ function renderPlaces() {
         </li>`;}).join("")}
       </ol>
     </article>
-
-    <div class="chips" role="group" aria-label="Категории">
-      ${Object.entries(CATS).map(([k, v]) => `<button type="button" class="chip" data-cat="${k}" aria-pressed="${k === placeCat}">${v}</button>`).join("")}
-    </div>
-
-    ${placeCat === "photo" ? `<article class="card now">
-      <h3>📷 Свет в ваши даты (3–9 декабря)</h3>
-      <ul class="items small">
-        <li><span><b>Закат около 15:52</b> — в эти дни самые ранние закаты года.</span></li>
-        <li><span><b>Мягкий «золотой» свет</b> — примерно с 15:00. Солнце низко весь день, тени длинные и красивые.</span></li>
-        <li><span><b>Синий час — примерно 16:00–16:30</b>: небо ещё синее, а подсветка мостов и зданий уже горит. Лучшее время для городских пейзажей.</span></li>
-        <li><span><b>Рассвет около 7:50</b> — утренние кадры без толпы до завтрака.</span></li>
-      </ul>
-      <p class="small muted">Совет: в синий час держите телефон неподвижно (облокотитесь на парапет) — снимок будет чётче.</p>
-    </article>` : ""}
-    ${list.map(p => {
-      const dates = tripDatesFor(p);
-      const openToday = !p.days || p.days.includes(wd);
-      return `<article class="card">
-        <div class="chips" style="gap:6px">
-          <span class="pill cat-${p.cat}">${CATS[p.cat]}</span>
-          ${p.free && p.cat !== "museum" ? `<span class="pill free">Бесплатно</span>` : ""}
-          ${p.book ? `<span class="pill todo">Бронь заранее</span>` : ""}
-          ${inTrip ? (openToday ? `<span class="pill ok">Сегодня открыто</span>` : `<span class="pill closed">Сегодня закрыто</span>`) : ""}
-        </div>
-        <h3>${esc(p.name)}</h3>
-        ${sorting && p.ll ? `<p class="near-dist">📍 ${fmtDist(walkM(p))}</p>` : ""}
-        <p>${esc(p.text)}</p>
-        ${p.photo ? `<p class="photo-tip"><b>📷 Для фото:</b> ${esc(p.photo)}</p>` : ""}
-        <div class="place-meta">
-          ${p.program ? `<span>📌 <b>По программе: ${wday(p.program)}, ${fmt(p.program)}</b></span>` : ""}
-          <span>🚇 ${esc(p.station)}${p.direct === 0 ? ` · <b style="color:var(--tube)">пешком от отеля</b>` : p.direct ? ` · <b style="color:var(--tube)">${p.direct} ост. без пересадок</b>` : ""}</span>
-          <span>🕒 ${esc(p.hours)}</span>
-          ${dates ? `<span>📅 В поездке: ${dates.length ? dates.map(d => ["вс","пн","вт","ср","чт","пт","сб"][parse(d).getDay()] + " " + fmt(d)).join(", ") : "не совпадает"}</span>` : ""}
-        </div>
-        ${routeHtml(p)}
-        ${p.site ? `<a class="btn ticket-btn" href="${p.site}" target="_blank" rel="noopener">🎟 ${esc(p.siteLabel)}</a>` : ""}
-        <div class="btn-row">
-          <a class="btn ghost" href="${mapsPlace(p.q)}" target="_blank" rel="noopener">📍 На карте</a>
-          <a class="btn ghost" href="${mapsTransit(p.q)}" target="_blank" rel="noopener">🚇 Как добраться</a>
-        </div>
-        <div class="alt-links">
-          ${p.ll ? `<a class="maplink" href="${cmLink(p.ll, p.q)}" target="_blank" rel="noopener">или маршрут в Citymapper</a>` : ""}
-          ${IS_APPLE ? `<a class="maplink" href="${applePlace(p.q)}" target="_blank" rel="noopener">или в Apple Картах</a>` : ""}
-        </div>
-      </article>`;
-    }).join("")}
-    <p class="small muted">Часы работы в декабре могут меняться, перед поездкой лучше проверить на сайте места.</p>
   </div>`;
+}
+
+/* Под-экран 5: «Что рядом со мной». В первый раз — объяснение до запроса геолокации:
+   человек понимает, зачем телефон спросит разрешение, и реже нажимает «Запретить». */
+function placesNear() {
+  const head = subHeader("Что рядом со мной");
+  if (!store.get("nearSeen", false) && !near && nearState === "") return `<div class="stack">${head}
+    <div style="text-align:center;padding:8px 0">
+      <div style="display:inline-grid;place-items:center;width:4.5rem;height:4.5rem;border-radius:50%;background:var(--surface);border:1px solid var(--line);color:var(--tube)">
+        <span style="width:2.2rem;height:2.2rem;display:block">${SVG_NEAR}</span></div>
+      <h3 style="margin:12px 0 4px">Что интересного вокруг вас</h3>
+      <p class="small muted">Все места из приложения — от ближнего к дальнему</p>
+    </div>
+    <ol class="steps">
+      <li><span class="n">1</span><span><b>Телефон спросит разрешение на геолокацию</b><br><span class="small muted">Нажмите «Разрешить». Место нужно только сейчас, оно никуда не отправляется.</span></span></li>
+      <li><span class="n">2</span><span><b>Покажем места по расстоянию</b><br><span class="small muted">С минутами пешком. Считаем по прямой с запасом, поэтому это примерно.</span></span></li>
+      <li><span class="n">3</span><span><b>Нажмите на место — поведём туда</b><br><span class="small muted">Кнопка «Как добраться» откроет точный маршрут в картах.</span></span></li>
+    </ol>
+    <button type="button" class="btn go-btn" data-near="go">📍 Найти, где я</button>
+    <p class="small muted" style="text-align:center">Работает и без интернета: GPS не нужна связь.</p>
+  </div>`;
+  const list = near && nearState !== "far" && nearState !== "loading" ? TOUR.places.filter(p => p.ll).sort((a, b) => walkM(a) - walkM(b)) : [];
+  return `<div class="stack">${head}
+    ${nearPanel()}
+    ${list.length ? `<div class="plist">${list.map(p => placeRow(p, true)).join("")}</div>` : ""}
+    ${nearHelp()}
+  </div>`;
+}
+
+// Вызывается при входе на «Что рядом со мной»: если объяснение уже видели — сразу ищем, где человек
+function autoLocate() {
+  if (!store.get("nearSeen", false) || nearState === "loading") return;
+  if (near && !near.demo && Date.now() - near.at < 2 * 60000) return; // свежие данные — не дёргаем GPS лишний раз
+  locate();
+}
+
+function renderPlaces() {
+  const [kind, arg] = placeRoute;
+  const shelf = kind === "shelf" ? shelves().find(s => s.id === arg) : null;
+  let html;
+  if (kind === "cat" && CATS[arg]) html = placesList(CATS[arg],
+      TOUR.places.filter(p => arg === "all" || (arg === "photo" ? p.photo : p.cat === arg)), arg === "photo" ? PHOTO_LIGHT : "");
+  else if (shelf) html = placesList(shelf.title, shelf.list);
+  else if (kind === "p" && TOUR.places[Number(arg)]) html = placePage(TOUR.places[Number(arg)]);
+  else if (kind === "metro") html = placesMetro();
+  else if (kind === "near") html = placesNear();
+  else html = placesHome();     // неизвестный адрес — показываем главный, а не пустой экран
+  $("#v-places").innerHTML = html;
 }
 
 /* ===== Разговорник ===== */
@@ -1423,19 +1655,74 @@ function wireConverter() {
 /* Навигация по вкладкам через #hash */
 const VIEWS = ["today", "program", "places", "help", "tools", "phrases"];
 const TAB_FOR = { phrases: "tools" }; // какую вкладку подсвечивать для экранов без своей вкладки
+/* Навигация. Адрес после # — «где мы»: "places", "places/p/12" и т. д.
+   Первая часть до "/" выбирает вкладку, остальное — под-экран внутри неё. */
+const scrollMem = {};   // прокрутка на каждом адресе — чтобы «назад» вернул на то же место списка
+const backStack = [];   // адреса, с которых ушли вперёд по ссылке (для стрелки «назад» в приложении)
+let navKind = "back";   // как попали на текущий адрес: "go" — вперёд по ссылке, "back" — назад или из истории
 function show() {
-  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "today";
+  const parts = location.hash.slice(1).split("/");
+  const v = VIEWS.includes(parts[0]) ? parts[0] : "today";
   VIEWS.forEach(n => $("#v-" + n).classList.toggle("active", n === v));
   const tab = TAB_FOR[v] || v;
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.v === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  if (v === "places") {
+    placeRoute = parts.slice(1);
+    renderPlaces();
+    if (placeRoute[0] === "near") autoLocate();
+  }
   if (v !== "phrases" && CAN_SPEAK) speechSynthesis.cancel();
-  window.scrollTo(0, 0);
+  if (navKind === "go") window.scrollTo(0, 0);           // новый экран — с начала
+  else {                                                  // вернулись — туда же, где были
+    if (backStack[backStack.length - 1] === location.hash) backStack.pop();
+    window.scrollTo(0, scrollMem[location.hash] || 0);
+  }
+  navKind = "back";
+}
+// Перейти вперёд по ссылке внутри приложения
+function go(h) {
+  if (location.hash === "#" + h) return;
+  scrollMem[location.hash] = window.scrollY;
+  backStack.push(location.hash);
+  navKind = "go";
+  location.hash = h;            // show() вызовет обработчик hashchange
+}
+// Стрелка «назад»: если пришли по ссылке — шаг назад по истории, иначе — на главный экран «Мест»
+function goBack() {
+  if (backStack.length) history.back();
+  else { navKind = "go"; location.hash = "places"; }
 }
 
 function renderAll() { renderToday(); renderProgram(); renderPlaces(); renderHelp(); renderTools(); renderPhrases(); }
 
 /* Один общий обработчик кликов (event delegation) */
+/* Надёжное нажатие на ссылки внутри приложения — тот же приём, что у нижнего меню:
+   на некоторых Android «призрачное» второе касание глушит click, поэтому переходим уже по pointerup.
+   Если палец сдвинулся больше чем на 10 px — это прокрутка (например, полки вбок), а не нажатие. */
+let tapDown = null, lastTapNav = 0;
+document.addEventListener("pointerdown", e => { tapDown = { x: e.clientX, y: e.clientY }; }, { passive: true });
+document.addEventListener("pointerup", e => {
+  if (e.pointerType === "mouse" || !tapDown) return;
+  const moved = Math.hypot(e.clientX - tapDown.x, e.clientY - tapDown.y) > 10;
+  tapDown = null;
+  if (moved) return;
+  const el = e.target.closest("[data-go], [data-back]");
+  if (!el) return;
+  lastTapNav = Date.now();
+  if (el.hasAttribute("data-back")) goBack(); else go(el.dataset.go);
+});
+
 document.addEventListener("click", e => {
+  const nv = e.target.closest("[data-go], [data-back]");
+  if (nv) {
+    e.preventDefault();                                   // сами решаем, куда идти
+    if (Date.now() - lastTapNav < 800) return;            // уже перешли по pointerup
+    if (nv.hasAttribute("data-back")) goBack(); else go(nv.dataset.go);
+    return;
+  }
+  // «Призрачный» click сразу после перехода по pointerup может попасть в кнопку нового экрана — гасим его
+  if (Date.now() - lastTapNav < 350) { e.preventDefault(); return; }
+  if (e.target.closest("[data-more-cats]")) { moreCats = !moreCats; renderPlaces(); return; }
   const pv = e.target.closest("[data-pv]");
   if (pv) { preview = pv.dataset.pv; renderToday(); renderProgram(); renderPlaces(); window.scrollTo(0, 0); return; }
   if (e.target.closest("#pv-exit")) { preview = null; renderToday(); renderProgram(); renderPlaces(); return; }
@@ -1444,12 +1731,11 @@ document.addEventListener("click", e => {
   const nb = e.target.closest("[data-near]");
   if (nb) {
     const a = nb.dataset.near;
+    store.set("nearSeen", true);   // объяснение «Что рядом со мной» больше не показываем
     if (a === "off") { near = null; nearState = ""; renderPlaces(); }
     else locate(a === "demo");
     return;
   }
-  const cat = e.target.closest("[data-cat]");
-  if (cat) { placeCat = cat.dataset.cat; renderPlaces(); return; }
   if (e.target.closest("#taxi-open")) { showBig("Please take me to:", TOUR.hotel.name, TOUR.hotel.address, `Near ${TOUR.hotel.tube} station`); return; }
   const say = e.target.closest("[data-say]");
   if (say) { speak(say.dataset.say, Number(say.dataset.rate), say); return; }
@@ -1638,6 +1924,10 @@ setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - 
    жестом и click не присылает. Событие pointerup при этом приходит правильно,
    поэтому переключаем экран по pointerup, а click оставляем для мыши и клавиатуры. */
 function navTo(v) {
+  scrollMem[location.hash] = window.scrollY;
+  delete scrollMem["#" + v];       // вкладку из нижнего меню всегда открываем с начала
+  backStack.length = 0;            // новая вкладка — новая «цепочка» переходов
+  navKind = "go";
   if (location.hash !== "#" + v) location.hash = v; // запись в историю: «назад» вернёт на прошлую вкладку
   show();
 }
