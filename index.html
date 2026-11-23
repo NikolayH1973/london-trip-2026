@@ -950,7 +950,12 @@ async function loadWeather() {
    покажем его с подписью «обновлено в …». Окно то же, что у посредника: от 12 ч до вылета до +9 ч. */
 let FL = store.get("fl", {});            // { BA405: { at: время получения, data: ответ посредника } }
 const FL_OPEN = 12 * 3600e3, FL_CLOSE = 9 * 3600e3;
+// Тестовый режим — только по ссылке ?flighttest (сегодняшний рейс) или ?flighttest=2026-11-24.
+// Результат теста в телефоне не сохраняем, чтобы он не смешался с настоящим статусом в декабре.
+const FL_TEST = new URLSearchParams(location.search).get("flighttest");
+if (FL_TEST !== null) FL = {};
 function flightWindow(f) {
+  if (FL_TEST !== null) return "live";
   const dep = Date.parse(f.at), now = Date.now();
   return now < dep - FL_OPEN ? "early" : now > dep + FL_CLOSE ? "over" : "live";
 }
@@ -958,12 +963,14 @@ async function loadFlights(force) {
   if (!/^https?:$/.test(location.protocol)) return;       // открыто как файл — посредника нет
   for (const f of [TOUR.flights.out, TOUR.flights.back]) {
     if (flightWindow(f) !== "live") continue;              // вне окна не тратим запросы
+    if (FL_TEST !== null && f !== TOUR.flights.out) continue; // в тесте карточка только BA405 — второй запрос не нужен
     const last = FL[f.no];
     if (!force && last && Date.now() - last.at < 5 * 60e3) continue;   // не чаще раза в 5 минут
     try {
-      const res = await fetch("/api/flight?f=" + f.no, { signal: AbortSignal.timeout(8000) });
+      const test = FL_TEST === null ? "" : "&test=" + (FL_TEST || "today");
+      const res = await fetch("/api/flight?f=" + f.no + test, { signal: AbortSignal.timeout(8000) });
       FL[f.no] = { at: Date.now(), data: await res.json() };
-      store.set("fl", FL);
+      if (FL_TEST === null) store.set("fl", FL);
     } catch (e) { /* нет связи — остаётся прошлый ответ */ }
   }
   renderToday();
@@ -1005,9 +1012,11 @@ function flightCard(f) {
   if (win === "early") body = `<p class="small muted">Статус появится здесь ${opens} ${f.tzName} — за 12 часов до вылета.</p>`;
   else if (d && d.state === "ok") body = flightStatusHtml(d);
   else if (!d) body = `<p class="small muted">${navigator.onLine ? "Загружаю статус…" : "Нет интернета — статус появится, когда будет связь."}</p>`;
+  else if (d.state === "notfound") body = `<p class="small muted">Рейса пока нет в данных сервиса — обычно он появляется за несколько часов до вылета. Проверим снова через 5 минут.</p>`;
   else body = `<p class="small muted">Статус сейчас недоступен. Проверьте по кнопкам ниже.</p>`;
   const when = d && d.fetched ? new Date(d.fetched) : null;
   return `<article class="card">
+    ${FL_TEST !== null ? `<p class="pill todo">🧪 Тест: рейс ${f.no} за ${d && d.date ? fmt(d.date) : (FL_TEST || "сегодня")}</p>` : ""}
     <h3>✈️ Статус рейса ${f.no} · ${f.from} → ${f.to}</h3>
     ${body}
     ${win === "live" && d && d.state === "ok" ? `<p class="small muted">По данным Aviationstack · обновлено в ${String(when.getHours()).padStart(2, "0")}:${String(when.getMinutes()).padStart(2, "0")}${navigator.onLine ? "" : " (нет интернета)"}</p>` : ""}

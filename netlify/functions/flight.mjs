@@ -13,8 +13,8 @@
 
 // Наши рейсы. dep — время вылета по расписанию с часовым поясом аэропорта
 const FLIGHTS = {
-  BA405: { date: "2026-12-03", dep: "2026-12-03T06:20:00+02:00" },   // Тель-Авив → Лондон
-  BA404: { date: "2026-12-09", dep: "2026-12-09T20:30:00+00:00" }    // Лондон → Тель-Авив
+  BA405: { date: "2026-12-03", dep: "2026-12-03T06:20:00+02:00", tz: "Asia/Jerusalem" },   // Тель-Авив → Лондон
+  BA404: { date: "2026-12-09", dep: "2026-12-09T20:30:00+00:00", tz: "Europe/London" }     // Лондон → Тель-Авив
 };
 const HOUR = 3600 * 1000;
 const OPEN_BEFORE = 12 * HOUR;   // начинаем спрашивать за 12 ч до вылета
@@ -46,14 +46,24 @@ function pick(side = {}) {
   };
 }
 
+// Сегодняшняя дата в часовом поясе аэропорта вылета, в виде 2026-11-23 (формат en-CA как раз такой)
+const todayIn = tz => new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(new Date());
+
 export default async (req) => {
-  const code = (new URL(req.url).searchParams.get("f") || "").toUpperCase();
+  const params = new URL(req.url).searchParams;
+  const code = (params.get("f") || "").toUpperCase();
   const cfg = FLIGHTS[code];
   if (!cfg) return json({ state: "unknown" }, 86400);
 
-  const now = Date.now(), dep = Date.parse(cfg.dep);
-  if (now < dep - OPEN_BEFORE) return json({ state: "early", opensAt: new Date(dep - OPEN_BEFORE).toISOString() }, 600);
-  if (now > dep + CLOSE_AFTER) return json({ state: "over" }, 86400);
+  // Тестовый режим: тот же рейс, но в другой день (BA405/BA404 летают ежедневно).
+  // ?test=today — сегодняшний, ?test=2026-11-24 — конкретная дата. «Окно» не проверяем.
+  const test = params.get("test");
+  const date = test === null ? cfg.date : /^\d{4}-\d{2}-\d{2}$/.test(test) ? test : todayIn(cfg.tz);
+  if (test === null) {
+    const now = Date.now(), dep = Date.parse(cfg.dep);
+    if (now < dep - OPEN_BEFORE) return json({ state: "early", opensAt: new Date(dep - OPEN_BEFORE).toISOString() }, 600);
+    if (now > dep + CLOSE_AFTER) return json({ state: "over" }, 86400);
+  }
 
   const key = process.env.AVIATIONSTACK_KEY;
   if (!key) return json({ state: "nokey" }, 300);
@@ -64,11 +74,13 @@ export default async (req) => {
     const data = await res.json();
     if (data.error) return json({ state: "error", reason: data.error.code || "api" }, 600);
     // Сервис отдаёт рейсы за несколько дней — берём наш по дате вылета
-    const f = (data.data || []).find(x => x.flight_date === cfg.date);
-    if (!f) return json({ state: "notfound", fetched: new Date().toISOString() }, FRESH);
+    const f = (data.data || []).find(x => x.flight_date === date);
+    if (!f) return json({ state: "notfound", date, fetched: new Date().toISOString() }, test === null ? FRESH : 300);
     return json({
       state: "ok",
       flight: code,
+      date,
+      test: test !== null,
       status: f.flight_status || "unknown",   // scheduled, active, landed, cancelled, incident, diverted
       dep: pick(f.departure),
       arr: pick(f.arrival),
