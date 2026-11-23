@@ -1914,8 +1914,8 @@ document.addEventListener("click", e => {
   const pv = e.target.closest("[data-pv]");
   if (pv) { preview = pv.dataset.pv; renderToday(); renderProgram(); renderPlaces(); window.scrollTo(0, 0); return; }
   if (e.target.closest("#pv-exit")) { preview = null; renderToday(); renderProgram(); renderPlaces(); return; }
-  const go = e.target.closest("[data-pv-go]");
-  if (go) { preview = go.dataset.pvGo; renderToday(); renderProgram(); renderPlaces(); location.hash = "today"; return; }
+  const pvGo = e.target.closest("[data-pv-go]");   // не «go»: так уже называется функция перехода, имя её бы «затенило»
+  if (pvGo) { preview = pvGo.dataset.pvGo; renderToday(); renderProgram(); renderPlaces(); location.hash = "today"; return; }
   const nb = e.target.closest("[data-near]");
   if (nb) {
     const a = nb.dataset.near;
