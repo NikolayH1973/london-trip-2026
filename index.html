@@ -290,6 +290,12 @@ details.guide[open] summary { margin-bottom: 8px; }
 /* Главная кнопка карточки места — цвета линии Piccadilly */
 .btn.go-btn { background: var(--tube); color: var(--tube-ink); }
 #options { scroll-margin-top: 16px; }
+.signup-box { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
+.signup-box label { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; font-weight: 600; }
+.signup-box input, .signup-box select { min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink); font: inherit; font-weight: 400; width: 100%; box-sizing: border-box; }
+.opt-card > .btn { width: 100%; box-sizing: border-box; }
+.linkish { border: 0; background: none; padding: 0 2px; color: var(--tube); text-decoration: underline; cursor: pointer; font: inherit; }
 .opt-card { border-top: 1px solid var(--line); padding-top: 10px; scroll-margin-top: 16px; }
 .opt-card summary { cursor: pointer; list-style: none; display: flex; flex-direction: column; gap: 2px; min-height: 44px; }
 .opt-card summary::-webkit-details-marker { display: none; }
@@ -498,21 +504,27 @@ const TOUR = {
       ],
       tip: "Паспорт держите при себе, а не в чемодане в камере хранения." }
   ],
+  // Запись на опции — Google-форма Николая, ответы попадают в Google-таблицу, у гида доступ «Редактор».
+  // entry.… — внутренние номера вопросов формы (из «предзаполненной ссылки»). Поменяли форму — обновить здесь.
+  signup: {
+    form: "https://docs.google.com/forms/d/e/1FAIpQLSd8j5HiK2c3WekNhfi1H39_dNo0YXkL4EM3qCPLQ6Xjvovw8w/viewform",
+    fields: { option: "entry.28826872", name: "entry.1991592601", count: "entry.1125033599", phone: "entry.951988755" }
+  },
   // Опции — экскурсии за доплату. Тексты гида (23 ноября) — дословно. price: null = «цену уточнит гид»
   options: [
-    { id: "windsor", q: "Windsor Castle", title: "Виндзорский замок", date: "2026-12-05", price: null, includes: null,
+    { id: "windsor", q: "Windsor Castle", form: "Виндзорский замок — 5 декабря", title: "Виндзорский замок", date: "2026-12-05", price: null, includes: null,
       hook: "Прикоснитесь к жизни настоящих королей!",
       text: "Приглашаем вас в незабываемое путешествие в один из самых роскошных и впечатляющих королевских замков Великобритании! За его величественными стенами скрываются почти 1000 лет захватывающей истории, дворцовых интриг, громких событий и королевских тайн. Вы пройдёте по залам, где принимали монархов и глав государств, увидите роскошные интерьеры и знаменитую часовню Святого Георгия. Мы раскроем удивительные истории королевской семьи и покажем Виндзор таким, каким его не увидишь на страницах путеводителей. Подарите себе встречу с настоящей королевской Англией — впечатления от этой экскурсии останутся с вами надолго!" },
-    { id: "museum", q: "British Museum London", title: "Британский музей с местным гидом", date: "2026-12-06", price: null, includes: "местный гид; вход в музей бесплатный",
+    { id: "museum", q: "British Museum London", form: "Британский музей с гидом — 6 декабря", title: "Британский музей с местным гидом", date: "2026-12-06", price: null, includes: "местный гид; вход в музей бесплатный",
       hook: "Путешествие сквозь тысячелетия и цивилизации!",
       text: "Приглашаем вас в один из величайших музеев мира, где за несколько часов можно совершить путешествие от Древнего Египта и Месопотамии до античной Греции и Рима. Вы увидите знаменитый Розеттский камень, загадочные египетские мумии, величественные ассирийские рельефы и легендарные скульптуры Парфенона. За каждым экспонатом скрывается удивительная история о людях, верованиях, власти, войнах и великих открытиях. Мы не просто будем рассматривать древние предметы — мы попробуем разгадать, как рождались и исчезали цивилизации, оставившие след в истории человечества. Британский музей — это возможность увидеть весь мир в одном здании и за одну экскурсию прожить тысячи лет истории!" },
-    { id: "tower", q: "Tower of London", title: "Лондонский Тауэр с местным гидом", date: "2026-12-06", price: null, includes: "местный гид и билеты в Тауэр",
+    { id: "tower", q: "Tower of London", form: "Тауэр с гидом — 6 декабря", title: "Лондонский Тауэр с местным гидом", date: "2026-12-06", price: null, includes: "местный гид и билеты в Тауэр",
       hook: "Место, где история становится захватывающим приключением!",
       text: "Приглашаем вас открыть одну из самых загадочных и впечатляющих достопримечательностей Лондона! За мощными стенами Тауэра скрываются почти тысяча лет королевской истории, заговоров, предательств, дворцовых интриг и драматических судеб. Здесь короновали, заключали в темницы и казнили, здесь хранятся бесценные королевские регалии и знаменитые драгоценности британской короны. Вы узнаете истории Анны Болейн, Ричарда III, узников Тауэра и легендарных воронов, без которых, согласно преданию, рухнет британская монархия. Это не просто экскурсия по старинной крепости — это погружение в самые драматичные страницы английской истории, от которых невозможно оторваться!" },
-    { id: "stratford", q: "Stratford-upon-Avon", title: "Стратфорд-на-Эйвоне", date: "2026-12-08", price: null, includes: null,
+    { id: "stratford", q: "Stratford-upon-Avon", form: "Стратфорд-на-Эйвоне — 8 декабря", title: "Стратфорд-на-Эйвоне", date: "2026-12-08", price: null, includes: null,
       hook: "Город, где родился Шекспир и оживает магия английской истории!",
       text: "Приглашаем вас в очаровательный английский городок, ставший родиной величайшего драматурга всех времён — Уильяма Шекспира. Здесь, среди старинных фахверковых домов, уютных улочек и живописных берегов реки Эйвон, словно остановилось время. Мы прикоснёмся к истории семьи Шекспира, увидим дом, в котором он родился, узнаем о его жизни, любви, творчестве и загадках, которые до сих пор волнуют исследователей. Поговорим о том, как небольшой провинциальный город подарил миру автора «Гамлета», «Ромео и Джульетты» и «Макбета». Вас ждёт атмосфера настоящей старой Англии, удивительные истории и красота, достойная театральных декораций. Стратфорд-на-Эйвоне — это возможность пройтись по улицам, где начиналась история человека, чьи произведения покорили весь мир!" },
-    { id: "oxford", q: "Oxford University colleges", title: "Оксфорд", date: "2026-12-08", price: null, includes: null,
+    { id: "oxford", q: "Oxford University colleges", form: "Оксфорд — 8 декабря", title: "Оксфорд", date: "2026-12-08", price: null, includes: null,
       hook: "Путешествие в мир английских традиций, великих умов и удивительных историй!",
       text: "Приглашаем вас открыть один из самых красивых и знаменитых университетских городов мира! Оксфорд — это не просто старинные колледжи и готические башни, а целая вселенная, в которой на протяжении веков формировались идеи, менялись судьбы и учились будущие лидеры мира. Мы прогуляемся по средневековым улочкам, заглянем в атмосферные университетские дворики, увидим знаменитые библиотеки и места, где учились Оскар Уайльд, Льюис Кэрролл и многие другие выдающиеся личности. Здесь оживают истории Гарри Поттера, «Алисы в Стране чудес» и многовековые академические традиции Великобритании. Вы почувствуете особую атмосферу города, где прошлое удивительным образом соседствует с современной студенческой жизнью. Оксфорд — это Англия из книг, фильмов и наших самых красивых представлений, которую стоит увидеть своими глазами!" }
   ],
@@ -912,6 +924,38 @@ function dayItems(day) {
 const PRICE_TEST = new URLSearchParams(location.search).has("pricetest");
 const SAMPLE_PRICE = { windsor: "£80", museum: "£50", tower: "£70", stratford: "£70", oxford: "£70" };
 const optPrice = o => o.price || (PRICE_TEST && SAMPLE_PRICE[o.id] ? SAMPLE_PRICE[o.id] + " 🧪" : null);
+/* Запись через Google-форму. Имя и «сколько человек» спрашиваем один раз и храним только
+   в этом телефоне (localStorage). Дальше «Записаться» открывает форму уже заполненной:
+   отмечена экскурсия, вписаны имя и количество — остаётся нажать «Отправить».
+   Отправить за человека нельзя, и это правильно: запись появляется, только когда он сам подтвердил. */
+let signupFor = null;                        // для какой опции сейчас показан вопрос «как вас зовут»
+const optOpen = new Set();                   // какие карточки опций раскрыты (чтобы перерисовка их не сворачивала)
+function signupUrl(o, who) {
+  const s = TOUR.signup, f = s.fields;
+  const q = new URLSearchParams({ usp: "pp_url", [f.option]: o.form });
+  if (who) {
+    q.append(f.name, who.name); q.append(f.count, String(who.count));
+    if (who.phone) q.append(f.phone, who.phone);
+  }
+  return s.form + "?" + q.toString();
+}
+function signupHtml(o) {
+  const who = store.get("signup", null);
+  if (signupFor === o.id) return `<div class="signup-box">
+      <p class="small">Один раз — и дальше форма будет открываться уже заполненной.</p>
+      <label>Имя и фамилия<input id="su-name" autocomplete="name" value="${esc(who ? who.name : "")}" placeholder="Например: Анна и Борис Ивановы"></label>
+      <label>Сколько человек<select id="su-count">${[1, 2, 3, 4].map(n => `<option ${who && who.count === n ? "selected" : n === 2 && !who ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+      <label>Телефон <span class="muted">(необязательно)</span><input id="su-phone" type="tel" autocomplete="tel" value="${esc(who && who.phone ? who.phone : "")}"></label>
+      <p class="small t-closed" id="su-err" hidden>Впишите имя — по нему гид найдёт вас в списке.</p>
+      <button type="button" class="btn go-btn" data-signup-save="${o.id}">Дальше — к форме записи</button>
+      <p class="small muted">Хранится только в вашем телефоне.</p>
+    </div>`;
+  if (who) return `<a class="btn go-btn" href="${signupUrl(o, who)}" target="_blank" rel="noopener">✍️ Записаться</a>
+      <p class="small muted">Форма откроется заполненной: ${esc(who.name)}, ${who.count} чел. Нажмите в ней «Отправить».
+        <button type="button" class="linkish" data-signup="${o.id}">Изменить</button></p>`;
+  return `<button type="button" class="btn go-btn" data-signup="${o.id}">✍️ Записаться</button>`;
+}
+
 function optionsHtml() {
   const g = TOUR.guide;
   const day = iso => `${wday(iso)}, ${fmt(iso)}`;
@@ -919,8 +963,8 @@ function optionsHtml() {
     <h3>🟣 Опции — экскурсии за доплату</h3>
     <p class="small muted">Не входят в стоимость тура, по желанию. Записаться и оплатить — у гида; можно в фунтах, долларах или евро по курсу.</p>
     ${TOUR.options.map(o => {
-      const msg = `${g.name.split(" ")[0]}, здравствуйте! Хотим записаться на опцию «${o.title}» (${day(o.date)}).`;
-      return `<details class="opt-card" id="opt-${o.id}">
+      const msg = `${g.name.split(" ")[0]}, здравствуйте! Вопрос про опцию «${o.title}» (${day(o.date)}): `;
+      return `<details class="opt-card" id="opt-${o.id}" ${optOpen.has(o.id) || signupFor === o.id ? "open" : ""}>
         <summary>
           <span class="eyebrow">${day(o.date)}</span>
           <b class="opt-t">${esc(o.title)}</b>
@@ -936,7 +980,8 @@ function optionsHtml() {
           <a class="btn ghost" href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(o.q)}" target="_blank" rel="noopener">📷 Фото</a>
           <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.q)}" target="_blank" rel="noopener">📍 На карте</a>
         </div>
-        <a class="btn ghost" href="${waHref(g.phone)}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">✍️ Записаться — написать гиду</a>
+        ${signupHtml(o)}
+        <a class="btn ghost" href="${waHref(g.phone)}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 Вопрос гиду в WhatsApp</a>
       </details>`;
     }).join("")}
   </article>`;
@@ -1920,6 +1965,19 @@ document.addEventListener("click", e => {
   // «Призрачный» click сразу после перехода по pointerup может попасть в кнопку нового экрана — гасим его
   if (Date.now() - lastTapNav < 350) { e.preventDefault(); return; }
   if (e.target.closest("[data-more-cats]")) { moreCats = !moreCats; renderPlaces(); return; }
+  const su = e.target.closest("[data-signup]");
+  if (su) { signupFor = su.dataset.signup; renderProgram(); document.getElementById("su-name")?.focus(); return; }
+  const sv = e.target.closest("[data-signup-save]");
+  if (sv) {
+    const name = $("#su-name").value.trim();
+    if (!name) { $("#su-err").hidden = false; $("#su-name").focus(); return; }
+    const who = { name, count: Number($("#su-count").value), phone: $("#su-phone").value.trim() };
+    store.set("signup", who);
+    const o = TOUR.options.find(x => x.id === sv.dataset.signupSave);
+    signupFor = null; renderProgram();
+    window.open(signupUrl(o, who), "_blank", "noopener");   // прямо по нажатию — браузер не считает это всплывающим окном
+    return;
+  }
   const pv = e.target.closest("[data-pv]");
   if (pv) { preview = pv.dataset.pv; renderToday(); renderProgram(); renderPlaces(); window.scrollTo(0, 0); return; }
   if (e.target.closest("#pv-exit")) { preview = null; renderToday(); renderProgram(); renderPlaces(); return; }
@@ -1960,6 +2018,11 @@ document.addEventListener("change", e => {
   store.set("checks", done);
   renderToday();
 });
+// Запоминаем раскрытые карточки опций: событие toggle не всплывает, поэтому слушаем на этапе погружения (true)
+document.addEventListener("toggle", e => {
+  const d = e.target;
+  if (d.classList && d.classList.contains("opt-card")) d.open ? optOpen.add(d.id.slice(4)) : optOpen.delete(d.id.slice(4));
+}, true);
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#taxi").classList.remove("open"); });
 
 /* Свайп влево/вправо на экране «Сегодня» листает дни */
