@@ -54,6 +54,10 @@ self.addEventListener("fetch", event => {
   // Чужие сайты (карты, WhatsApp) не трогаем
   if (url.origin !== self.location.origin) return;
 
+  // Статус рейса (/api/…) — всегда напрямую. Из кэша его брать нельзя: кэш ниже игнорирует «?f=…»
+  // и мог бы отдать ответ про другой рейс. Последний статус приложение хранит само.
+  if (url.pathname.startsWith("/api/")) return;
+
   // Наши файлы: сначала сеть (с таймаутом), при успехе обновляем кэш; иначе — кэш
   event.respondWith(
     fetchWithTimeout(req)

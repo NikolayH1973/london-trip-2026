@@ -289,6 +289,8 @@ details.guide[open] summary { margin-bottom: 8px; }
 .cats-more { border-top: 1px dashed var(--line); padding-top: 8px; }
 /* Главная кнопка карточки места — цвета линии Piccadilly */
 .btn.go-btn { background: var(--tube); color: var(--tube-ink); }
+.flight-st { font-size: 1.2rem; font-weight: 700; margin: 0; }
+.flight-rows { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 10px 12px; border-radius: 12px; background: var(--bg); }
 .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .steps li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
 .steps .n { flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .9rem;
@@ -399,8 +401,9 @@ const TOUR = {
   end:   "2026-12-09",
   tz: "Europe/London",
   flights: {
-    out:  { code: "BA", from: "Тель-Авив", to: "Лондон", dep: "06:20", arr: "10:05" },
-    back: { code: "BA", from: "Лондон", to: "Тель-Авив", dep: "20:30", arr: "03:25" }
+    // no — номер рейса; at — вылет по расписанию с часовым поясом (для «окна» статуса); tz — пояс аэропорта вылета
+    out:  { code: "BA", no: "BA405", from: "Тель-Авив", to: "Лондон", dep: "06:20", arr: "10:05", at: "2026-12-03T06:20:00+02:00", tz: "Asia/Jerusalem", tzName: "по Израилю" },
+    back: { code: "BA", no: "BA404", from: "Лондон", to: "Тель-Авив", dep: "20:30", arr: "03:25", at: "2026-12-09T20:30:00+00:00", tz: "Europe/London", tzName: "по Лондону" }
   },
   hotel: {
     name: "Royal National Hotel",
@@ -941,6 +944,80 @@ async function loadWeather() {
   }
 }
 
+/* ===== Статус рейса =====
+   Приложение спрашивает наш посредник /api/flight (файл netlify/functions/flight.mjs),
+   а уже он — сервис Aviationstack. Последний ответ храним в телефоне: без интернета
+   покажем его с подписью «обновлено в …». Окно то же, что у посредника: от 12 ч до вылета до +9 ч. */
+let FL = store.get("fl", {});            // { BA405: { at: время получения, data: ответ посредника } }
+const FL_OPEN = 12 * 3600e3, FL_CLOSE = 9 * 3600e3;
+function flightWindow(f) {
+  const dep = Date.parse(f.at), now = Date.now();
+  return now < dep - FL_OPEN ? "early" : now > dep + FL_CLOSE ? "over" : "live";
+}
+async function loadFlights(force) {
+  if (!/^https?:$/.test(location.protocol)) return;       // открыто как файл — посредника нет
+  for (const f of [TOUR.flights.out, TOUR.flights.back]) {
+    if (flightWindow(f) !== "live") continue;              // вне окна не тратим запросы
+    const last = FL[f.no];
+    if (!force && last && Date.now() - last.at < 5 * 60e3) continue;   // не чаще раза в 5 минут
+    try {
+      const res = await fetch("/api/flight?f=" + f.no, { signal: AbortSignal.timeout(8000) });
+      FL[f.no] = { at: Date.now(), data: await res.json() };
+      store.set("fl", FL);
+    } catch (e) { /* нет связи — остаётся прошлый ответ */ }
+  }
+  renderToday();
+}
+// Aviationstack пишет МЕСТНОЕ время аэропорта (хоть и с «+00:00» на конце), поэтому берём часы:минуты как есть
+const flHM = s => s ? s.slice(11, 16) : null;
+function flightStatusHtml(d) {
+  const dep = d.dep || {}, arr = d.arr || {};
+  const [icon, label] = {
+    scheduled: (dep.delay || 0) >= 15 ? ["🟠", `Задержка вылета ~${dep.delay} мин`] : ["🟢", "По расписанию"],
+    active:    ["✈️", "В воздухе"],
+    landed:    ["✅", "Приземлился"],
+    cancelled: ["🔴", "Рейс отменён"],
+    diverted:  ["🔴", "Рейс перенаправлен в другой аэропорт"],
+    incident:  ["🔴", "Происшествие с рейсом — следите за новостями авиакомпании"]
+  }[d.status] || ["⚪", "Статус уточняется"];
+  // «06:20 → 06:55»: если ожидаемое/фактическое время отличается от расписания
+  const timeLine = s => {
+    const sch = flHM(s.scheduled), real = flHM(s.actual) || flHM(s.estimated);
+    if (!sch) return "—";
+    return real && real !== sch ? `<s class="muted">${sch}</s> → <b>${real}</b>` : `<b>${sch}</b>`;
+  };
+  const extra = (s, isArr) => [s.terminal && `терминал ${esc(s.terminal)}`, s.gate && `выход ${esc(s.gate)}`,
+    isArr && s.baggage && `багаж: лента ${esc(s.baggage)}`].filter(Boolean).join(" · ");
+  return `<p class="flight-st">${icon} ${label}</p>
+    <div class="flight-rows small">
+      <span class="muted">Вылет${dep.airport ? " · " + esc(dep.airport) : ""}</span><span>${timeLine(dep)}${extra(dep) ? `<br><span class="muted">${extra(dep)}</span>` : ""}</span>
+      <span class="muted">Прилёт${arr.airport ? " · " + esc(arr.airport) : ""}</span><span>${timeLine(arr)}${extra(arr, true) ? `<br><span class="muted">${extra(arr, true)}</span>` : ""}</span>
+    </div>
+    ${d.status === "cancelled" ? `<p class="tip">Следите за сообщениями гида в WhatsApp — он скажет, что делать дальше.</p>` : ""}`;
+}
+function flightCard(f) {
+  const win = flightWindow(f);
+  if (win === "over") return "";
+  const saved = FL[f.no], d = saved && saved.data;
+  const opens = new Intl.DateTimeFormat("ru-RU", { timeZone: f.tz, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
+    .format(new Date(Date.parse(f.at) - FL_OPEN));
+  let body;
+  if (win === "early") body = `<p class="small muted">Статус появится здесь ${opens} ${f.tzName} — за 12 часов до вылета.</p>`;
+  else if (d && d.state === "ok") body = flightStatusHtml(d);
+  else if (!d) body = `<p class="small muted">${navigator.onLine ? "Загружаю статус…" : "Нет интернета — статус появится, когда будет связь."}</p>`;
+  else body = `<p class="small muted">Статус сейчас недоступен. Проверьте по кнопкам ниже.</p>`;
+  const when = d && d.fetched ? new Date(d.fetched) : null;
+  return `<article class="card">
+    <h3>✈️ Статус рейса ${f.no} · ${f.from} → ${f.to}</h3>
+    ${body}
+    ${win === "live" && d && d.state === "ok" ? `<p class="small muted">По данным Aviationstack · обновлено в ${String(when.getHours()).padStart(2, "0")}:${String(when.getMinutes()).padStart(2, "0")}${navigator.onLine ? "" : " (нет интернета)"}</p>` : ""}
+    <div class="btn-row">
+      <a class="btn ghost" href="https://www.flightradar24.com/data/flights/${f.no.toLowerCase()}" target="_blank" rel="noopener">Flightradar24</a>
+      <a class="btn ghost" href="https://www.flightaware.com/live/flight/BAW${f.no.slice(2)}" target="_blank" rel="noopener">FlightAware</a>
+    </div>
+  </article>`;
+}
+
 function renderToday() {
   const real = londonToday();
   const today = preview || real;
@@ -960,6 +1037,7 @@ function renderToday() {
         <button type="button" class="nav-btn" ${next ? `data-pv="${next.date}"` : "disabled"} aria-label="Следующий день">→</button>
       </nav>
       <p class="hint">Листайте дни стрелками, номерами или свайпом влево-вправо.</p>
+      ${idx === 0 ? flightCard(TOUR.flights.out) : idx === TOUR.days.length - 1 ? flightCard(TOUR.flights.back) : ""}
       <article class="card now">
         <span class="pill gold">День ${idx + 1} из ${TOUR.days.length} · ${wday(d.date)}, ${fmt(d.date)}</span>
         <h2>${esc(d.title)}</h2>
@@ -988,7 +1066,7 @@ function renderToday() {
       <article class="card now">
         <span class="eyebrow">До вылета</span>
         <div><span class="big-num">${n}</span> <span class="muted">${plural(n,"день","дня","дней")}</span></div>
-        <p>Рейс ${f.code}: ${f.from} ${f.dep} → ${f.to} ${f.arr}, ${wday(TOUR.start)}, ${fmt(TOUR.start)}.</p>
+        <p>Рейс ${f.no}: ${f.from} ${f.dep} → ${f.to} ${f.arr}, ${wday(TOUR.start)}, ${fmt(TOUR.start)}.</p>
         ${WX && WX.days && WX.days[TOUR.start] ? `<div><span class="small muted">Погода в Лондоне в день прилёта:</span>${wxLine(TOUR.start)}</div>` : `<p class="small muted">Взять ли зонт? Скорее всего, да. Прогноз появится здесь примерно за 2 недели до вылета.</p>`}
       </article>
       <article class="card">
@@ -996,6 +1074,7 @@ function renderToday() {
         ${airportHtml()}
         <p class="tip">Сбор ночью: выезжать из дома нужно в ночь со среды на четверг.</p>
       </article>
+      ${flightCard(TOUR.flights.out)}
       <article class="card">
         <h3>Сборы: готово ${cnt} из ${list.length}</h3>
         <div class="progress"><i style="width:${Math.round(cnt / list.length * 100)}%"></i></div>
@@ -1826,6 +1905,10 @@ renderAll();
 show();
 loadWeather();
 window.addEventListener("online", loadWeather);
+loadFlights();
+window.addEventListener("online", () => loadFlights(true));
+document.addEventListener("visibilitychange", () => { if (!document.hidden) loadFlights(); });
+setInterval(loadFlights, 5 * 60e3);
 
 /* Офлайн-режим: регистрируем Service Worker (файл sw.js рядом с index.html).
    Работает только на настоящем сайте (https или localhost); в «песочнице» тихо пропускаем. */
