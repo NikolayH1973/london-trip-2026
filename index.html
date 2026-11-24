@@ -263,6 +263,9 @@ details.guide[open] summary { margin-bottom: 8px; }
 .shelf-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .shelf-h h2 { font-size: 1.12rem; margin: 0; }
 .tile .t-day { color: var(--accent); font-weight: 600; }
+.tile .t-day.done { color: #1e8a4c; }
+:root[data-theme="dark"] .tile .t-day.done { color: #7fd6a2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tile .t-day.done { color: #7fd6a2; } }
 .shelf-h a { flex: none; font-size: .9rem; font-weight: 600; color: var(--tube); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
 /* margin -16px + padding 16px: ряд доходит до краёв экрана, а первая плитка стоит ровно по сетке */
 .rail { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 4px -16px 0; padding: 2px 16px 6px;
@@ -1473,10 +1476,18 @@ function placeRow(p, useNear) {
 // Плитка на полке
 // Коротко для плитки: «пт, 4 дек»
 const shortDay = iso => { const d = parse(iso); return ["вс","пн","вт","ср","чт","пт","сб"][d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3); };
+// Пометка дня программы: прошёл — ✅ «были», сегодня — 📌 «сегодня», впереди — 📌 дата
+function progMark(iso, short) {
+  const today = preview || londonToday();
+  const day = short ? shortDay(iso) : `${wday(iso)}, ${fmt(iso)}`;
+  return iso < today ? `<small class="t-day done" data-when="past">✅ были · ${esc(day)}</small>`
+    : iso === today ? `<small class="t-day" data-when="today">📌 сегодня</small>`
+    : `<small class="t-day">📌 ${esc(day)}</small>`;
+}
 function placeTile(p, showDay) {
   return `<a class="tile" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
     <span class="ico pill cat-${p.cat}" aria-hidden="true">${CAT_ICON[p.cat]}</span>
-    ${showDay ? `<small class="t-day">📌 ${shortDay(p.program)}</small>` : ""}
+    ${showDay ? progMark(p.program, true) : ""}
     <b>${esc(placeTitle(p))}</b>
     ${placeTag(p) ? `<small>${esc(placeTag(p))}</small>` : ""}
     <small>${howFar(p)}</small></a>`;
@@ -1499,10 +1510,11 @@ function shelves() {
     return t.length === 0 || (t.length === 1 && t[0][1] <= 10); };
   const S = [{ id: "xmas", title: "Рождественские ярмарки", sub: "все работают в ваши даты",
                list: TOUR.places.filter(p => p.cat === "xmas").sort(byTrip) }];
-  // «По программе»: куда группа идёт с гидом, по дням. Во время поездки прошедшие дни скрываем
-  // и ставим полку первой — это главный вопрос дня «куда мы сегодня».
-  const prog = { id: "prog", title: "По программе", sub: inTrip ? "куда идём с группой — с сегодняшнего дня" : "куда пойдём с группой, по дням",
-    list: TOUR.places.filter(p => p.program && (!inTrip || p.program >= today)).sort((a, b) => a.program.localeCompare(b.program) || byTrip(a, b)) };
+  // «Места программы»: где группа будет с гидом, по дням. Ничего не скрываем: прошедшие дни
+  // отмечены ✅ «были», сегодняшние — «📌 сегодня», а полка сама прокручивается к сегодняшнему дню.
+  // Во время поездки полка первая — это главный вопрос дня «куда мы сегодня».
+  const prog = { id: "prog", title: "Места программы", sub: "где будем с гидом, по дням",
+    list: TOUR.places.filter(p => p.program).sort((a, b) => a.program.localeCompare(b.program) || byTrip(a, b)) };
   if (inTrip) S.unshift(prog); else S.push(prog);
   if (before || today === TOUR.start) S.push({ id: "eve", title: before ? "Первый вечер" : "Сегодня вечером",
     sub: `${wday(TOUR.start)}, ${fmt(TOUR.start)} · без пересадок, после перелёта`,
@@ -1527,7 +1539,7 @@ function placesHome() {
     ${shelves().map(s => `<section aria-label="${esc(s.title)}">
       <div class="shelf-h"><div><h2>${esc(s.title)}</h2><p class="small muted">${esc(s.sub)}</p></div>
         <a href="#places/shelf/${s.id}" data-go="places/shelf/${s.id}">Все ${s.list.length}</a></div>
-      <div class="rail">${s.list.slice(0, 8).map(p => placeTile(p, s.id === "prog")).join("")}</div>
+      <div class="rail"${s.id === "prog" ? ' data-rail="prog"' : ""}>${(s.id === "prog" ? s.list : s.list.slice(0, 8)).map(p => placeTile(p, s.id === "prog")).join("")}</div>
     </section>`).join("")}
     <section aria-label="Все категории">
       <div class="shelf-h"><h2>Все категории</h2></div>
@@ -1544,10 +1556,10 @@ function progList(shelf) {
   const dates = [...new Set(shelf.list.map(p => p.program))];
   return `<div class="stack">
     ${subHeader(shelf.title, placesWord(shelf.list.length))}
-    <p class="small muted">Места, где группа будет с гидом. Время сбора — в «Программе».</p>
-    ${dates.map(d => { const i = TOUR.days.findIndex(x => x.date === d), day = TOUR.days[i];
+    <p class="small muted">Места, где группа будет с гидом. ✅ — там уже были. Время сбора — в «Программе».</p>
+    ${dates.map(d => { const i = TOUR.days.findIndex(x => x.date === d), day = TOUR.days[i], today = preview || londonToday();
       return `<section>
-        <h3 style="margin:8px 0 6px">День ${i + 1} · ${esc(wday(d))}, ${esc(fmt(d))}${day ? `<br><span class="small muted" style="font-weight:400">${esc(day.title)}</span>` : ""}</h3>
+        <h3 style="margin:8px 0 6px">${d < today ? "✅ " : d === today ? "📌 Сегодня · " : ""}День ${i + 1} · ${esc(wday(d))}, ${esc(fmt(d))}${day ? `<br><span class="small muted" style="font-weight:400">${esc(day.title)}</span>` : ""}</h3>
         <div class="plist">${shelf.list.filter(p => p.program === d).map(p => placeRow(p, false)).join("")}</div>
       </section>`; }).join("")}
   </div>`;
@@ -1698,6 +1710,13 @@ function renderPlaces() {
   else if (kind === "near") html = placesNear();
   else html = placesHome();     // неизвестный адрес — показываем главный, а не пустой экран
   $("#v-places").innerHTML = html;
+  // Полка «Места программы» открывается на сегодняшнем (или ближайшем следующем) дне; прошедшие — левее
+  const rail = $("#v-places [data-rail=prog]");
+  if (rail) {
+    const first = rail.querySelector('.tile:not(:has([data-when="past"]))');
+    const past = rail.querySelector('[data-when="past"]');
+    if (first && past) rail.scrollLeft = first.offsetLeft - rail.offsetLeft - 16;
+  }
 }
 
 /* ===== Разговорник ===== */
