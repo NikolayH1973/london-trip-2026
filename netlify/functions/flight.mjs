@@ -17,7 +17,10 @@ const FLIGHTS = {
   BA404: { date: "2026-12-09", dep: "2026-12-09T20:30:00+00:00", tz: "Europe/London" }     // Лондон → Тель-Авив
 };
 const HOUR = 3600 * 1000;
-const OPEN_BEFORE = 12 * HOUR;   // начинаем спрашивать за 12 ч до вылета
+// Проверено 23–24.11 на настоящем BA405: в 23:06 рейса в данных ещё не было (за ~7 ч), в 05:00 уже был.
+// Похоже, он появляется после полуночи по UTC (02:00 по Израилю). Поэтому окно — 5 ч до вылета:
+// раньше сервис всё равно ответил бы «нет данных» и только тратил бы лимит.
+const OPEN_BEFORE = 5 * HOUR;    // начинаем спрашивать за 5 ч до вылета
 const CLOSE_AFTER = 9 * HOUR;    // и перестаём через 9 ч после вылета (5 ч полёта + запас на задержку)
 const FRESH = 30 * 60;           // секунд: как долго Netlify отдаёт сохранённый ответ
 
@@ -75,7 +78,8 @@ export default async (req) => {
     if (data.error) return json({ state: "error", reason: data.error.code || "api" }, 600);
     // Сервис отдаёт рейсы за несколько дней — берём наш по дате вылета
     const f = (data.data || []).find(x => x.flight_date === date);
-    if (!f) return json({ state: "notfound", date, fetched: new Date().toISOString() }, test === null ? FRESH : 300);
+    // «Нет данных» держим в кэше только 5 минут: рейс может появиться в любой момент, не ждём полчаса
+    if (!f) return json({ state: "notfound", date, fetched: new Date().toISOString() }, 300);
     return json({
       state: "ok",
       flight: code,

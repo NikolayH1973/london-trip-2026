@@ -1023,7 +1023,7 @@ async function loadWeather() {
    а уже он — сервис Aviationstack. Последний ответ храним в телефоне: без интернета
    покажем его с подписью «обновлено в …». Окно то же, что у посредника: от 12 ч до вылета до +9 ч. */
 let FL = store.get("fl", {});            // { BA405: { at: время получения, data: ответ посредника } }
-const FL_OPEN = 12 * 3600e3, FL_CLOSE = 9 * 3600e3;
+const FL_OPEN = 5 * 3600e3, FL_CLOSE = 9 * 3600e3;   // то же окно, что у посредника: за 5 ч до вылета — +9 ч
 // Тестовый режим — только по ссылке ?flighttest (сегодняшний рейс) или ?flighttest=2026-11-24.
 // Результат теста в телефоне не сохраняем, чтобы он не смешался с настоящим статусом в декабре.
 const FL_TEST = new URLSearchParams(location.search).get("flighttest");
@@ -1083,7 +1083,7 @@ function flightCard(f) {
   const opens = new Intl.DateTimeFormat("ru-RU", { timeZone: f.tz, day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
     .format(new Date(Date.parse(f.at) - FL_OPEN));
   let body;
-  if (win === "early") body = `<p class="small muted">Статус появится здесь ${opens} ${f.tzName} — за 12 часов до вылета.</p>`;
+  if (win === "early") body = `<p class="small muted">Статус появится здесь ${opens} ${f.tzName} — за 5 часов до вылета.</p>`;
   else if (d && d.state === "ok") body = flightStatusHtml(d);
   else if (!d) body = `<p class="small muted">${navigator.onLine ? "Загружаю статус…" : "Нет интернета — статус появится, когда будет связь."}</p>`;
   else if (d.state === "notfound") body = `<p class="small muted">Рейса пока нет в данных сервиса — обычно он появляется за несколько часов до вылета. Проверим снова через 5 минут.</p>`;
