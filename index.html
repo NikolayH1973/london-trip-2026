@@ -715,7 +715,8 @@ const TOUR = {
      route — маршрут от отеля: [линия, остановок, станция, пометка] или ["walk", минут, пометка].
      direct — остановок по Piccadilly, если маршрут не прописан (null = с пересадкой). */
   places: [
-    /* program — дата дня программы, когда группа там будет. free — вход бесплатный. */
+    /* program — дата дня программы, когда группа там будет. free — вход бесплатный.
+       eve — место для вечера; eveGuide — вечерняя прогулка с гидом в день program. */
     { cat: "sight", name: "Биг-Бен и здание Парламента", route: [["District",9,"Westminster","на восток"]], ll: [51.5007, -0.1246], photo: "Классический кадр — с южного берега Темзы у Вестминстерского моста: Парламент и Биг-Бен целиком над рекой. Лучшее время — синий час, примерно 16:00–16:30: небо ещё синее, а подсветка уже горит.", q: "Big Ben London", free: true,
       station: "Westminster", direct: null, hours: "снаружи — всегда",
       text: "Главный символ Лондона. Лучшие фото — с Вестминстерского моста или с противоположного берега Темзы, особенно вечером, когда включается подсветка." },
@@ -725,7 +726,7 @@ const TOUR = {
     { cat: "sight", name: "Букингемский дворец", route: [["Piccadilly",7,"Green Park"],["walk",8,"через парк Green Park"]], ll: [51.5014, -0.1419], photo: "Самый живописный вид — с синего мостика над озером в Сент-Джеймсском парке: в одну сторону дворец, в другую — крыши Уайтхолла. Зимним утром над водой бывает лёгкий туман.", q: "Buckingham Palace", program: "2026-12-04", free: true,
       station: "Green Park", direct: 7, hours: "снаружи — всегда",
       text: "Резиденция короля. Зимой смена караула проходит не каждый день, точное расписание лучше уточнить у гида накануне." },
-    { cat: "sight", name: "Маленькая Венеция", route: [["H&C",7,"Royal Oak"],["walk",10,"вдоль канала"]], ll: [51.5225, -0.1836], q: "Little Venice London", program: "2026-12-04", free: true,
+    { cat: "sight", name: "Маленькая Венеция", eve: true, eveGuide: true, route: [["H&C",7,"Royal Oak"],["walk",10,"вдоль канала"]], ll: [51.5225, -0.1836], q: "Little Venice London", program: "2026-12-04", free: true,
      
       photo: "Мостик над каналом у Rembrandt Gardens: в кадр попадают разноцветные плавучие дома и отражения фонарей в воде. Вечером — самый уютный свет.",
       station: "Royal Oak / Warwick Avenue", direct: null, hours: "всегда",
@@ -789,11 +790,11 @@ const TOUR = {
       station: "Baker Street / Bond Street", direct: null, hours: "ежедневно 10–17",
       text: "Особняк XVIII века, а внутри — картины старых мастеров, французский фарфор, мебель, часы и целые залы рыцарских доспехов. Вход свободный, без билетов и очереди. Тихая «скрытая жемчужина» в двух шагах от шумной Оксфорд-стрит. Понравится тем, кто любит антиквариат." },
 
-    { cat: "xmas", name: "Огни Регент-стрит с красного автобуса", program: "2026-12-05", q: "Piccadilly Circus London", ll: [51.5101, -0.1340],
+    { cat: "xmas", name: "Огни Регент-стрит с красного автобуса", eveGuide: true, program: "2026-12-05", q: "Piccadilly Circus London", ll: [51.5101, -0.1340],
       station: "Piccadilly Circus", direct: 8, hours: "каждый вечер, лучше после 16:30",
       photo: "Верхний этаж, первый ряд: огромное лобовое окно, а над улицей плывут светящиеся ангелы. Снимайте без вспышки, прижав телефон к стеклу — не будет бликов от салона.",
       text: "Самая дешёвая экскурсия по рождественским огням. На Пикадилли-серкус сядьте в любой красный двухэтажный автобус по Регент-стрит в сторону Oxford Circus — например, 12, 88, 159 или 453 (номер проверьте на табло остановки). Поднимитесь наверх и займите первый ряд — над головой проплывут знаменитые ангелы «Spirit of Christmas». Проезд £1,85 — приложите Oyster или банковскую карту при входе. С тарифом Hopper час можно пересаживаться на другие автобусы бесплатно. Важно: с октября 2026 Оксфорд-стрит стала пешеходной и автобусы по ней больше не ходят — выйдите у Oxford Circus и пройдитесь под её огнями пешком." },
-    { cat: "xmas", name: "Рождество в Ковент-Гардене", program: "2026-12-06", ll: [51.5117, -0.124], photo: "Ёлка и гирлянды лучше всего смотрятся после 16:00, когда стемнеет. Снимайте под стеклянной крышей рынка — свет мягкий, без резких теней.", q: "Covent Garden Piazza London",
+    { cat: "xmas", name: "Рождество в Ковент-Гардене", eveGuide: true, program: "2026-12-06", ll: [51.5117, -0.124], photo: "Ёлка и гирлянды лучше всего смотрятся после 16:00, когда стемнеет. Снимайте под стеклянной крышей рынка — свет мягкий, без резких теней.", q: "Covent Garden Piazza London",
       station: "Covent Garden", direct: 10, hours: "пн–сб 10–21, вс 12–17",
       text: "Огромная ёлка, гирлянды и рождественские лавки в старом крытом рынке. Вечером 5 декабря вы будете здесь с группой." },
     { cat: "xmas", name: "Ярмарка на Лестер-сквер", ll: [51.5103, -0.1301], q: "Leicester Square London",
@@ -1477,17 +1478,21 @@ function placeRow(p, useNear) {
 // Коротко для плитки: «пт, 4 дек»
 const shortDay = iso => { const d = parse(iso); return ["вс","пн","вт","ср","чт","пт","сб"][d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3); };
 // Пометка дня программы: прошёл — ✅ «были», сегодня — 📌 «сегодня», впереди — 📌 дата
-function progMark(iso, short) {
+function progMark(iso, short, guide) {
   const today = preview || londonToday();
-  const day = short ? shortDay(iso) : `${wday(iso)}, ${fmt(iso)}`;
+  // На вечерней полке без дня недели: «🌙 с гидом · 5 дек» должно уместиться в одну строку плитки
+  const day = guide ? shortDay(iso).split(", ")[1] : short ? shortDay(iso) : `${wday(iso)}, ${fmt(iso)}`;
+  const mark = guide ? "🌙 с гидом" : "📌";
   return iso < today ? `<small class="t-day done" data-when="past">✅ были · ${esc(day)}</small>`
-    : iso === today ? `<small class="t-day" data-when="today">📌 сегодня</small>`
-    : `<small class="t-day">📌 ${esc(day)}</small>`;
+    : iso === today ? `<small class="t-day" data-when="today">${mark} сегодня</small>`
+    : `<small class="t-day">${mark}${guide ? " ·" : ""} ${esc(day)}</small>`;
 }
-function placeTile(p, showDay) {
+function placeTile(p, shelfId) {
+  const showDay = shelfId === "prog" || (shelfId === "eve" && p.eveGuide);
   return `<a class="tile" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
     <span class="ico pill cat-${p.cat}" aria-hidden="true">${CAT_ICON[p.cat]}</span>
-    ${showDay ? progMark(p.program, true) : ""}
+    ${showDay ? progMark(p.program, true, shelfId === "eve") : ""}
+    ${closedToday(p) ? `<small class="t-closed">сегодня закрыто</small>` : ""}
     <b>${esc(placeTitle(p))}</b>
     ${placeTag(p) ? `<small>${esc(placeTag(p))}</small>` : ""}
     <small>${howFar(p)}</small></a>`;
@@ -1505,22 +1510,17 @@ function shelves() {
   const before = today < TOUR.start, inTrip = today >= TOUR.start && today <= TOUR.end;
   const byTrip = (a, b) => tripMin(a) - tripMin(b);
   const evening = p => p.eve || p.cat === "pub" || p.cat === "xmas";
-  // «Легко после перелёта»: пешком или одной линией без пересадок, не дальше 10 остановок (~25 мин)
-  const easy = p => { const t = (routeOf(p) || []).filter(l => l[0] !== "walk");
-    return t.length === 0 || (t.length === 1 && t[0][1] <= 10); };
+  // Полки не меняются по дням: те же названия, тот же состав, тот же порядок — человек запоминает, где что.
+  // Что изменилось «сегодня», показывают только пометки на плитках (✅ были, 📌 сегодня, сегодня закрыто).
   const S = [{ id: "xmas", title: "Рождественские ярмарки", sub: "все работают в ваши даты",
                list: TOUR.places.filter(p => p.cat === "xmas").sort(byTrip) }];
-  // «Места программы»: где группа будет с гидом, по дням. Ничего не скрываем: прошедшие дни
-  // отмечены ✅ «были», сегодняшние — «📌 сегодня», а полка сама прокручивается к сегодняшнему дню.
-  // Во время поездки полка первая — это главный вопрос дня «куда мы сегодня».
-  const prog = { id: "prog", title: "Места программы", sub: "где будем с гидом, по дням",
-    list: TOUR.places.filter(p => p.program).sort((a, b) => a.program.localeCompare(b.program) || byTrip(a, b)) };
-  if (inTrip) S.unshift(prog); else S.push(prog);
-  if (before || today === TOUR.start) S.push({ id: "eve", title: before ? "Первый вечер" : "Сегодня вечером",
-    sub: `${wday(TOUR.start)}, ${fmt(TOUR.start)} · без пересадок, после перелёта`,
-    list: TOUR.places.filter(p => evening(p) && easy(p)).sort(byTrip) });
-  else if (inTrip) S.push({ id: "eve", title: "Сегодня вечером", sub: `${wday(today)}, ${fmt(today)}`,
-    list: TOUR.places.filter(p => evening(p) && !closedToday(p)).sort(byTrip) });
+  // «Места программы»: где группа будет с гидом, по дням; полка сама прокручивается к сегодняшнему дню.
+  S.push({ id: "prog", title: "Места программы", sub: "где будем с гидом, по дням",
+    list: TOUR.places.filter(p => p.program).sort((a, b) => a.program.localeCompare(b.program) || byTrip(a, b)) });
+  // «Куда пойти вечером»: сначала вечерние прогулки с гидом (по датам), потом остальное — от ближнего к дальнему.
+  S.push({ id: "eve", title: "Куда пойти вечером", sub: "огни, пабы и ярмарки — от ближних к дальним",
+    list: TOUR.places.filter(evening).sort((a, b) => (a.eveGuide ? 0 : 1) - (b.eveGuide ? 0 : 1)
+      || (a.eveGuide && b.eveGuide ? a.program.localeCompare(b.program) : 0) || byTrip(a, b)) });
   S.push({ id: "hotel", title: "Рядом с отелем", sub: "пешком до 20 минут",
     list: TOUR.places.filter(p => hotelWalk(p) <= 20).sort((a, b) => hotelWalk(a) - hotelWalk(b)) });
   S.push({ id: "free", title: "Бесплатно", sub: "музеи и виды без билетов",
@@ -1539,7 +1539,7 @@ function placesHome() {
     ${shelves().map(s => `<section aria-label="${esc(s.title)}">
       <div class="shelf-h"><div><h2>${esc(s.title)}</h2><p class="small muted">${esc(s.sub)}</p></div>
         <a href="#places/shelf/${s.id}" data-go="places/shelf/${s.id}">Все ${s.list.length}</a></div>
-      <div class="rail"${s.id === "prog" ? ' data-rail="prog"' : ""}>${(s.id === "prog" ? s.list : s.list.slice(0, 8)).map(p => placeTile(p, s.id === "prog")).join("")}</div>
+      <div class="rail"${s.id === "prog" ? ' data-rail="prog"' : ""}>${(s.id === "prog" ? s.list : s.list.slice(0, 8)).map(p => placeTile(p, s.id)).join("")}</div>
     </section>`).join("")}
     <section aria-label="Все категории">
       <div class="shelf-h"><h2>Все категории</h2></div>
