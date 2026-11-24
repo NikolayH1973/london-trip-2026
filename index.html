@@ -262,6 +262,7 @@ details.guide[open] summary { margin-bottom: 8px; }
 /* Полка: заголовок + ряд плиток с прокруткой вбок */
 .shelf-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .shelf-h h2 { font-size: 1.12rem; margin: 0; }
+.tile .t-day { color: var(--accent); font-weight: 600; }
 .shelf-h a { flex: none; font-size: .9rem; font-weight: 600; color: var(--tube); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
 /* margin -16px + padding 16px: ряд доходит до краёв экрана, а первая плитка стоит ровно по сетке */
 .rail { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 4px -16px 0; padding: 2px 16px 6px;
@@ -1462,9 +1463,12 @@ function placeRow(p, useNear) {
     <span class="chev" aria-hidden="true">›</span></a>`;
 }
 // Плитка на полке
-function placeTile(p) {
+// Коротко для плитки: «пт, 4 дек»
+const shortDay = iso => { const d = parse(iso); return ["вс","пн","вт","ср","чт","пт","сб"][d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3); };
+function placeTile(p, showDay) {
   return `<a class="tile" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
     <span class="ico pill cat-${p.cat}" aria-hidden="true">${CAT_ICON[p.cat]}</span>
+    ${showDay ? `<small class="t-day">📌 ${shortDay(p.program)}</small>` : ""}
     <b>${esc(placeTitle(p))}</b>
     ${placeTag(p) ? `<small>${esc(placeTag(p))}</small>` : ""}
     <small>${howFar(p)}</small></a>`;
@@ -1487,6 +1491,11 @@ function shelves() {
     return t.length === 0 || (t.length === 1 && t[0][1] <= 10); };
   const S = [{ id: "xmas", title: "Рождественские ярмарки", sub: "все работают в ваши даты",
                list: TOUR.places.filter(p => p.cat === "xmas").sort(byTrip) }];
+  // «По программе»: куда группа идёт с гидом, по дням. Во время поездки прошедшие дни скрываем
+  // и ставим полку первой — это главный вопрос дня «куда мы сегодня».
+  const prog = { id: "prog", title: "По программе", sub: inTrip ? "куда идём с группой — с сегодняшнего дня" : "куда пойдём с группой, по дням",
+    list: TOUR.places.filter(p => p.program && (!inTrip || p.program >= today)).sort((a, b) => a.program.localeCompare(b.program) || byTrip(a, b)) };
+  if (inTrip) S.unshift(prog); else S.push(prog);
   if (before || today === TOUR.start) S.push({ id: "eve", title: before ? "Первый вечер" : "Сегодня вечером",
     sub: `${wday(TOUR.start)}, ${fmt(TOUR.start)} · без пересадок, после перелёта`,
     list: TOUR.places.filter(p => evening(p) && easy(p)).sort(byTrip) });
@@ -1510,7 +1519,7 @@ function placesHome() {
     ${shelves().map(s => `<section aria-label="${esc(s.title)}">
       <div class="shelf-h"><div><h2>${esc(s.title)}</h2><p class="small muted">${esc(s.sub)}</p></div>
         <a href="#places/shelf/${s.id}" data-go="places/shelf/${s.id}">Все ${s.list.length}</a></div>
-      <div class="rail">${s.list.slice(0, 8).map(placeTile).join("")}</div>
+      <div class="rail">${s.list.slice(0, 8).map(p => placeTile(p, s.id === "prog")).join("")}</div>
     </section>`).join("")}
     <section aria-label="Все категории">
       <div class="shelf-h"><h2>Все категории</h2></div>
@@ -1519,6 +1528,20 @@ function placesHome() {
       ${moreCats ? `<div class="chips cats-more" style="margin-top:8px">${MORE_CATS.map(chip).join("")}</div>` : ""}
       <a class="maplink" style="padding-left:0" href="#places/cat/all" data-go="places/cat/all">📋 Все места списком (${TOUR.places.length}) ›</a>
     </section>
+  </div>`;
+}
+
+/* Полка «По программе» целиком: места, сгруппированные по дням программы */
+function progList(shelf) {
+  const dates = [...new Set(shelf.list.map(p => p.program))];
+  return `<div class="stack">
+    ${subHeader(shelf.title, placesWord(shelf.list.length))}
+    <p class="small muted">Места, где группа будет с гидом. Время сбора — в «Программе».</p>
+    ${dates.map(d => { const i = TOUR.days.findIndex(x => x.date === d), day = TOUR.days[i];
+      return `<section>
+        <h3 style="margin:8px 0 6px">День ${i + 1} · ${esc(wday(d))}, ${esc(fmt(d))}${day ? `<br><span class="small muted" style="font-weight:400">${esc(day.title)}</span>` : ""}</h3>
+        <div class="plist">${shelf.list.filter(p => p.program === d).map(p => placeRow(p, false)).join("")}</div>
+      </section>`; }).join("")}
   </div>`;
 }
 
@@ -1660,6 +1683,7 @@ function renderPlaces() {
   let html;
   if (kind === "cat" && CATS[arg]) html = placesList(CATS[arg],
       TOUR.places.filter(p => arg === "all" || (arg === "photo" ? p.photo : p.cat === arg)), arg === "photo" ? PHOTO_LIGHT : "");
+  else if (shelf && shelf.id === "prog") html = progList(shelf);
   else if (shelf) html = placesList(shelf.title, shelf.list);
   else if (kind === "p" && TOUR.places[Number(arg)]) html = placePage(TOUR.places[Number(arg)]);
   else if (kind === "metro") html = placesMetro();
