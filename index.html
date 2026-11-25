@@ -110,6 +110,16 @@ ul.items { margin: 0; padding: 0; list-style: none; display: flex; flex-directio
 ul.items li { display: flex; gap: 10px; align-items: flex-start; }
 ul.items li::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: .6em; border-radius: 50%; background: var(--accent); }
 ul.items li.opt::before { background: var(--optional); }
+ul.items li.plain::before { visibility: hidden; }
+ul.items li > a.it-row, ul.items li > details.it-info { flex: 1; min-width: 0; }
+a.it-row { display: flex; gap: 8px; justify-content: space-between; align-items: flex-start; color: inherit; text-decoration: none; }
+a.it-row .chev, .it-i { flex: none; color: var(--accent); font-weight: 700; }
+a.it-row .pill.opt { white-space: normal; }
+details.it-info > summary { display: flex; gap: 8px; justify-content: space-between; align-items: flex-start; cursor: pointer; list-style: none; }
+details.it-info > summary::-webkit-details-marker { display: none; }
+details.it-info[open] > summary .it-i { opacity: .55; }
+details.it-info > p { margin: 6px 0 0; font-size: .92em; color: var(--muted); }
+details.it-info .btn-row { margin-top: 8px; }
 .tip { font-size: .95rem; padding: 10px 12px; border-left: 4px solid var(--gold); background: var(--gold-soft); border-radius: 0 10px 10px 0; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 12px 18px; border-radius: 12px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; text-decoration: none; cursor: pointer; text-align: center; }
@@ -452,20 +462,25 @@ const TOUR = {
     { date: "2026-12-03", title: "Первое знакомство с Лондоном",
       meeting: { time: "09:55", place: "Хитроу, зал прилёта — гид встречает группу" },
       items: [
-        { t: "Встреча группы и обзорная экскурсия по Лондону: история, знаменитые улицы, архитектура" },
+        { t: "Встреча группы и обзорная экскурсия по Лондону", info: ["Первое знакомство с городом, его историей, знаменитыми улицами и архитектурой."] },
         { t: "Трансфер и заселение в гостиницу" },
-        { t: "Вечер свободный — отдых после перелёта" }
+        { t: "Вечер свободный — отдых после перелёта", link: "places/shelf/eve", linkLabel: "Куда пойти вечером ›",
+          info: ["Сегодня вечером на Трафальгарской площади зажигают ёлку — подарок Норвегии Лондону с 1947 года. Церемония обычно около 17:00–18:30; дата ожидается, но официально ещё не подтверждена."] }
       ],
       tip: "Ранний вылет: спать в самолёте, в Лондоне будет длинный день. Ценное и тёплую куртку держите в ручной клади — до заселения чемоданы будут в автобусе." },
     { date: "2026-12-04", title: "Королевский Лондон",
       meeting: { time: null, wa: "время и место" },
       items: [
-        { t: "Пешая прогулка: Букингемский дворец и смена караула" },
-        { t: "Даунинг-стрит — резиденция премьер-министра" },
-        { t: "Трафальгарская площадь" },
-        { t: "Традиционное английское чаепитие — включено" },
+        { t: "Пешая прогулка: Букингемский дворец и смена караула", place: "Букингемский дворец",
+          info: ["Смена караула — одна из самых известных британских церемоний и возможность прикоснуться к королевским традициям.",
+                 "Церемония проходит не каждый день: по понедельникам, средам и пятницам в 11:00, по воскресеньям в 10:00. 4 декабря — пятница, значит, смена караула по расписанию будет. Расписание может меняться из-за погоды."] },
+        { t: "Даунинг-стрит — резиденция премьер-министра", place: "Даунинг-стрит" },
+        { t: "Трафальгарская площадь", place: "Трафальгарская площадь" },
+        { t: "Традиционное английское чаепитие — включено",
+          info: ["Время немного замедлиться и почувствовать настоящий британский стиль жизни.",
+                 "Afternoon tea — традиция с 1840-х: чай, маленькие сэндвичи (классика — с огурцом), сконы с джемом и густыми сливками, пирожные. Чай пьют с молоком."] },
         { t: "Окончание экскурсии около 17:00" },
-        { t: "Вечером с гидом: Маленькая Венеция — каналы, лодки, уютные набережные", eve: true }
+        { t: "Вечером с гидом: Маленькая Венеция — каналы, лодки, уютные набережные", eve: true, place: "Маленькая Венеция" }
       ],
       tip: "Смена караула собирает толпу: держитесь рядом с гидом и заранее договоритесь, где встречаетесь, если потеряетесь." },
     { date: "2026-12-05", title: "Виндзор — королевская история Англии",
@@ -473,7 +488,7 @@ const TOUR = {
       items: [
         { t: "Виндзорский замок: королевские покои, парадные залы, прогулка по старому Виндзору", opt: "windsor" },
         { t: "Возвращение в гостиницу около 17:00" },
-        { t: "Вечером с гидом: Риджент-стрит — праздничная иллюминация и витрины", eve: true }
+        { t: "Вечером с гидом: Риджент-стрит — праздничная иллюминация и витрины", eve: true, place: "Огни Регент-стрит с красного автобуса" }
       ],
       tip: "Если не едете в Виндзор, день до вечера свободный. Идеи — в разделе «Места»." },
     { date: "2026-12-06", title: "Лондон сквозь века",
@@ -482,15 +497,17 @@ const TOUR = {
         { t: "Лондонский Тауэр с местным гидом: крепость, тюрьма, королевские регалии", opt: "tower" },
         { t: "Британский музей: Египет, Греция, Рим и другие великие цивилизации", opt: "museum" },
         { t: "Окончание экскурсии около 17:00" },
-        { t: "Вечером с гидом: Ковент-Гарден и традиционный английский паб", eve: true }
+        { t: "Вечером с гидом: Ковент-Гарден и традиционный английский паб", eve: true, place: "Рождество в Ковент-Гардене" }
       ],
       tip: "Тауэр и музей — это много ходьбы и лестниц: удобная обувь важнее красивой. Кто не идёт на опции, свободен до вечера." },
     { date: "2026-12-07", title: "Аристократы, денди и другие обитатели Лондона",
       meeting: { time: null, wa: "время и место" },
       items: [
-        { t: "Пикадилли: история, мода, развлечения и театральная жизнь" },
-        { t: "Мир аристократов, эксцентричных денди, писателей и светских львов" },
-        { t: "Чайна-таун — восточная кухня и традиционные лавки" }
+        { t: "Пикадилли: история, мода, развлечения и театральная жизнь", place: "Пикадилли-серкус" },
+        { t: "Мир аристократов, эксцентричных денди, писателей и светских львов",
+          info: ["Истории о писателях, художниках, светских львах и необычных жителях столицы.",
+                 "Главный денди Лондона — Бо Браммелл, законодатель мужской моды начала XIX века. Его памятник стоит на Джермин-стрит у Пикадилли, среди старинных магазинов рубашек и шляп."] },
+        { t: "Чайна-таун — восточная кухня и традиционные лавки", place: "Чайна-таун" }
       ],
       tip: "В Чайна-тауне хорошо пообедать: димсамы и утка по-пекински — недорого и сытно." },
     { date: "2026-12-08", title: "Шекспир и университетская Англия",
@@ -503,8 +520,15 @@ const TOUR = {
     { date: "2026-12-09", title: "Лондон в вашем ритме",
       meeting: { time: "16:15", place: "Выезд из гостиницы в аэропорт — с вещами" },
       items: [
-        { t: "Свободный день. Советуем: музей мадам Тюссо, Вестминстер — Парламент, Биг-Бен и аббатство" },
-        { t: "Бейкер-стрит — дом Шерлока Холмса, Оксфорд-стрит — универмаги и шопинг" },
+        { t: "Свободный день. Гид советует:" , plain: true },
+        { t: "Музей мадам Тюссо",
+          info: ["Восковые фигуры знаменитостей, политиков и исторических личностей.",
+                 "Рядом со станцией Baker Street — от отеля линия H&C без пересадок. Билеты онлайн заранее обычно дешевле, чем в кассе."] },
+        { t: "Вестминстер — Парламент, Биг-Бен и аббатство", place: "Биг-Бен и здание Парламента" },
+        { t: "Бейкер-стрит — дом Шерлока Холмса",
+          info: ["Знаменитый адрес литературного сыщика Шерлока Холмса.",
+                 "Дом-музей на Бейкер-стрит, 221b, в двух минутах от Тюссо — удобно совместить."] },
+        { t: "Оксфорд-стрит — универмаги и шопинг", info: ["Магазины, большие универмаги и шопинг."] },
         { t: "16:15 — выезд в аэропорт, вылет в 20:30, прилёт в Израиль в 03:25" }
       ],
       tip: "Утром освободите номер и сдайте чемоданы в камеру хранения отеля. Паспорт держите при себе, а не в чемодане." }
@@ -730,7 +754,7 @@ const TOUR = {
      
       photo: "Мостик над каналом у Rembrandt Gardens: в кадр попадают разноцветные плавучие дома и отражения фонарей в воде. Вечером — самый уютный свет.",
       station: "Royal Oak / Warwick Avenue", direct: null, hours: "всегда",
-      text: "Тихий квартал на слиянии каналов: плавучие дома, лодки-кафе, набережные с ивами. Совсем другой Лондон — без толп и шума. 4 декабря — вечерняя прогулка с гидом." },
+      text: "Каналы, лодки, уютные набережные и совсем другая атмосфера большого города. Тихий квартал на слиянии каналов: плавучие дома и лодки-кафе. 4 декабря — вечерняя прогулка с гидом." },
     { cat: "sight", name: "Даунинг-стрит", route: [["District",9,"Westminster","на восток"],["walk",5,"по Уайтхоллу"]], ll: [51.5033, -0.1276], q: "Downing Street London", program: "2026-12-04", free: true,
       photo: "Ближе ворот не подойти: снимайте через решётку с Уайтхолла — в глубине видна чёрная дверь дома № 10.",
       station: "Westminster", direct: null, hours: "снаружи — всегда; улица закрыта воротами",
@@ -967,10 +991,31 @@ function airportHtml() {
     </div>`;
 }
 
+/* Пункт программы может вести дальше:
+   place — в карточку места («›»), opt — в описание опции (вся строка),
+   info — короткое пояснение, раскрывается прямо в строке («ⓘ»), link — на другой экран (например, полку). */
+const itemOpen = new Set();   // раскрытые пояснения (ключ «дата:номер») — чтобы перерисовка их не сворачивала
 function dayItems(day) {
-  return `<ul class="items">${day.items.map(i =>
-    `<li class="${i.opt ? "opt" : ""}"><span>${i.eve ? "🌙 " : ""}${esc(i.t)}${i.opt
-      ? ` <a class="pill opt" href="#program/opt-${i.opt}" data-go="program/opt-${i.opt}">за доплату${(o => o && optPrice(o) ? " · " + esc(optPrice(o)) : "")(TOUR.options.find(x => x.id === i.opt))} · подробнее ›</a>` : ""}</span></li>`).join("")}</ul>`;
+  return `<ul class="items">${day.items.map((i, n) => {
+    const text = `${i.eve ? "🌙 " : ""}${esc(i.t)}`;
+    const p = i.place && TOUR.places.find(x => x.name === i.place);
+    const o = i.opt && TOUR.options.find(x => x.id === i.opt);
+    const cls = [i.opt ? "opt" : "", i.plain ? "plain" : ""].join(" ").trim();
+    if (o) return `<li class="${cls}"><a class="it-row" href="#program/opt-${o.id}" data-go="program/opt-${o.id}">
+        <span>${text} <span class="pill opt">за доплату${optPrice(o) ? " · " + esc(optPrice(o)) : ""} · подробнее</span></span><span class="chev" aria-hidden="true">›</span></a></li>`;
+    if (i.info) {
+      const key = `${day.date}:${n}`;
+      const btns = [p ? `<a class="btn ghost" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">${CAT_ICON[p.cat]} ${esc(placeTitle(p))} ›</a>` : "",
+                    i.link ? `<a class="btn ghost" href="#${i.link}" data-go="${i.link}">${esc(i.linkLabel)}</a>` : ""].join("");
+      return `<li class="${cls}"><details class="it-info" data-key="${key}" ${itemOpen.has(key) ? "open" : ""}>
+        <summary><span>${text}</span><span class="it-i" aria-label="подробнее">ⓘ</span></summary>
+        ${i.info.map(t => `<p>${esc(t)}</p>`).join("")}${btns ? `<div class="btn-row">${btns}</div>` : ""}
+      </details></li>`;
+    }
+    if (p) return `<li class="${cls}"><a class="it-row" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
+        <span>${text}</span><span class="chev" aria-hidden="true">›</span></a></li>`;
+    return `<li class="${cls}"><span>${text}</span></li>`;
+  }).join("")}</ul>`;
 }
 
 /* ===== Опции (экскурсии за доплату) =====
@@ -1620,6 +1665,7 @@ function placePage(p) {
       ${p.site ? `<a class="btn ticket-btn" href="${p.site}" target="_blank" rel="noopener">🎟 ${esc(p.siteLabel)}</a>` : ""}
       <p>${esc(p.text)}</p>
       ${p.photo ? `<p class="photo-tip"><b>📷 Для фото:</b> ${esc(p.photo)}</p>` : ""}
+      <a class="btn ghost" href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(p.q)}" target="_blank" rel="noopener">📷 Посмотреть фото места</a>
       <div class="place-meta">
         ${p.program ? `<span>📌 <b>По программе: ${wday(p.program)}, ${fmt(p.program)}</b></span>` : ""}
         <span>🕒 ${esc(p.hours)}</span>
@@ -2083,6 +2129,7 @@ document.addEventListener("change", e => {
 document.addEventListener("toggle", e => {
   const d = e.target;
   if (d.classList && d.classList.contains("opt-card")) d.open ? optOpen.add(d.id.slice(4)) : optOpen.delete(d.id.slice(4));
+  if (d.classList && d.classList.contains("it-info")) d.open ? itemOpen.add(d.dataset.key) : itemOpen.delete(d.dataset.key);
 }, true);
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#taxi").classList.remove("open"); });
 
