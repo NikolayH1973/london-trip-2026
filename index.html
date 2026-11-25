@@ -214,6 +214,12 @@ details.card[open] summary { margin-bottom: 6px; }
 nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom); }
 /* minmax(0,1fr): колонки всегда равные, даже при крупном шрифте (иначе длинное слово распирает колонку) */
+/* Плавающая кнопка «Назад»: появляется, когда ссылка унесла вниз по тому же экрану (к опции) — в установленном
+   приложении на iPhone нет кнопки «назад» браузера, а свайп легко не заметить */
+.backfab { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 41;
+  border: 0; border-radius: 999px; padding: 12px 20px; min-height: 48px; font: inherit; font-weight: 700; font-size: 1rem;
+  background: var(--ink); color: var(--surface); box-shadow: 0 6px 18px rgba(0,0,0,.25); cursor: pointer; white-space: nowrap; }
+.backfab[hidden] { display: none; }
 nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 nav.tabs a { position: relative; z-index: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 2px 10px; text-decoration: none; color: var(--muted); font-size: 11.5px; /* подписи меню не растут с «А+»: рядом иконки, а крупный текст переносится по слогам */ font-weight: 500; text-align: center; line-height: 1.15; overflow-wrap: anywhere; hyphens: auto; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 nav.tabs a span { max-width: 100%; }
@@ -398,6 +404,7 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
 
 <div class="diag" id="diag" hidden></div>
 
+<button class="backfab" id="backfab" type="button" hidden>← Назад</button>
 <nav class="tabs" aria-label="Разделы">
   <div class="in">
     <a href="#today" data-v="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Сегодня</a>
@@ -1001,7 +1008,7 @@ function dayItems(day) {
     const p = i.place && TOUR.places.find(x => x.name === i.place);
     const o = i.opt && TOUR.options.find(x => x.id === i.opt);
     const cls = [i.opt ? "opt" : "", i.plain ? "plain" : ""].join(" ").trim();
-    if (o) return `<li class="${cls}"><a class="it-row" href="#program/opt-${o.id}" data-go="program/opt-${o.id}">
+    if (o) return `<li class="${cls}"><a class="it-row" href="#program/opt-${o.id}" data-go="program/opt-${o.id}" data-day="${day.date}">
         <span>${text} <span class="pill opt">за доплату${optPrice(o) ? " · " + esc(optPrice(o)) : ""} · подробнее</span></span><span class="chev" aria-hidden="true">›</span></a></li>`;
     if (i.info) {
       const key = `${day.date}:${n}`;
@@ -2033,6 +2040,7 @@ function show() {
   if (v !== "phrases" && CAN_SPEAK) speechSynthesis.cancel();
   // Адрес вида #program/opt-tower: открыть вкладку и прокрутить к элементу с этим id (раскрыв, если он сворачивается)
   const target = v !== "places" && parts[1] ? $("#v-" + v).querySelector("#" + CSS.escape(parts[1])) : null;
+  updateBackFab(target);
   if (target) { target.open = true; navKind = "back"; requestAnimationFrame(() => target.scrollIntoView({ block: "start" })); return; }
   if (navKind === "go") window.scrollTo(0, 0);           // новый экран — с начала
   else {                                                  // вернулись — туда же, где были
@@ -2040,6 +2048,17 @@ function show() {
     window.scrollTo(0, scrollMem[location.hash] || 0);
   }
   navKind = "back";
+}
+// Кнопка «Назад» видна, только если мы прыгнули к элементу (#program/opt-…) по ссылке изнутри приложения.
+// Подпись говорит, куда вернёмся; нажатие — тот же goBack(), он вернёт и прокрутку.
+let fabDay = null;   // из какого дня программы нажали на опцию — для подписи «← Назад к 8 декабря»
+// pointerdown, а не click: переход срабатывает на pointerup, раньше click
+document.addEventListener("pointerdown", e => { const a = e.target.closest && e.target.closest("[data-go]"); if (a) fabDay = a.dataset.day || null; }, true);
+function updateBackFab(target) {
+  const fab = $("#backfab"), from = backStack[backStack.length - 1] || "";
+  const where = { "#today": "Назад: Сегодня", "#program": fabDay ? `Назад к ${fmt(fabDay)}` : "Назад к программе" }[from.split("/")[0]] || (from.startsWith("#places") ? "Назад к месту" : "Назад");
+  fab.hidden = !(target && backStack.length);
+  fab.textContent = "← " + where;
 }
 // Перейти вперёд по ссылке внутри приложения
 function go(h) {
@@ -2326,6 +2345,7 @@ function renderFsBtn() {
   b.setAttribute("aria-label", `Размер текста: ${FS_NAMES[lvl]}. Нажмите, чтобы ${lvl === 2 ? "вернуть обычный" : "увеличить"}`);
   b.title = `Размер текста: ${FS_NAMES[lvl]}`;
 }
+$("#backfab").addEventListener("click", goBack);
 $("#fs-btn").addEventListener("click", () => {
   const next = (Number(document.documentElement.dataset.fs || 0) + 1) % 3;
   if (next) document.documentElement.dataset.fs = String(next); else delete document.documentElement.dataset.fs;
