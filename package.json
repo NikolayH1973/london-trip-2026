@@ -1,0 +1,9 @@
+{
+  "name": "london-trip-2026",
+  "private": true,
+  "type": "module",
+  "description": "PWA для поездки в Лондон. Зависимость нужна только функциям статистики на Netlify.",
+  "dependencies": {
+    "@netlify/blobs": "^11.1.0"
+  }
+}
