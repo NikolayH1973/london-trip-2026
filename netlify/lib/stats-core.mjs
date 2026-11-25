@@ -41,13 +41,14 @@ export function byDay(events) {
 
 // Прибавляем события дня к тому, что уже лежит в файле устройства за этот день
 export function mergeDay(old, batch, events) {
-  const rec = old || { mode: batch.mode, plat: batch.plat, first: events[0][0], last: 0, opens: 0, ev: {} };
+  const rec = old || { mode: batch.mode, plat: batch.plat, first: events[0][0], last: 0, opens: 0, opensApp: 0, ev: {} };
+  rec.opensApp ||= 0;                                  // поле появилось позже — в старых записях его нет
   if (batch.mode === "app") rec.mode = "app";           // хоть раз открыли установленное — считаем установившим
   rec.plat = batch.plat;
   for (const [ts, name] of events) {
     rec.first = Math.min(rec.first, ts);
     rec.last = Math.max(rec.last, ts);
-    if (name === "open") rec.opens++;
+    if (name === "open") { rec.opens++; if (batch.mode === "app") rec.opensApp++; }   // открытия в установленном приложении — отдельно
     rec.ev[name] = (rec.ev[name] || 0) + 1;
   }
   return rec;
@@ -74,11 +75,11 @@ export async function buildReport(store) {
   const devices = {}, days = {}, events = {};
   for (const { day, id, rec } of recs) {
     if (!rec) continue;
-    const dev = devices[id] ||= { mode: "web", plat: rec.plat, days: 0, opens: 0 };
+    const dev = devices[id] ||= { mode: "web", plat: rec.plat, days: 0, opens: 0, opensApp: 0 };
     if (rec.mode === "app") dev.mode = "app";
-    dev.plat = rec.plat; dev.days++; dev.opens += rec.opens;
-    const d = days[day] ||= { devices: 0, opens: 0, events: 0 };
-    d.devices++; d.opens += rec.opens;
+    dev.plat = rec.plat; dev.days++; dev.opens += rec.opens; dev.opensApp += rec.opensApp || 0;
+    const d = days[day] ||= { devices: 0, opens: 0, opensApp: 0, events: 0 };
+    d.devices++; d.opens += rec.opens; d.opensApp += rec.opensApp || 0;
     for (const [name, n] of Object.entries(rec.ev)) { d.events += n; events[name] = (events[name] || 0) + n; }
   }
   const list = Object.values(devices);
@@ -89,6 +90,7 @@ export async function buildReport(store) {
       installed: count(x => x.mode === "app"),
       ios: count(x => x.plat === "ios"), android: count(x => x.plat === "android"), desktop: count(x => x.plat === "desktop"),
       opens: list.reduce((s, x) => s + x.opens, 0),
+      opensApp: list.reduce((s, x) => s + x.opensApp, 0),
       returning: count(x => x.days > 1)        // открывали больше чем в один день
     },
     days: Object.entries(days).sort(([a], [b]) => a.localeCompare(b)).map(([day, v]) => ({ day, ...v })),

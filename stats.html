@@ -21,7 +21,7 @@
   .kpi b { display:block; font-size:1.9rem; line-height:1.1; font-variant-numeric:tabular-nums; }
   .kpi span { font-size:.85rem; color:var(--muted); }
   .bars { display:grid; gap:7px; }
-  .bar { display:grid; grid-template-columns:88px 1fr 64px; gap:8px; align-items:center; font-size:.9rem; }
+  .bar { display:grid; grid-template-columns:88px 1fr 76px; gap:8px; align-items:center; font-size:.9rem; }
   .bar i { display:block; height:14px; border-radius:7px; background:var(--tube); min-width:2px; }
   .bar .n { text-align:right; font-variant-numeric:tabular-nums; color:var(--muted); }
   .cols { display:grid; gap:14px; } @media (min-width:600px) { .cols { grid-template-columns:1fr 1fr; } .cols .card { margin-top:0; } }
@@ -79,14 +79,17 @@ function render(r) {
   $("#sub").textContent = `Анонимно: без имён, телефонов и местоположения · обновлено ${new Date().toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" })}`;
   $("#out").innerHTML = `
     <div class="kpis">
-      <div class="kpi"><b>${t.devices}</b><span>устройств открывали</span></div>
-      <div class="kpi"><b>${t.installed}</b><span>установили на экран · ${pct(t.installed, t.devices)}</span></div>
-      <div class="kpi"><b>${t.opens}</b><span>открытий всего</span></div>
-      <div class="kpi"><b>${t.returning}</b><span>возвращались в другие дни · ${pct(t.returning, t.devices)}</span></div>
+      <div class="kpi"><b>${t.installed}</b><span>людей с приложением на экране</span></div>
+      <div class="kpi"><b>${t.opensApp}</b><span>открытий в установленном приложении</span></div>
+      <div class="kpi"><b>${t.opens}</b><span>открытий всего (с браузером)</span></div>
+      <div class="kpi"><b>${t.devices}</b><span>браузеров и приложений</span></div>
     </div>
-    <p class="small muted" style="margin:8px 2px 0">iPhone ${t.ios} · Android ${t.android} · компьютер ${t.desktop}. Открытия без интернета приходят, когда появится связь.</p>
-    <div class="card"><h2>Открытия по дням</h2>
-      <div class="bars">${r.days.length ? r.days.map(d => `<div class="bar"><span>${DAY(d.day)}</span><i style="width:${Math.round(d.opens * 100 / maxOpens)}%"></i><span class="n">${d.opens} · ${d.devices} уст.</span></div>`).join("") : `<p class="muted small">Пока пусто</p>`}</div>
+    <p class="small muted" style="margin:8px 2px 0"><b>Как читать:</b> «людей с приложением на экране» — самая точная цифра людей: одно установленное приложение — один человек.
+      «Браузеров и приложений» больше, чем людей: на iPhone ссылка из WhatsApp, Safari и значок на экране хранят данные отдельно, и один телефон считается 2–3 раза.
+      Экраны, места и кнопки ниже считаются точно — каждое нажатие один раз.<br>
+      iPhone ${t.ios} · Android ${t.android} · компьютер ${t.desktop} · открывали в разные дни: ${t.returning}. Открытия без интернета приходят, когда появится связь.</p>
+    <div class="card"><h2>Открытия по дням</h2><p class="small muted" style="margin:-4px 0 10px">всего · 📱 из них в установленном приложении</p>
+      <div class="bars">${r.days.length ? r.days.map(d => `<div class="bar"><span>${DAY(d.day)}</span><i style="width:${Math.round(d.opens * 100 / maxOpens)}%"></i><span class="n">${d.opens}${d.opensApp ? ` · 📱${d.opensApp}` : ""}</span></div>`).join("") : `<p class="muted small">Пока пусто</p>`}</div>
     </div>
     <div class="cols" style="margin-top:14px">
       <div class="card"><h2>Экраны</h2>${rows(sorted(screens))}</div>
