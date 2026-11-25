@@ -12,7 +12,14 @@ export default async req => {
   const secret = process.env.STATS_KEY;
   if (!secret) return json({ error: "nokey" }, 503);                    // ключ ещё не задан в Netlify
   if (new URL(req.url).searchParams.get("key") !== secret) return json({ error: "denied" }, 403);
-  return json(await buildReport(getStore({ name: "stats", consistency: "strong" })));
+  const store = getStore({ name: "stats", consistency: "strong" });
+  // «Обнулить»: удаляем все файлы статистики (кнопка на странице отчёта, тоже только с ключом)
+  if (req.method === "DELETE") {
+    const { blobs } = await store.list({ prefix: "d/" });
+    await Promise.all(blobs.map(b => store.delete(b.key)));
+    return json({ ok: true, deleted: blobs.length });
+  }
+  return json(await buildReport(store));
 };
 
 export const config = { path: "/api/stats" };

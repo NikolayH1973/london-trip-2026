@@ -2353,6 +2353,7 @@ setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - 
     const btns = document.createElement("div");
     btns.style.cssText = "display:flex;gap:8px;margin-top:14px;flex-wrap:wrap";
     btns.innerHTML = `<button type="button" id="diag-test" style="padding:10px 14px;font:inherit;border:2px solid #000;border-radius:8px;background:#ffd300">Тест касаний (30 сек)</button>
+      <button type="button" id="diag-stats" style="padding:10px 14px;font:inherit;border:2px solid #000;border-radius:8px;background:#fff">📊 Статистика здесь: ${store.get("noStats", false) ? "выключена → включить" : "включена → выключить"}</button>
       <button type="button" id="diag-close" style="padding:10px 14px;font:inherit;border:2px solid #000;border-radius:8px;background:#fff">Закрыть</button>`;
     d.appendChild(btns);
     d.hidden = false;
@@ -2360,6 +2361,13 @@ setTimeout(() => { renderClocks(); setInterval(renderClocks, 60000); }, 60000 - 
   $("#diag").addEventListener("click", e => {
     if (e.target.id === "diag-close") $("#diag").hidden = true;
     if (e.target.id === "diag-test") { $("#diag").hidden = true; startTapLog(); }
+    // Своё устройство — не считать. Нужно для установленного приложения на iPhone: у него своё хранилище,
+    // отдельное от Safari, поэтому ссылка ?nostats, открытая в Safari, на него не действует.
+    if (e.target.id === "diag-stats") {
+      const off = !store.get("noStats", false);
+      store.set("noStats", off); if (off) store.set("statsQ", []);
+      $("#diag").hidden = true; toast(off ? "📊 Статистика на этом устройстве отключена" : "📊 Статистика снова включена");
+    }
   });
 
   /* Тест касаний: 30 секунд записываем, что происходит при каждом нажатии */

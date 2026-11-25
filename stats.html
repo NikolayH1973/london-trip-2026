@@ -95,7 +95,19 @@ function render(r) {
       <div class="card"><h2>Опции — открывали описание</h2>${rows(sorted(pick(ev, "opt:", k => OPTS[k] || k)))}</div>
       <div class="card"><h2>Пояснения ⓘ в программе</h2>${rows(sorted(pick(ev, "info:", k => k)))}</div>
       <div class="card"><h2>Категории мест</h2>${rows(sorted(pick(ev, "cat:", k => CATS[k] || k)))}</div>
+    </div>
+    <div class="card"><h2>Обнулить</h2>
+      <p class="small muted">Удалит всю собранную статистику — например, после ваших тестов, перед тем как ссылка уйдёт группе. Отменить нельзя.</p>
+      <button id="reset" type="button" style="background:var(--accent)">🗑 Обнулить статистику</button>
     </div>`;
+  $("#reset").onclick = reset;
+}
+async function reset() {
+  if (!confirm("Удалить всю статистику? Отменить будет нельзя.")) return;
+  const key = keyFromPage();
+  const res = await fetch("/api/stats?key=" + encodeURIComponent(key), { method: "DELETE" });
+  if (!res.ok) return alert("Не получилось обнулить (" + res.status + ")");
+  load();
 }
 async function load() {
   const key = keyFromPage();
