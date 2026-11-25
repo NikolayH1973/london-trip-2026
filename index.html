@@ -1519,8 +1519,10 @@ function howFar(p, useNear) {
   return stopsWord(tube[0][1]) + (walk ? ` + ${walk} мин` : "");
 }
 // Только в дни поездки: место сегодня закрыто (по дням недели)?
+// «Места» всегда живут по НАСТОЯЩЕЙ дате, а не по дате просмотра дня: иначе после «Открыть день подробно»
+// на 8 декабря места 4–7 декабря показывались бы как «✅ были», хотя поездка ещё не началась.
 function closedToday(p) {
-  const today = preview || londonToday();
+  const today = londonToday();
   return today >= TOUR.start && today <= TOUR.end && !!p.days && !p.days.includes(parse(today).getDay());
 }
 
@@ -1538,7 +1540,7 @@ function placeRow(p, useNear) {
 const shortDay = iso => { const d = parse(iso); return ["вс","пн","вт","ср","чт","пт","сб"][d.getDay()] + ", " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3); };
 // Пометка дня программы: прошёл — ✅ «были», сегодня — 📌 «сегодня», впереди — 📌 дата
 function progMark(iso, short, guide) {
-  const today = preview || londonToday();
+  const today = londonToday();
   // На вечерней полке без дня недели: «🌙 с гидом · 5 дек» должно уместиться в одну строку плитки
   const day = guide ? shortDay(iso).split(", ")[1] : short ? shortDay(iso) : `${wday(iso)}, ${fmt(iso)}`;
   const mark = guide ? "🌙 с гидом" : "📌";
@@ -1562,10 +1564,10 @@ function subHeader(title, extra) {
     <h2>${esc(title)}</h2>${extra ? `<span class="small muted">${extra}</span>` : ""}</div>`;
 }
 
-/* Полки главного экрана. Порядок постоянный — человек запоминает, где что лежит.
-   Меняется только содержимое полки «вечер»: до поездки — первый вечер, в поездке — сегодняшний. */
+/* Полки главного экрана. Порядок и состав постоянные — человек запоминает, где что лежит.
+   По дням меняются только пометки на плитках (✅ были, 📌 сегодня, сегодня закрыто) — по настоящей дате. */
 function shelves() {
-  const today = preview || londonToday();
+  const today = londonToday();
   const before = today < TOUR.start, inTrip = today >= TOUR.start && today <= TOUR.end;
   const byTrip = (a, b) => tripMin(a) - tripMin(b);
   const evening = p => p.eve || p.cat === "pub" || p.cat === "xmas";
@@ -1616,7 +1618,7 @@ function progList(shelf) {
   return `<div class="stack">
     ${subHeader(shelf.title, placesWord(shelf.list.length))}
     <p class="small muted">Места, где группа будет с гидом. ✅ — там уже были. Время сбора — в «Программе».</p>
-    ${dates.map(d => { const i = TOUR.days.findIndex(x => x.date === d), day = TOUR.days[i], today = preview || londonToday();
+    ${dates.map(d => { const i = TOUR.days.findIndex(x => x.date === d), day = TOUR.days[i], today = londonToday();
       return `<section>
         <h3 style="margin:8px 0 6px">${d < today ? "✅ " : d === today ? "📌 Сегодня · " : ""}День ${i + 1} · ${esc(wday(d))}, ${esc(fmt(d))}${day ? `<br><span class="small muted" style="font-weight:400">${esc(day.title)}</span>` : ""}</h3>
         <div class="plist">${shelf.list.filter(p => p.program === d).map(p => placeRow(p, false)).join("")}</div>
@@ -1650,7 +1652,7 @@ const PHOTO_LIGHT = `<article class="card now">
 
 /* Под-экран 3: карточка места. Сверху — решение и действие, ниже — подробности */
 function placePage(p) {
-  const today = preview || londonToday();
+  const today = londonToday();
   const inTrip = today >= TOUR.start && today <= TOUR.end;
   const dates = tripDatesFor(p);
   const nf = nearFresh();
