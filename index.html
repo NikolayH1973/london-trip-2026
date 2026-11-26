@@ -657,7 +657,34 @@ const TOUR = {
         tip: "I'm afraid… — вежливое начало для плохих новостей и жалоб." },
       { en: "Could you tell me where to check in for British Airways to Tel Aviv, please?", tr: "Куд ю тэл ми уэ́а ту чек ин фо Бри́тиш Э́эуэйз ту Тэл Ави́в, пли́из?", ru: "Подскажите, где регистрация British Airways на Тель-Авив?" },
       { en: "Could you tell me which gate it is, please?", tr: "Куд ю тэл ми уич гейт ит из, пли́из?", ru: "Подскажите, какой это выход на посадку?",
-        tip: "Номер выхода (gate) появляется на табло примерно за час до вылета." }
+        tip: "Номер выхода (gate) появляется на табло примерно за час до вылета." },
+      { en: "We're travelling together. Could we sit together, please?", tr: "Уи́эр тра́вэлинг тугэ́зэ. Куд уи сит тугэ́зэ, пли́из?", ru: "Мы летим вместе. Можно нам сидеть рядом?",
+        tip: "Просите при регистрации, и чем раньше, тем лучше: онлайн-регистрация открывается за 24 часа до вылета." },
+      { en: "Could we have a window seat and the one next to it?", tr: "Куд уи хэв э уи́ндоу си́ит энд зэ уан некст ту ит?", ru: "Можно нам место у окна и соседнее с ним?" },
+      { en: "Could I have an aisle seat, please?", tr: "Куд ай хэв эн айл си́ит, пли́из?", ru: "Можно мне место у прохода?",
+        tip: "Aisle читается «айл», буква s не произносится. Удобно, если часто встаёте." },
+      { en: "Are there any seats with extra legroom? How much are they?", tr: "А зэа э́ни си́итс уиз э́кстра лэ́грум? Хау мач а зэй?", ru: "Есть места, где больше места для ног? Сколько они стоят?",
+        tip: "Обычно это места у аварийного выхода или в первом ряду, и они платные. Сначала спросите цену." },
+      { en: "Can I take this bag on board as hand luggage?", tr: "Кэн ай тэйк зис бэг он бо́од эз хэнд ла́гидж?", ru: "Можно взять эту сумку в салон как ручную кладь?" },
+      { en: "Is the flight on time?", tr: "Из зэ флайт он тайм?", ru: "Рейс вылетает вовремя?",
+        tip: "On time — по расписанию, delayed — задерживается, boarding — идёт посадка, gate closed — выход закрыт." }
+    ]},
+    { id: "plane", title: "В самолёте", icon: "💺", items: [
+      { en: "Excuse me, is this seat taken?", tr: "Экскью́з ми, из зис си́ит тэ́йкэн?", ru: "Простите, это место занято?",
+        tip: "Если свободно, ответят: No, it's free." },
+      { en: "Excuse me, could I get past, please?", tr: "Экскью́з ми, куд ай гет па́аст, пли́из?", ru: "Простите, можно пройти?",
+        tip: "Пригодится, когда сидите у окна и нужно выйти в проход." },
+      { en: "I think you might be in my seat. Here's my boarding pass.", tr: "Ай синк ю майт би ин май си́ит. Хи́эз май бо́одинг па́ас.", ru: "Кажется, вы сели на моё место. Вот мой посадочный.",
+        tip: "I think и might be — мягко, без упрёка. Сначала сверьте номер места: цифра — ряд, буква — место в ряду." },
+      { en: "Would you mind swapping seats, so we can sit together?", tr: "Вуд ю майнд суо́пинг си́итс, соу уи кэн сит тугэ́зэ?", ru: "Вы не против поменяться местами, чтобы мы сидели вместе?",
+        tip: "Предложите равноценное место: окно на окно, проход на проход. Тогда соглашаются охотнее. Ответ «No, not at all» значит «Конечно, не против»." },
+      { en: "Could you help me put my bag in the overhead locker, please?", tr: "Куд ю хэлп ми пут май бэг ин зи о́увэхэд ло́кэ, пли́из?", ru: "Не поможете положить сумку на полку?" },
+      { en: "Could I have some water, please?", tr: "Куд ай хэв сам уо́тэ, пли́из?", ru: "Можно мне воды?",
+        tip: "Still water — без газа, sparkling — с газом." },
+      { en: "Could I have a blanket, please?", tr: "Куд ай хэв э блэ́нкит, пли́из?", ru: "Можно плед?",
+        tip: "Blanket — плед, pillow — подушка, headphones — наушники." },
+      { en: "I ordered a kosher meal.", tr: "Ай о́одэд э ко́ушэ ми́ил.", ru: "Я заказывал(а) кошерное питание.",
+        tip: "Кошерное или вегетарианское питание нужно заказать заранее, не позже чем за сутки до вылета. На борту его уже не закажешь." }
     ]},
     { id: "hotel", title: "Гостиница", icon: "🏨", items: [
       { en: "Could I have the Wi-Fi password, please?", tr: "Куд ай хэв зэ уа́й-фай па́асвёд, пли́из?", ru: "Можно пароль от Wi-Fi?" },
@@ -2299,7 +2326,7 @@ function quizAction(act, pick) {
 
 /* ===== Тренажёр фраз: карточки из разговорника =====
    Лицо — фраза по-русски, вспоминаем английскую и переворачиваем.
-   «Знаю ✓» — фраза уходит в выученные (хранится на телефоне), «Повторить позже» — в конец колоды. */
+   «Знаю ✓» — фраза уходит в выученные (хранится на телефоне), «Не помню ↻» — в конец колоды. */
 let cardTheme = "all", cardDeck = null, cardFlip = false;
 const phraseKey = ph => ph.en;
 function cardPool(theme) { return TOUR.phrases.filter(t => theme === "all" || t.id === theme).flatMap(t => t.items.map(ph => ({ ...ph, theme: t.id }))); }
@@ -2335,7 +2362,7 @@ function renderCards() {
           <button type="button" class="btn ghost" data-say="${esc(ph.en)}" data-rate="0.6" aria-pressed="false">🐢 Медленно</button></div>` : ""}
         ${ph.tip ? `<p class="tip">${esc(ph.tip)}</p>` : ""}
         <div class="card-acts">
-          <button type="button" class="btn ghost" data-card="later">Повторить позже</button>
+          <button type="button" class="btn ghost" data-card="later">Не помню ↻</button>
           <button type="button" class="btn" data-card="know">Знаю ✓</button>
         </div>` : `<button type="button" class="btn" data-card="flip">Перевернуть</button>`}
       <p class="small muted" style="margin:0;text-align:center">${esc(themeTitle)} · осталось ${cardDeck.length}</p>`
@@ -2500,7 +2527,7 @@ function renderTools() {
     </article>
     <a class="card" href="#phrases" style="text-decoration:none;color:inherit">
       <h3>🗣️ Разговорник с озвучкой</h3>
-      <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
+      <p class="small muted">Вежливые фразы для аэропорта, самолёта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
       <span class="btn">Открыть разговорник</span>
     </a>
     <article class="card">
