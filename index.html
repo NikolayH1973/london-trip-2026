@@ -778,8 +778,8 @@ const TOUR = {
         { place: "Зимний рынок на Саут-Банк", food: true, note: "домики на набережной" },
         { walk: 7, via: "обратно через мост" }
       ] },
-    { id: "wonder", icon: "🎡", title: "Winter Wonderland и огни Риджент-стрит", when: "Вечер", km: "2,8", dur: "3–4 часа",
-      best: "Пешком ≈2,8 км, с метро — около 1 км.",
+    { id: "wonder", icon: "🎡", title: "Winter Wonderland и огни Риджент-стрит", when: "Вечер", km: "3,4", dur: "3–4 часа",
+      best: "Пешком ≈3,4 км, с метро — около 1,6 км.",
       warn: "В Winter Wonderland нужен билет на конкретный час — даже на бесплатный вход. Бронируют только на официальном сайте (кнопка в карточке места).",
       start: { st: "Hyde Park Corner", line: "Piccadilly", stops: 6, ll: [51.5027, -0.1527] },
       finish: { st: "Piccadilly Circus", line: "Piccadilly", ll: [51.5098, -0.1342] },
@@ -788,9 +788,9 @@ const TOUR = {
         { place: "Winter Wonderland в Гайд-парке", food: true, note: "аттракционы, баварская деревня, рынок" },
         { walk: 25, via: "вдоль Грин-парка по улице Пикадилли — или обратно до Hyde Park Corner и 2 остановки на метро до Piccadilly Circus" },
         { place: "Пикадилли-серкус", note: "знаменитые экраны" },
-        { walk: 1 },
-        { place: "Огни Регент-стрит с красного автобуса", note: "подсветка над улицей, лучше после 16:30" },
-        { walk: 1 }
+        { walk: 6, via: "вверх по Риджент-стрит под гирляндами" },
+        { place: "Огни Регент-стрит с красного автобуса", ll: [51.5128, -0.1402], note: "самые красивые гирлянды — у магазина игрушек Hamleys; лучше после 16:30" },
+        { walk: 6, via: "обратно к Piccadilly Circus" }
       ] },
     { id: "westminster", icon: "🏛", title: "Вестминстер и Темза", when: "День", km: "3,3", dur: "2–3 часа",
       best: "Удобно 9 декабря, в свободный день, до выезда в 16:15.",
@@ -1716,9 +1716,15 @@ function walkShelf() {
 // Ссылка на пеший маршрут в Google Картах: старт → точки → финиш (координаты, чтобы не искать по названию)
 function walkMapUrl(w) {
   const ll = a => a.join(",");
-  const pts = w.legs.filter(l => l.place).map(l => walkPlace(l.place)).filter(Boolean).map(p => ll(p.ll));
+  // точка на карте: своя координата у шага (l.ll) важнее координаты места
+  const raw = w.legs.filter(l => l.place).map(l => l.ll || (walkPlace(l.place) || {}).ll).filter(Boolean);
+  // Google не строит маршрут, если соседние точки совпадают (< ~40 м) — такие пропускаем
+  const near = (a, b) => Math.abs(a[0] - b[0]) < 0.0004 && Math.abs(a[1] - b[1]) < 0.0006;
+  const pts = [];
+  raw.forEach(p => { const prev = pts.length ? pts[pts.length - 1] : w.start.ll; if (!near(prev, p)) pts.push(p); });
+  if (pts.length && near(pts[pts.length - 1], w.finish.ll)) pts.pop();
   return "https://www.google.com/maps/dir/?api=1&travelmode=walking&origin=" + ll(w.start.ll) +
-    "&destination=" + ll(w.finish.ll) + "&waypoints=" + encodeURIComponent(pts.join("|"));
+    "&destination=" + ll(w.finish.ll) + "&waypoints=" + encodeURIComponent(pts.map(ll).join("|"));
 }
 function walkPage(w) {
   const chip = line => `<span class="r-line" style="background:${TUBE[line].bg};color:${TUBE[line].fg}">${esc(line)}</span>`;
