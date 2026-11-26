@@ -46,9 +46,9 @@
    Ключ берём из ссылки ?key=… или из формы и запоминаем на этом устройстве. */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
-const VIEWS = { today:"Сегодня", program:"Программа", options:"Опции (блок)", places:"Места", help:"Я потерялся", tools:"Полезное", phrases:"Разговорник" };
+const VIEWS = { today:"Сегодня", program:"Программа", options:"Опции (блок)", places:"Места", help:"Я потерялся", tools:"Полезное", phrases:"Разговорник", quiz:"🧠 Викторина", cards:"🗣️ Тренажёр фраз" };
 const OPTS = { windsor:"Виндзорский замок", tower:"Тауэр с гидом", museum:"Британский музей с гидом", stratford:"Стратфорд и Оксфорд" };
-const ACTS = { signup:"📝 Записаться на опции", route:"🚇 Как добраться", waze:"🚗 Waze в аэропорт", photos:"📷 Фото места/опции", whatsapp:"💬 WhatsApp гиду", call:"📞 Звонок", big:"🪧 Крупная карточка (таксисту и т. п.)" };
+const ACTS = { signup:"📝 Записаться на опции", route:"🚇 Как добраться", waze:"🚗 Waze в аэропорт", photos:"📷 Фото места/опции", whatsapp:"💬 WhatsApp гиду", call:"📞 Звонок", big:"🪧 Крупная карточка (таксисту и т. п.)", quiz:"🧠 Раунд викторины пройден" };
 const PLACES_SUB = { metro:"🚇 Схема метро", near:"📍 Что рядом со мной" };
 const CATS = { all:"Все места", photo:"Для фото", sight:"Достопримечательности", museum:"Музеи", xmas:"Ярмарки", view:"Виды", food:"Еда", pub:"Пабы и музыка", flea:"Блошиные рынки" };
 const WALKS = { xmas:"Рождественские рынки центра", wonder:"Winter Wonderland и огни", westminster:"Вестминстер и Темза", city:"Сити и Темза" };

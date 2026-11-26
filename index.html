@@ -120,6 +120,40 @@ details.it-info > summary::-webkit-details-marker { display: none; }
 details.it-info[open] > summary .it-i { opacity: .55; }
 details.it-info > p { margin: 6px 0 0; font-size: .92em; color: var(--muted); }
 details.it-info .btn-row { margin-top: 8px; }
+/* Викторина и тренажёр фраз */
+.quiz-bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.quiz-bar i { display: block; height: 100%; background: var(--gold); }
+.quiz-opts { display: grid; gap: 10px; }
+.quiz-opt { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.quiz-opt b { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--line); font-size: .9rem; }
+.quiz-opt span { display: flex; flex-direction: column; }
+.quiz-opt em { font-style: normal; font-size: .85rem; font-weight: 600; }
+.quiz-opt.ok { border-color: #1e8e4e; background: #e6f5ec; }
+.quiz-opt.ok b { background: #1e8e4e; color: #fff; } .quiz-opt.ok em { color: #1e7a45; }
+.quiz-opt.bad { border-color: var(--accent); background: #fdeaec; }
+.quiz-opt.bad b { background: var(--accent); color: #fff; } .quiz-opt.bad em { color: var(--accent); }
+.quiz-opt.dim { opacity: .55; }
+.quiz-opt:disabled { cursor: default; }
+:root[data-theme="dark"] .quiz-opt.ok { background: #183526; } :root[data-theme="dark"] .quiz-opt.ok em { color: #7fd6a2; }
+:root[data-theme="dark"] .quiz-opt.bad { background: #3a1820; } :root[data-theme="dark"] .quiz-opt.bad em { color: #ff9aa6; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .quiz-opt.ok { background: #183526; } :root:not([data-theme="light"]) .quiz-opt.ok em { color: #7fd6a2; }
+  :root:not([data-theme="light"]) .quiz-opt.bad { background: #3a1820; } :root:not([data-theme="light"]) .quiz-opt.bad em { color: #ff9aa6; }
+}
+.quiz-quit { align-self: center; min-height: 44px; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.quiz-result { align-items: center; text-align: center; }
+.quiz-score { font-size: 2.6rem; font-weight: 800; line-height: 1.1; }
+.quiz-ranks > div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.quiz-ranks > div:last-child { border-bottom: 0; }
+.quiz-miss { display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.quiz-miss:last-child { border-bottom: 0; }
+.quiz-place, .play-row { text-decoration: none; color: inherit; }
+.quiz-place { font-size: .95rem; font-weight: 600; color: var(--accent); }
+.flash { align-items: center; justify-content: center; text-align: center; min-height: 230px; font: inherit; color: var(--ink); cursor: pointer; width: 100%; }
+.flash.flipped { border: 2px solid var(--gold); }
+.flash-ru { font-size: 1.35rem; font-weight: 700; }
+.flash-en { font-size: 1.25rem; font-weight: 700; color: var(--accent); }
+.card-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .tip { font-size: .95rem; padding: 10px 12px; border-left: 4px solid var(--gold); background: var(--gold-soft); border-radius: 0 10px 10px 0; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 12px 18px; border-radius: 12px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; text-decoration: none; cursor: pointer; text-align: center; }
@@ -128,6 +162,8 @@ details.it-info .btn-row { margin-top: 8px; }
 .maplink { align-self: center; font-size: .95rem; font-weight: 500; padding: 8px 12px; min-height: 44px; display: inline-flex; align-items: center; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips.rail { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px 4px; scrollbar-width: none; }
+.chips.rail .chip { flex: none; }
 .chip { min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: .95rem; }
 a.chip { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); text-decoration: none; }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -406,6 +442,8 @@ footer.note { margin-top: 24px; font-size: .8rem; color: var(--muted); text-alig
   <section class="view" id="v-help" aria-label="Помощь"></section>
   <section class="view" id="v-tools" aria-label="Полезное"></section>
   <section class="view" id="v-phrases" aria-label="Разговорник"></section>
+  <section class="view" id="v-quiz" aria-label="Викторина"></section>
+  <section class="view" id="v-cards" aria-label="Тренажёр фраз"></section>
 
   <footer class="note">Неофициальный помощник, сделан участником поездки. Порядок экскурсий может меняться — главное слово за гидом. Прогноз погоды: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo.com</a></footer>
 </div>
@@ -1954,8 +1992,8 @@ function renderPhrases() {
   const shown = themes.filter(t => phraseTheme === "all" || t.id === phraseTheme);
   const total = themes.reduce((n, t) => n + t.items.length, 0);
   $("#v-phrases").innerHTML = `<div class="stack">
-    <a class="back" href="#tools">← Полезное</a>
-    <div><h2>Разговорник</h2><p class="small muted">${total} вежливых фраз на британский манер. 🔊 — послушать, 🐢 — медленно, «Показать» — крупно на весь экран, чтобы дать прочитать собеседнику.</p></div>
+    ${toolsHeader("Разговорник")}
+    <div><p class="small muted" style="margin:0">${total} вежливых фраз на британский манер. 🔊 — послушать, 🐢 — медленно, «Показать» — крупно на весь экран, чтобы дать прочитать собеседнику.</p></div>
     ${CAN_SPEAK ? "" : `<p class="tip">Этот браузер не умеет озвучивать текст. Пользуйтесь кнопкой «Показать».</p>`}
     <div class="chips" role="group" aria-label="Темы">
       <button type="button" class="chip" data-theme="all" aria-pressed="${phraseTheme === "all"}">Все</button>
@@ -1979,6 +2017,258 @@ function renderPhrases() {
         </div>
       </article>`).join("")}`).join("")}
   </div>`;
+}
+
+/* ===== Викторина «Знаешь ли ты Лондон?» =====
+   40 вопросов о местах нашей программы и британских привычках. В одном раунде — 10 случайных,
+   сначала те, что человек ещё не видел. Порядок ответов перемешивается каждый раз.
+   ok — номер правильного ответа в массиве a (с нуля), f — интересный факт после ответа, place — карточка места. */
+const QUIZ = [
+  { c: "Вестминстер", q: "Что на самом деле называется «Биг-Бен»?", a: ["Колокол внутри часовой башни", "Сама часовая башня", "Здание Парламента", "Мост рядом с Парламентом"], ok: 0,
+    f: "Big Ben — это колокол весом почти 14 тонн. Башню в 2012 году назвали Elizabeth Tower в честь юбилея Елизаветы II.", place: "Биг-Бен и здание Парламента" },
+  { c: "Вестминстер", q: "Где коронуют британских монархов почти тысячу лет — с 1066 года?", a: ["Вестминстерское аббатство", "Собор Святого Павла", "Букингемский дворец", "Виндзорский замок"], ok: 0,
+    f: "Там же в мае 2023 года короновали Карла III.", place: "Вестминстерское аббатство" },
+  { c: "Вестминстер", q: "Какой номер дома у резиденции премьер-министра на Даунинг-стрит?", a: ["10", "1", "7", "221B"], ok: 0,
+    f: "В соседнем доме № 11 живёт министр финансов. А 221B — это адрес Шерлока Холмса на Бейкер-стрит.", place: "Даунинг-стрит" },
+  { c: "Вестминстер", q: "Какая официальная должность есть у кота, живущего на Даунинг-стрит?", a: ["Главный мышелов", "Хранитель ключей", "Почётный министр", "Королевский кот"], ok: 0,
+    f: "Chief Mouser to the Cabinet Office — коты на этой должности живут при разных премьер-министрах." },
+  { c: "Король", q: "Как понять, что король сейчас в Букингемском дворце?", a: ["Над дворцом поднят королевский штандарт", "У ворот стоит больше гвардейцев", "Горят все окна", "Играет оркестр"], ok: 0,
+    f: "Когда монарха нет, над дворцом поднимают обычный британский флаг — Union Flag.", place: "Букингемский дворец" },
+  { c: "Король", q: "Из чего сделаны высокие чёрные шапки королевских гвардейцев?", a: ["Из медвежьего меха", "Из овечьей шерсти", "Из конского волоса", "Из бархата"], ok: 0,
+    f: "Шапка называется bearskin — «медвежья шкура». Весит она около 700 граммов.", place: "Букингемский дворец" },
+  { c: "Трафальгарская площадь", q: "Кто стоит на высокой колонне посреди Трафальгарской площади?", a: ["Адмирал Нельсон", "Королева Виктория", "Уинстон Черчилль", "Герцог Веллингтон"], ok: 0,
+    f: "Колонна — в честь победы в Трафальгарском сражении 1805 года. У её подножия четыре бронзовых льва.", place: "Трафальгарская площадь" },
+  { c: "Трафальгарская площадь", q: "Кто каждый год дарит Лондону главную ёлку на Трафальгарской площади?", a: ["Норвегия", "Канада", "Шотландия", "Королевская семья"], ok: 0,
+    f: "Ёлку присылают из Осло с 1947 года — в благодарность за помощь Британии во Второй мировой войне.", place: "Трафальгарская площадь" },
+  { c: "Тауэр", q: "По легенде, если они покинут Тауэр, королевство падёт. Кто это?", a: ["Вороны", "Голуби", "Бифитеры", "Коты"], ok: 0,
+    f: "Поэтому в Тауэре всегда живут как минимум шесть воронов, и ещё один — запасной.", place: "Лондонский Тауэр" },
+  { c: "Тауэр", q: "Что хранится в Тауэре под особой охраной?", a: ["Королевские регалии — короны и скипетры", "Золотой запас Британии", "Оригинал Великой хартии вольностей", "Личный архив короля"], ok: 0,
+    f: "Crown Jewels — больше 100 предметов. Самая известная — Имперская корона.", place: "Лондонский Тауэр" },
+  { c: "Тауэр", q: "Как прозвали стражей Тауэра в красно-чёрной форме?", a: ["Бифитеры", "Гвардейцы", "Бобби", "Йомены-ковбои"], ok: 0,
+    f: "Beefeaters — «едоки говядины»: по одной из версий, им когда-то давали мясо в счёт жалованья.", place: "Лондонский Тауэр" },
+  { c: "Мосты", q: "Мост с двумя готическими башнями, который все знают по открыткам, — это…", a: ["Тауэрский мост", "Лондонский мост", "Вестминстерский мост", "Мост Миллениум"], ok: 0,
+    f: "Туристы часто называют его London Bridge, но Лондонский мост — соседний и совсем простой с виду.", place: "Тауэрский мост" },
+  { c: "Мосты", q: "Тауэрский мост умеет то, чего не умеют другие мосты Лондона. Что?", a: ["Разводиться, пропуская корабли", "Вращаться", "Подниматься целиком вверх", "Светиться всю ночь"], ok: 0,
+    f: "Мост открыли в 1894 году. Его половины поднимают и сейчас — несколько сотен раз в год." , place: "Тауэрский мост" },
+  { c: "Рядом с отелем", q: "Сколько лет Хаммерсмитскому мосту — тому, что рядом с нашим отелем?", a: ["Почти 140 лет", "Около 50 лет", "Около 90 лет", "Больше 300 лет"], ok: 0,
+    f: "Мост открыли в 1887 году. С 2019 года машинам по нему ездить нельзя.", place: "Хаммерсмитский мост" },
+  { c: "Сити", q: "Кто построил собор Святого Павла?", a: ["Кристофер Рен", "Уильям Шекспир", "Исаак Ньютон", "Чарльз Диккенс"], ok: 0,
+    f: "Рен строил собор после Великого пожара. Здесь в 1981 году венчались принц Чарльз и принцесса Диана.", place: "Собор Святого Павла и мост Миллениум" },
+  { c: "История", q: "В каком году Великий пожар уничтожил почти весь старый Лондон?", a: ["1666", "1066", "1812", "1940"], ok: 0,
+    f: "Пожар начался в пекарне на Пудинг-лейн и горел четыре дня." },
+  { c: "Метро", q: "Лондонское метро — самое старое в мире. Когда открылась первая линия?", a: ["В 1863 году", "В 1913 году", "В 1935 году", "В 1801 году"], ok: 0,
+    f: "Первые поезда ходили на паровой тяге. Лондонцы зовут метро the Tube — «труба»." },
+  { c: "Метро", q: "Что значит знаменитое объявление в метро «Mind the gap»?", a: ["Осторожно, зазор между поездом и платформой", "Не забывайте вещи", "Двери закрываются", "Держитесь за поручни"], ok: 0,
+    f: "Его слышно на каждой станции, а надпись нарисована у края платформы." },
+  { c: "Метро", q: "Какие линии метро ходят через Hammersmith у нашего отеля?", a: ["Piccadilly, District и Hammersmith & City", "Только Central", "Victoria и Jubilee", "Northern и Bakerloo"], ok: 0,
+    f: "Piccadilly — синяя, District — зелёная, розовая Hammersmith & City — на отдельной станции через дорогу. Вся схема — в «Местах»." },
+  { c: "Транспорт", q: "Что должен выучить лондонский таксист, чтобы водить чёрный кэб?", a: ["Около 25 000 улиц наизусть", "Три иностранных языка", "Историю Лондона", "Правила этикета королевского двора"], ok: 0,
+    f: "Экзамен называется The Knowledge. Подготовка занимает в среднем три-четыре года." },
+  { c: "Транспорт", q: "Почему на лондонских переходах написано «LOOK RIGHT»?", a: ["Машины едут по левой стороне", "Справа велодорожка", "Это реклама", "Так короче идти"], ok: 0,
+    f: "Мы привыкли смотреть налево — в Лондоне машина подъедет справа. Смотрите в обе стороны." },
+  { c: "Музеи", q: "Какой камень из Британского музея помог расшифровать египетские иероглифы?", a: ["Розеттский", "Философский", "Скунский", "Лунный"], ok: 0,
+    f: "На нём один и тот же текст написан тремя видами письма. Вход в музей бесплатный.", place: "Британский музей" },
+  { c: "Музеи", q: "Чей скелет висит под потолком главного зала Музея естествознания?", a: ["Синего кита", "Динозавра диплодока", "Мамонта", "Гигантской акулы"], ok: 0,
+    f: "Кита зовут Hope — «Надежда». Раньше на его месте стоял скелет диплодока.", place: "Музей естествознания" },
+  { c: "Музеи", q: "Сколько стоит вход в Национальную галерею на Трафальгарской площади?", a: ["Бесплатно", "£10", "£25", "Только по абонементу"], ok: 0,
+    f: "Там висят «Подсолнухи» Ван Гога. Платят только за временные выставки.", place: "Национальная галерея" },
+  { c: "Виндзор", q: "Чем знаменит Виндзорский замок?", a: ["Это самый большой и старый жилой замок в мире", "Это самый высокий замок Европы", "В нём родился Шекспир", "Его построили в XX веке"], ok: 0,
+    f: "Замок заложил Вильгельм Завоеватель почти 1000 лет назад. Король часто проводит там выходные." },
+  { c: "Стратфорд и Оксфорд", q: "Кто родился в Стратфорде-на-Эйвоне?", a: ["Уильям Шекспир", "Чарльз Диккенс", "Джейн Остин", "Агата Кристи"], ok: 0,
+    f: "Шекспир родился в 1564 году. Его дом можно увидеть на нашей экскурсии 8 декабря." },
+  { c: "Стратфорд и Оксфорд", q: "Чем знаменит Оксфордский университет?", a: ["Это старейший университет англоязычного мира", "Там учатся только врачи", "Он открылся в 1950 году", "Там нет студентов"], ok: 0,
+    f: "Обеденный зал колледжа Крайст-Чёрч стал прообразом зала Хогвартса в фильмах о Гарри Поттере." },
+  { c: "Кино и книги", q: "На каком вокзале Гарри Поттер уезжал в Хогвартс с платформы 9¾?", a: ["King's Cross", "Victoria", "Paddington", "Waterloo"], ok: 0,
+    f: "На вокзале есть стена с «уходящей» тележкой — к ней очередь сфотографироваться.", place: "Вокзал King's Cross" },
+  { c: "Кино и книги", q: "Какой знаменитый адрес на Бейкер-стрит?", a: ["221B — дом Шерлока Холмса", "10 — дом премьер-министра", "1 — дом Диккенса", "007 — штаб Джеймса Бонда"], ok: 0,
+    f: "Во времена Конан Дойла такого номера на улице не было. Сейчас там музей Шерлока Холмса." },
+  { c: "Пикадилли", q: "Откуда взялось название «Пикадилли»?", a: ["От модных кружевных воротников «пикадиллов»", "От имени итальянского купца", "От слова «площадь» на латыни", "От названия цветка"], ok: 0,
+    f: "Портной Роберт Бейкер разбогател на этих воротниках в XVII веке и построил здесь дом.", place: "Пикадилли-серкус" },
+  { c: "Пикадилли", q: "В честь кого названа Риджент-стрит, где висят рождественские огни?", a: ["Принца-регента, будущего Георга IV", "Королевы Виктории", "Архитектора Риджента", "Короля Карла III"], ok: 0,
+    f: "Regent — «регент»: принц правил вместо больного отца, Георга III.", place: "Огни Регент-стрит с красного автобуса" },
+  { c: "Денди", q: "Кто был самым знаменитым денди Англии начала XIX века?", a: ["Бо Браммелл", "Шерлок Холмс", "Оскар Уайльд", "Лорд Нельсон"], ok: 0,
+    f: "Браммелл ввёл моду на тёмный костюм и белоснежный шейный платок. Его памятник стоит на Джермин-стрит." },
+  { c: "Ковент-Гарден", q: "Что было на месте Ковент-Гардена много веков назад?", a: ["Сад монастыря", "Королевская конюшня", "Порт на Темзе", "Тюрьма"], ok: 0,
+    f: "Covent — искажённое convent, «монастырь». Потом здесь появился знаменитый овощной рынок.", place: "Рождество в Ковент-Гардене" },
+  { c: "Каналы", q: "Что плавает по каналам Маленькой Венеции?", a: ["Узкие лодки-дома", "Гондолы", "Паромы", "Байдарки"], ok: 0,
+    f: "Narrowboats — длинные и узкие лодки шириной около двух метров, в них живут круглый год.", place: "Маленькая Венеция" },
+  { c: "Магазины", q: "Чем знаменит магазин Hamleys на Риджент-стрит?", a: ["Это старейший магазин игрушек в мире", "Там продают только чай", "Это магазин короля", "Там всё по одному фунту"], ok: 0,
+    f: "Hamleys открылся в 1760 году. В нём семь этажей игрушек." },
+  { c: "Высота", q: "The Shard — самое высокое здание Британии. Какой оно высоты?", a: ["Около 310 метров", "Около 100 метров", "Около 500 метров", "Около 830 метров"], ok: 0,
+    f: "Shard значит «осколок стекла». 830 метров — высота Бурдж-Халифы в Дубае.", place: "The Shard" },
+  { c: "Еда и чай", q: "Как англичане пьют чай по умолчанию?", a: ["С молоком", "С лимоном", "С мёдом", "Только зелёный"], ok: 0,
+    f: "Если хотите без молока, скажите: no milk, please. Фраза есть в разговорнике." },
+  { c: "Еда и чай", q: "Что спорят положить на скон первым жители Корнуолла и Девона?", a: ["Джем или сливки — спор идёт до сих пор", "Масло или сыр", "Мёд или сахар", "Ничего, сконы едят пустыми"], ok: 0,
+    f: "В Корнуолле сначала джем, потом сливки, в Девоне — наоборот. Проверьте на чаепитии 4 декабря!" },
+  { c: "Еда и чай", q: "Сколько миллилитров в британской пинте пива?", a: ["568", "500", "330", "1000"], ok: 0,
+    f: "Полпинты — около 280 мл, если хочется немного." },
+  { c: "Практичное", q: "На сколько часов Лондон отстаёт от Израиля в декабре?", a: ["На 2 часа", "На 1 час", "На 3 часа", "Время одинаковое"], ok: 0,
+    f: "Когда в Лондоне 20:00, в Израиле уже 22:00. Часы вверху приложения показывают оба времени." },
+  { c: "Практичное", q: "Во сколько примерно темнеет в Лондоне в начале декабря?", a: ["Около 16:00", "Около 18:00", "Около 20:00", "Около 14:00"], ok: 0,
+    f: "Поэтому смотреть огни можно уже в пять вечера. Время заката — в строке погоды у каждого дня." },
+  { c: "Практичное", q: "Что значит британское слово «queue»?", a: ["Очередь", "Королева", "Вопрос", "Касса"], ok: 0,
+    f: "Читается «кью». Британцы очень уважают очередь — влезть без неё серьёзная бестактность." }
+];
+// Заголовок экранов, открытых из «Полезного»: стрелка всегда ведёт в «Полезное» (как у под-экранов «Мест»)
+const toolsHeader = title => `<div class="sub-h"><a class="back" href="#tools" aria-label="Назад в Полезное">${SVG_BACK}</a><h2>${esc(title)}</h2></div>`;
+const QUIZ_N = 10; // вопросов в одном раунде
+const QUIZ_RANKS = [[10, "Почти лондонец"], [8, "Знаток Лондона"], [5, "Путешественник"], [0, "Турист"]];
+const quizRank = s => QUIZ_RANKS.find(r => s >= r[0])[1];
+const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* Текущий раунд храним в localStorage: если человек ушёл в карточку места и вернулся — продолжит с того же вопроса.
+   run = { qs:[номера вопросов], ord:[[порядок ответов]…], i:текущий, picks:[выбранный номер ответа…] } */
+function quizNew() {
+  let seen = store.get("quizSeen", []);
+  let fresh = QUIZ.map((_, i) => i).filter(i => !seen.includes(i));
+  if (fresh.length < QUIZ_N) { seen = []; fresh = QUIZ.map((_, i) => i); }  // всё увидели — начинаем круг заново
+  const qs = shuffle(fresh).slice(0, QUIZ_N);
+  store.set("quizSeen", seen.concat(qs));
+  store.set("quizRun", { qs, ord: qs.map(() => shuffle([0, 1, 2, 3])), i: 0, picks: [] });
+}
+function quizPlaceLink(name, label) {
+  const p = name && walkPlace(name);
+  return p ? `<a class="it-row quiz-place" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}"><span>${esc(label || placeTitle(p))}</span><span class="chev" aria-hidden="true">›</span></a>` : "";
+}
+function renderQuiz() {
+  const run = store.get("quizRun", null);
+  const best = store.get("quizBest", null);
+  const head = toolsHeader("🧠 Знаешь ли ты Лондон?");
+  let html;
+  if (!run) {
+    const seen = Math.min(store.get("quizSeen", []).length, QUIZ.length);
+    html = `${head}
+      <div>
+      <p class="small muted" style="margin:0">${QUIZ.length} ${plural(QUIZ.length, "вопрос", "вопроса", "вопросов")} о местах нашей программы и британских привычках. В раунде ${QUIZ_N} случайных — каждый раз новые, пока не увидите все. Работает без интернета.</p></div>
+      <article class="card">
+        <p class="small" style="margin:0">${best != null ? `Ваш рекорд: <b>${best} из ${QUIZ_N}</b> · ${quizRank(best)}` : "Рекорда пока нет — самое время поставить."}</p>
+        <p class="small muted" style="margin:0">Уже видели ${seen} из ${QUIZ.length} вопросов.</p>
+        <button type="button" class="btn" data-quiz="start">Начать</button>
+      </article>
+      <article class="card"><h3>Звания</h3>
+        <div class="small quiz-ranks">${QUIZ_RANKS.slice().reverse().map((r, k, a) => `<div><span>${r[1]}</span><span class="muted">${(hi => hi === r[0] ? r[0] : r[0] + "–" + hi)(k < a.length - 1 ? a[k + 1][0] - 1 : QUIZ_N)}</span></div>`).join("")}</div>
+      </article>`;
+  } else if (run.i >= run.qs.length) {
+    const score = run.qs.filter((qi, k) => run.picks[k] === QUIZ[qi].ok).length;
+    const wrong = run.qs.filter((qi, k) => run.picks[k] !== QUIZ[qi].ok);
+    html = `${head}
+      <article class="card quiz-result">
+        <div class="quiz-score">${score} из ${run.qs.length}</div>
+        <h3 style="margin:0">${quizRank(score)}</h3>
+        <p class="small muted" style="margin:0">${run.newBest ? (run.prevBest != null ? `Новый рекорд! Прошлый был ${run.prevBest}.` : "Это ваш первый рекорд.") : best != null ? `Ваш рекорд — ${best}.` : ""}</p>
+      </article>
+      ${wrong.length ? `<article class="card"><h3>Ошибки — вспомним</h3>
+        ${wrong.map(qi => { const q = QUIZ[qi]; return `<div class="quiz-miss"><p class="small" style="margin:0"><b>${esc(q.q)}</b><br>✓ ${esc(q.a[q.ok])}</p>${quizPlaceLink(q.place, "Открыть карточку места")}</div>`; }).join("")}
+      </article>` : `<p class="tip">Ни одной ошибки — браво!</p>`}
+      <button type="button" class="btn" data-quiz="start">Ещё раунд — новые вопросы</button>
+      <a class="btn ghost" href="#cards">Тренажёр фраз</a>`;
+  } else {
+    const qi = run.qs[run.i], q = QUIZ[qi], ord = run.ord[run.i];
+    const picked = run.picks[run.i];
+    const done = picked != null;
+    const score = run.qs.slice(0, run.i).filter((x, k) => run.picks[k] === QUIZ[x].ok).length + (done && picked === q.ok ? 1 : 0);
+    html = `${head}
+      <p class="small muted" style="margin:0">Вопрос ${run.i + 1} из ${run.qs.length} · верно: ${score}</p>
+      <div class="quiz-bar"><i style="width:${(run.i + (done ? 1 : 0)) / run.qs.length * 100}%"></i></div>
+      <article class="card">
+        <span class="small muted">${esc(q.c)}</span>
+        <h3 style="margin:0">${esc(q.q)}</h3>
+        <div class="quiz-opts">
+          ${ord.map((ai, k) => {
+            const cls = !done ? "" : ai === q.ok ? " ok" : ai === picked ? " bad" : " dim";
+            const mark = !done ? "" : ai === q.ok ? `<em>${ai === picked ? "Верно!" : "Правильный ответ"}</em>` : ai === picked ? "<em>Ваш ответ</em>" : "";
+            return `<button type="button" class="quiz-opt${cls}" data-quiz-pick="${ai}" ${done ? "disabled" : ""}><b>${"АБВГ"[k]}</b><span>${esc(q.a[ai])}${mark}</span></button>`;
+          }).join("")}
+        </div>
+        ${done ? `<p class="tip"><b>${picked === q.ok ? "Точно!" : "Не угадали."}</b> ${esc(q.f)}</p>${quizPlaceLink(q.place, "Открыть карточку места")}` : `<p class="small muted" style="margin:0">Нажмите на ответ</p>`}
+      </article>
+      ${done ? `<button type="button" class="btn" data-quiz="next">${run.i + 1 < run.qs.length ? "Следующий вопрос ›" : "Узнать результат ›"}</button>` : ""}
+      <button type="button" class="quiz-quit small muted" data-quiz="quit">Закончить раунд</button>`;
+  }
+  $("#v-quiz").innerHTML = `<div class="stack">${html}</div>`;
+}
+function quizAction(act, pick) {
+  const run = store.get("quizRun", null);
+  if (act === "start") { quizNew(); }
+  else if (act === "quit") { store.set("quizRun", null); }
+  else if (act === "pick" && run && run.picks[run.i] == null) { run.picks[run.i] = pick; store.set("quizRun", run); }
+  else if (act === "next" && run) {
+    run.i++;
+    if (run.i >= run.qs.length) {   // раунд закончен — считаем рекорд
+      const score = run.qs.filter((qi, k) => run.picks[k] === QUIZ[qi].ok).length;
+      const prev = store.get("quizBest", null);
+      run.prevBest = prev; run.newBest = prev == null || score > prev;
+      if (run.newBest) store.set("quizBest", score);
+      if (STATS) STATS.track("act:quiz");
+    }
+    store.set("quizRun", run);
+  }
+  renderQuiz(); renderTools();
+  if (act !== "pick") window.scrollTo(0, 0);
+}
+
+/* ===== Тренажёр фраз: карточки из разговорника =====
+   Лицо — фраза по-русски, вспоминаем английскую и переворачиваем.
+   «Знаю ✓» — фраза уходит в выученные (хранится на телефоне), «Повторить позже» — в конец колоды. */
+let cardTheme = "all", cardDeck = null, cardFlip = false;
+const phraseKey = ph => ph.en;
+function cardPool(theme) { return TOUR.phrases.filter(t => theme === "all" || t.id === theme).flatMap(t => t.items.map(ph => ({ ...ph, theme: t.id }))); }
+function cardDeckBuild() {
+  const known = store.get("cardsKnown", []);
+  cardDeck = shuffle(cardPool(cardTheme).filter(ph => !known.includes(phraseKey(ph))));
+  cardFlip = false;
+}
+function renderCards() {
+  if (!cardDeck) cardDeckBuild();
+  const known = store.get("cardsKnown", []);
+  const pool = cardPool(cardTheme);
+  const k = pool.filter(ph => known.includes(phraseKey(ph))).length;
+  const ph = cardDeck[0];
+  const themeTitle = cardTheme === "all" ? "Все темы" : TOUR.phrases.find(t => t.id === cardTheme).title;
+  $("#v-cards").innerHTML = `<div class="stack">
+    ${toolsHeader("🗣️ Тренажёр фраз")}
+    <div><p class="small muted" style="margin:0">Вспомните фразу по-английски и переверните карточку. Выучено: <b>${k} из ${pool.length}</b>${cardTheme === "all" ? "" : " в теме"}.</p></div>
+    <div class="chips rail" role="group" aria-label="Темы">
+      <button type="button" class="chip" data-card-theme="all" aria-pressed="${cardTheme === "all"}">Все</button>
+      ${TOUR.phrases.map(t => `<button type="button" class="chip" data-card-theme="${t.id}" aria-pressed="${t.id === cardTheme}">${t.icon} ${esc(t.title)}</button>`).join("")}
+    </div>
+    ${ph ? `
+      <button type="button" class="card flash${cardFlip ? " flipped" : ""}" data-card="flip" aria-label="${cardFlip ? "Карточка" : "Перевернуть карточку"}">
+        <span class="small muted">${cardFlip ? "По-английски" : "Как сказать по-английски?"}</span>
+        <span class="flash-ru">${esc(ph.ru)}</span>
+        ${cardFlip ? `<span class="flash-en" lang="en-GB">${esc(ph.en)}</span><span class="tr">${esc(ph.tr)}</span>`
+          : `<span class="small muted">Вспомните фразу и нажмите на карточку</span>`}
+      </button>
+      ${cardFlip ? `
+        ${CAN_SPEAK ? `<div class="speak-row" style="grid-template-columns:1fr 1fr">
+          <button type="button" class="btn ghost" data-say="${esc(ph.en)}" data-rate="0.9" aria-pressed="false">🔊 Послушать</button>
+          <button type="button" class="btn ghost" data-say="${esc(ph.en)}" data-rate="0.6" aria-pressed="false">🐢 Медленно</button></div>` : ""}
+        ${ph.tip ? `<p class="tip">${esc(ph.tip)}</p>` : ""}
+        <div class="card-acts">
+          <button type="button" class="btn ghost" data-card="later">Повторить позже</button>
+          <button type="button" class="btn" data-card="know">Знаю ✓</button>
+        </div>` : `<button type="button" class="btn" data-card="flip">Перевернуть</button>`}
+      <p class="small muted" style="margin:0;text-align:center">${esc(themeTitle)} · осталось ${cardDeck.length}</p>`
+    : `<article class="card"><h3>🎉 Все фразы ${cardTheme === "all" ? "" : "этой темы "}выучены!</h3>
+        <p class="small muted" style="margin:0">Можно пройти их ещё раз — отметки «выучено» сбросятся только для ${cardTheme === "all" ? "всех тем" : "этой темы"}.</p>
+        <button type="button" class="btn" data-card="reset">Повторить заново</button></article>`}
+    <a class="small" href="#phrases">Все фразы списком — в разговорнике</a>
+  </div>`;
+}
+function cardAction(act) {
+  if (act === "flip") cardFlip = !cardFlip;
+  else if (act === "know" && cardDeck[0]) {
+    const known = store.get("cardsKnown", []);
+    store.set("cardsKnown", known.concat(phraseKey(cardDeck.shift())));
+    cardFlip = false;
+  } else if (act === "later" && cardDeck[0]) { cardDeck.push(cardDeck.shift()); cardFlip = false; }
+  else if (act === "reset") {
+    const pool = cardPool(cardTheme).map(phraseKey);
+    store.set("cardsKnown", store.get("cardsKnown", []).filter(k => !pool.includes(k)));
+    cardDeckBuild();
+  }
+  if (act !== "flip" && CAN_SPEAK) speechSynthesis.cancel();
+  renderCards(); renderTools();
 }
 
 /* Крупная карточка на весь экран (таксисту, официанту, продавцу) */
@@ -2113,6 +2403,11 @@ function renderTools() {
         <li><span><b>Без интернета</b> — откройте приложение один раз с интернетом, дальше оно работает и в метро, и в самолёте.</span></li>
       </ul>
     </details>
+    <article class="card">
+      <h3>✈️ В дорогу</h3>
+      <p class="small muted" style="margin:0">Пять часов в самолёте — время подготовиться к Лондону. Работает без интернета.</p>
+      ${toolsPlay()}
+    </article>
     <a class="card" href="#phrases" style="text-decoration:none;color:inherit">
       <h3>🗣️ Разговорник с озвучкой</h3>
       <p class="small muted">Вежливые фразы для аэропорта, гостиницы, такси, улицы, ресторана, магазина и аптеки. Телефон произнесёт их с британским акцентом.</p>
@@ -2149,6 +2444,15 @@ function renderTools() {
   wireConverter();
 }
 
+// Две строки «В дорогу»: викторина и тренажёр, с личным прогрессом
+function toolsPlay() {
+  const best = store.get("quizBest", null), run = store.get("quizRun", null);
+  const known = store.get("cardsKnown", []).length, total = TOUR.phrases.reduce((n, t) => n + t.items.length, 0);
+  const quizSub = run && run.i < run.qs.length ? `Раунд не закончен: вопрос ${run.i + 1} из ${run.qs.length}` : `${QUIZ.length} ${plural(QUIZ.length, "вопрос", "вопроса", "вопросов")}${best != null ? ` · рекорд: ${best} из ${QUIZ_N}` : ""}`;
+  return `<a class="it-row play-row" href="#quiz"><span><b>🧠 Викторина «Знаешь ли ты Лондон?»</b><br><span class="small muted">${quizSub}</span></span><span class="chev" aria-hidden="true">›</span></a>
+    <a class="it-row play-row" href="#cards"><span><b>🗣️ Тренажёр фраз</b><br><span class="small muted">${total} ${plural(total, "фраза", "фразы", "фраз")} · выучено ${Math.min(known, total)}</span></span><span class="chev" aria-hidden="true">›</span></a>`;
+}
+
 function wireConverter() {
   const g = $("#in-gbp"), s = $("#in-ils"), r = $("#in-rate");
   const num = v => parseFloat(String(v).replace(",", "."));
@@ -2164,8 +2468,8 @@ function wireConverter() {
 }
 
 /* Навигация по вкладкам через #hash */
-const VIEWS = ["today", "program", "places", "help", "tools", "phrases"];
-const TAB_FOR = { phrases: "tools" }; // какую вкладку подсвечивать для экранов без своей вкладки
+const VIEWS = ["today", "program", "places", "help", "tools", "phrases", "quiz", "cards"];
+const TAB_FOR = { phrases: "tools", quiz: "tools", cards: "tools" }; // какую вкладку подсвечивать для экранов без своей вкладки
 /* Навигация. Адрес после # — «где мы»: "places", "places/p/12" и т. д.
    Первая часть до "/" выбирает вкладку, остальное — под-экран внутри неё. */
 const scrollMem = {};   // прокрутка на каждом адресе — чтобы «назад» вернул на то же место списка
@@ -2185,7 +2489,7 @@ function show() {
     renderPlaces();
     if (placeRoute[0] === "near") autoLocate();
   }
-  if (v !== "phrases" && CAN_SPEAK) speechSynthesis.cancel();
+  if (v !== "phrases" && v !== "cards" && CAN_SPEAK) speechSynthesis.cancel();
   // Адрес вида #program/opt-tower: открыть вкладку и прокрутить к элементу с этим id (раскрыв, если он сворачивается)
   const target = v !== "places" && parts[1] ? $("#v-" + v).querySelector("#" + CSS.escape(parts[1])) : null;
   updateBackFab(target);
@@ -2222,7 +2526,7 @@ function goBack() {
   else { navKind = "go"; location.hash = "places"; }
 }
 
-function renderAll() { renderToday(); renderProgram(); renderPlaces(); renderHelp(); renderTools(); renderPhrases(); }
+function renderAll() { renderToday(); renderProgram(); renderPlaces(); renderHelp(); renderTools(); renderPhrases(); renderQuiz(); renderCards(); }
 
 /* Один общий обработчик кликов (event delegation) */
 /* Надёжное нажатие на ссылки внутри приложения — тот же приём, что у нижнего меню:
@@ -2279,6 +2583,12 @@ document.addEventListener("click", e => {
     installPrompt.userChoice.finally(() => { installPrompt = null; renderTools(); });
     return;
   }
+  const qz = e.target.closest("[data-quiz], [data-quiz-pick]");
+  if (qz) { if (qz.dataset.quizPick != null) quizAction("pick", Number(qz.dataset.quizPick)); else quizAction(qz.dataset.quiz); return; }
+  const cd = e.target.closest("[data-card]");
+  if (cd) { cardAction(cd.dataset.card); return; }
+  const ct = e.target.closest("[data-card-theme]");
+  if (ct) { cardTheme = ct.dataset.cardTheme; cardDeckBuild(); renderCards(); return; }
   const th = e.target.closest("[data-theme]");
   if (th) { phraseTheme = th.dataset.theme; renderPhrases(); return; }
   if (e.target.closest("#taxi-close")) { $("#taxi").classList.remove("open"); return; }
