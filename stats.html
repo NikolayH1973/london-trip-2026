@@ -51,6 +51,7 @@ const OPTS = { windsor:"Виндзорский замок", tower:"Тауэр с
 const ACTS = { signup:"📝 Записаться на опции", route:"🚇 Как добраться", waze:"🚗 Waze в аэропорт", photos:"📷 Фото места/опции", whatsapp:"💬 WhatsApp гиду", call:"📞 Звонок", big:"🪧 Крупная карточка (таксисту и т. п.)" };
 const PLACES_SUB = { metro:"🚇 Схема метро", near:"📍 Что рядом со мной" };
 const CATS = { all:"Все места", photo:"Для фото", sight:"Достопримечательности", museum:"Музеи", xmas:"Ярмарки", view:"Виды", food:"Еда", pub:"Пабы и музыка", flea:"Блошиные рынки" };
+const WALKS = { xmas:"Рождественские рынки центра", wonder:"Winter Wonderland и огни", westminster:"Вестминстер и Темза", city:"Сити и Темза" };
 const SHELVES = { xmas:"Ярмарки", prog:"Места программы", eve:"Куда пойти вечером", hotel:"Рядом с отелем", free:"Бесплатно" };
 const DAY = iso => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("ru-RU", { day:"numeric", month:"short", weekday:"short" }); };
 
@@ -75,7 +76,7 @@ function render(r) {
   const t = r.totals, ev = r.events;
   const pct = (a, b) => b ? Math.round(a * 100 / b) + "%" : "—";
   const maxOpens = Math.max(1, ...r.days.map(d => d.opens));
-  const screens = { ...pick(ev, "view:", k => VIEWS[k] || k), ...pick(ev, "places:", k => PLACES_SUB[k] || k), ...pick(ev, "shelf:", k => "Полка: " + (SHELVES[k] || k)) };
+  const screens = { ...pick(ev, "view:", k => VIEWS[k] || k), ...pick(ev, "places:", k => PLACES_SUB[k] || k), ...pick(ev, "shelf:", k => "Полка: " + (SHELVES[k] || k)), ...pick(ev, "walk:", k => "🚶 Прогулка: " + (WALKS[k] || k)) };
   $("#sub").textContent = `Анонимно: без имён, телефонов и местоположения · обновлено ${new Date().toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" })}`;
   $("#out").innerHTML = `
     <div class="kpis">

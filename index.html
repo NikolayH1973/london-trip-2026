@@ -226,6 +226,20 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
 nav.tabs a { position: relative; z-index: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 2px 10px; text-decoration: none; color: var(--muted); font-size: 11.5px; /* подписи меню не растут с «А+»: рядом иконки, а крупный текст переносится по слогам */ font-weight: 500; text-align: center; line-height: 1.15; overflow-wrap: anywhere; hyphens: auto; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 nav.tabs a span { max-width: 100%; }
 
+/* Пешие прогулки: «ниточка» от станции до станции */
+ol.walk { list-style: none; margin: 0; padding: 0; position: relative; }
+ol.walk::before { content: ""; position: absolute; left: 13px; top: 16px; bottom: 16px; border-left: 4px dotted var(--muted); }
+ol.walk > li { position: relative; display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+ol.walk .dot { width: 30px; height: 30px; display: grid; place-items: center; z-index: 1; }
+ol.walk .dot i { width: 16px; height: 16px; border-radius: 50%; background: var(--surface); border: 4px solid var(--accent); }
+ol.walk > li.w-st .dot i { width: 22px; height: 22px; border: 5px solid var(--tube); }
+ol.walk > li.w-st, ol.walk > li.w-pt { padding: 6px 0; }
+ol.walk > li.w-pt a.it-row { min-height: 44px; }
+ol.walk > li.w-leg { font-size: .85rem; color: var(--muted); padding: 2px 0; }
+.w-food { font-size: .78rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.note-warn { background: #fbf3dc; color: #5a4300; border-radius: 12px; padding: 10px 12px; font-size: .9rem; }
+:root[data-theme="dark"] .note-warn { background: #3a3220; color: #f3dfa6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .note-warn { background: #3a3220; color: #f3dfa6; } }
 /* Places: line diagram */
 .line { list-style: none; margin: 0; padding: 0; position: relative; }
 .line::before { content: ""; position: absolute; left: 11px; top: 14px; bottom: 14px; width: 8px; border-radius: 4px; background: var(--tube); }
@@ -540,7 +554,7 @@ const TOUR = {
         { t: "Оксфорд-стрит — универмаги и шопинг", info: ["Магазины, большие универмаги и шопинг."] },
         { t: "16:15 — выезд в аэропорт, вылет в 20:30, прилёт в Израиль в 03:25" }
       ],
-      tip: "Утром освободите номер и сдайте чемоданы в камеру хранения отеля. Паспорт держите при себе, а не в чемодане." }
+      tip: "Утром освободите номер и сдайте чемоданы в камеру хранения отеля. Паспорт держите при себе, а не в чемодане. Идеи на свободный день — «Места» → «Пешие прогулки»." }
   ],
   // Запись на опции — обычная ссылка на Google-форму Николая. Ответы попадают в Google-таблицу,
   // у гида доступ «Редактор». Приложение с формой не связано: в ней можно отметить сразу несколько экскурсий.
@@ -740,6 +754,78 @@ const TOUR = {
         { n: "King's Cross St. Pancras", s: 13, near: "Вокзалы King's Cross и St Pancras" },
         { n: "Farringdon", s: 14, near: "London Museum" },
         { n: "Liverpool Street", s: 17, near: "Олд-Спиталфилдс" }
+      ] }
+  ],
+
+  /* Пешие прогулки: старт и финиш — станции, до которых от отеля без пересадок; между точками ≈минуты пешком
+     (по координатам мест с запасом на повороты улиц). place — точное имя места из places. ll станций — для кнопки карт. */
+  walks: [
+    { id: "xmas", icon: "🎄", title: "Рождественские рынки центра", when: "Вечер", km: "2,8", dur: "2–3 часа",
+      best: "Лучше всего в свободный вечер: 3, 7 или 8 декабря.",
+      warn: "В воскресенье Ковент-Гарден работает только до 17:00 — удобнее идти в будний вечер.",
+      start: { st: "Covent Garden", line: "Piccadilly", stops: 10, ll: [51.5129, -0.1243] },
+      finish: { st: "Embankment", line: "District", ll: [51.5074, -0.1223] },
+      legs: [
+        { walk: 2 },
+        { place: "Рождество в Ковент-Гардене", food: true, note: "гигантская ёлка, рынок в старом павильоне" },
+        { walk: 7 },
+        { place: "Ярмарка на Лестер-сквер", food: true, note: "карусели, глинтвейн, сладости" },
+        { walk: 5 },
+        { place: "Рынок на Трафальгарской площади", food: true, note: "норвежская ёлка" },
+        { walk: 9 },
+        { place: "Мосты Golden Jubilee", note: "огни Темзы, Биг-Бен и колесо обозрения с моста" },
+        { walk: 5 },
+        { place: "Зимний рынок на Саут-Банк", food: true, note: "домики на набережной" },
+        { walk: 7, via: "обратно через мост" }
+      ] },
+    { id: "wonder", icon: "🎡", title: "Winter Wonderland и огни Риджент-стрит", when: "Вечер", km: "2,8", dur: "3–4 часа",
+      best: "Пешком ≈2,8 км, с метро — около 1 км.",
+      warn: "В Winter Wonderland нужен билет на конкретный час — даже на бесплатный вход. Бронируют только на официальном сайте (кнопка в карточке места).",
+      start: { st: "Hyde Park Corner", line: "Piccadilly", stops: 6, ll: [51.5027, -0.1527] },
+      finish: { st: "Piccadilly Circus", line: "Piccadilly", ll: [51.5098, -0.1342] },
+      legs: [
+        { walk: 9, via: "через ворота парка" },
+        { place: "Winter Wonderland в Гайд-парке", food: true, note: "аттракционы, баварская деревня, рынок" },
+        { walk: 25, via: "вдоль Грин-парка по улице Пикадилли — или обратно до Hyde Park Corner и 2 остановки на метро до Piccadilly Circus" },
+        { place: "Пикадилли-серкус", note: "знаменитые экраны" },
+        { walk: 1 },
+        { place: "Огни Регент-стрит с красного автобуса", note: "подсветка над улицей, лучше после 16:30" },
+        { walk: 1 }
+      ] },
+    { id: "westminster", icon: "🏛", title: "Вестминстер и Темза", when: "День", km: "3,3", dur: "2–3 часа",
+      best: "Удобно 9 декабря, в свободный день, до выезда в 16:15.",
+      start: { st: "Westminster", line: "District", stops: 9, ll: [51.5010, -0.1254] },
+      finish: { st: "Leicester Square", line: "Piccadilly", ll: [51.5113, -0.1281] },
+      legs: [
+        { walk: 1 },
+        { place: "Биг-Бен и здание Парламента" },
+        { walk: 4 },
+        { place: "Вестминстерское аббатство", note: "снаружи; внутрь — по платному билету" },
+        { walk: 17, via: "через Вестминстерский мост — лучший вид на Парламент" },
+        { place: "Зимний рынок на Саут-Банк", food: true, note: "перекусить на набережной" },
+        { walk: 5 },
+        { place: "Мосты Golden Jubilee" },
+        { walk: 9 },
+        { place: "Трафальгарская площадь", food: true, note: "рынок, ёлка, Национальная галерея — бесплатно" },
+        { walk: 6 }
+      ] },
+    { id: "city", icon: "🌉", title: "Сити и Темза", when: "День", km: "4,3", dur: "3–4 часа",
+      best: "Самый длинный маршрут — и самый красивый по реке.",
+      warn: "Боро-маркет закрывается в 17:00 (в воскресенье в 16:00) — выходите до обеда.",
+      start: { st: "Mansion House", line: "District", stops: 13, ll: [51.5122, -0.0940] },
+      finish: { st: "Tower Hill", line: "District", ll: [51.5098, -0.0766] },
+      legs: [
+        { walk: 6 },
+        { place: "Собор Святого Павла и мост Миллениум", note: "снаружи бесплатно, внутрь — по билету" },
+        { walk: 11, via: "через мост Миллениум" },
+        { place: "Тейт Модерн", note: "бесплатно, вид с верхнего этажа" },
+        { walk: 10, via: "по набережной" },
+        { place: "Боро-маркет", food: true, note: "главный фуд-маркет Лондона" },
+        { walk: 3 },
+        { place: "The George Inn", food: true, note: "паб XVII века во дворике" },
+        { walk: 17, via: "вдоль Темзы мимо крейсера «Белфаст»" },
+        { place: "Тауэрский мост", note: "по мосту — бесплатно" },
+        { walk: 8 }
       ] }
   ],
 
@@ -1601,7 +1687,7 @@ function placesHome() {
       <div class="shelf-h"><div><h2>${esc(s.title)}</h2><p class="small muted">${esc(s.sub)}</p></div>
         <a href="#places/shelf/${s.id}" data-go="places/shelf/${s.id}">Все ${s.list.length}</a></div>
       <div class="rail"${s.id === "prog" ? ' data-rail="prog"' : ""}>${(s.id === "prog" ? s.list : s.list.slice(0, 8)).map(p => placeTile(p, s.id)).join("")}</div>
-    </section>`).join("")}
+    </section>${s.id === "prog" ? walkShelf() : ""}`).join("")}
     <section aria-label="Все категории">
       <div class="shelf-h"><h2>Все категории</h2></div>
       <div class="chips" style="margin-top:8px">${MAIN_CATS.map(chip).join("")}
@@ -1609,6 +1695,54 @@ function placesHome() {
       ${moreCats ? `<div class="chips cats-more" style="margin-top:8px">${MORE_CATS.map(chip).join("")}</div>` : ""}
       <a class="maplink" style="padding-left:0" href="#places/cat/all" data-go="places/cat/all">📋 Все места списком (${TOUR.places.length}) ›</a>
     </section>
+  </div>`;
+}
+
+/* ===== Пешие прогулки ===== */
+const walkPlace = name => TOUR.places.find(p => p.name === name);
+function walkTile(w) {
+  return `<a class="tile" href="#places/walk/${w.id}" data-go="places/walk/${w.id}">
+    <span class="ico pill" style="background:var(--bg)" aria-hidden="true">${w.icon}</span>
+    <b>${esc(w.title)}</b>
+    <small class="muted">${esc(w.when)} · ≈${esc(w.km)} км · ${w.legs.filter(l => l.place).length} точек</small>
+  </a>`;
+}
+function walkShelf() {
+  return `<section aria-label="Пешие прогулки">
+    <div class="shelf-h"><div><h2>Пешие прогулки</h2><p class="small muted">готовые маршруты от метро до метро</p></div></div>
+    <div class="rail">${TOUR.walks.map(walkTile).join("")}</div>
+  </section>`;
+}
+// Ссылка на пеший маршрут в Google Картах: старт → точки → финиш (координаты, чтобы не искать по названию)
+function walkMapUrl(w) {
+  const ll = a => a.join(",");
+  const pts = w.legs.filter(l => l.place).map(l => walkPlace(l.place)).filter(Boolean).map(p => ll(p.ll));
+  return "https://www.google.com/maps/dir/?api=1&travelmode=walking&origin=" + ll(w.start.ll) +
+    "&destination=" + ll(w.finish.ll) + "&waypoints=" + encodeURIComponent(pts.join("|"));
+}
+function walkPage(w) {
+  const chip = line => `<span class="r-line" style="background:${TUBE[line].bg};color:${TUBE[line].fg}">${esc(line)}</span>`;
+  const items = w.legs.map(l => {
+    if (l.walk != null) return `<li class="w-leg"><span></span><span>≈ ${l.walk} мин пешком${l.via ? " — " + esc(l.via) : ""}</span></li>`;
+    const p = walkPlace(l.place); if (!p) return "";
+    return `<li class="w-pt"><span class="dot"><i></i></span>
+      <a class="it-row" href="#places/p/${placeId(p)}" data-go="places/p/${placeId(p)}">
+        <span><b>${esc(placeTitle(p))}</b>${l.food ? ` <span class="w-food">🍴 перекусить</span>` : ""}${l.note ? `<br><span class="small muted">${esc(l.note)}</span>` : ""}</span>
+        <span class="chev" aria-hidden="true">›</span></a></li>`;
+  }).join("");
+  return `<div class="stack">
+    ${subHeader(w.icon + " " + w.title)}
+    <p class="small muted" style="margin:0">${esc(w.when)} · ≈${esc(w.km)} км · ${esc(w.dur)} с остановками. ${esc(w.best)}</p>
+    ${w.warn ? `<div class="note-warn">⚠️ ${esc(w.warn)}</div>` : ""}
+    <article class="card">
+      <ol class="walk">
+        <li class="w-st"><span class="dot"><i></i></span><span><b>🚇 ${esc(w.start.st)}</b><br><span class="small">${chip(w.start.line)} ${stopsWord(w.start.stops)} от отеля, без пересадок</span></span></li>
+        ${items}
+        <li class="w-st"><span class="dot"><i></i></span><span><b>🚇 ${esc(w.finish.st)}</b><br><span class="small">домой: ${chip(w.finish.line)} без пересадок</span></span></li>
+      </ol>
+    </article>
+    <a class="btn go-btn" href="${walkMapUrl(w)}" target="_blank" rel="noopener">🗺 Открыть маршрут в Google Картах</a>
+    <p class="small muted" style="margin:0">Без интернета маршрут выше всё равно виден; карты откроются, когда появится связь. Минуты — примерные.</p>
   </div>`;
 }
 
@@ -1769,6 +1903,7 @@ function renderPlaces() {
   else if (shelf) html = placesList(shelf.title, shelf.list);
   else if (kind === "p" && TOUR.places[Number(arg)]) html = placePage(TOUR.places[Number(arg)]);
   else if (kind === "metro") html = placesMetro();
+  else if (kind === "walk" && TOUR.walks.find(w => w.id === arg)) html = walkPage(TOUR.walks.find(w => w.id === arg));
   else if (kind === "near") html = placesNear();
   else html = placesHome();     // неизвестный адрес — показываем главный, а не пустой экран
   $("#v-places").innerHTML = html;
@@ -2234,7 +2369,7 @@ var STATS = (() => {   // var, а не const: show() может спросить
     if (v === "places") {
       const r = parts.slice(1);
       if (r[0] === "p") { const p = TOUR.places[+r[1]]; return p ? "place:" + placeTitle(p) : "view:places"; }
-      if (r[0] === "cat" || r[0] === "shelf") return r[0] + ":" + (r[1] || "");
+      if (r[0] === "cat" || r[0] === "shelf" || r[0] === "walk") return r[0] + ":" + (r[1] || "");
       return r[0] ? "places:" + r[0] : "view:places";
     }
     if (parts[1] && parts[1].startsWith("opt-")) return "opt:" + parts[1].slice(4);
